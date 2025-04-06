@@ -58,6 +58,8 @@
                 "objects",
                 "player",
                 "portal_ui",
+                "screen_text",
+                "statusAnimation",
                 "vent"
             ]
         }
@@ -172,7 +174,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 1,
-                            "Name": "entity_0431",
+                            "Name": "entity_0092",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -910,7 +912,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 25,
-                            "Name": "entity_0455",
+                            "Name": "entity_0116",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -2139,57 +2141,6 @@
                             "B_Locked": false,
                             "Layer_ID": 1,
                             "Layer_Order": 24,
-                            "Name": "barrel_4",
-                            "Prefab_ID": "barrel1.prefab",
-                            "Prefab_Override": {
-                                "Components": {
-                                    "Animation::Base": null,
-                                    "Animation::Sprite": {
-                                        "End_Index": {
-                                            "x": 0,
-                                            "y": 0
-                                        },
-                                        "Sheet_Size": {
-                                            "x": 1,
-                                            "y": 1
-                                        },
-                                        "Start_Index": {
-                                            "x": 0,
-                                            "y": 0
-                                        }
-                                    },
-                                    "Combat::Health": null,
-                                    "Physics::Collider": null,
-                                    "Render::Texture": {
-                                        "Color": {
-                                            "w": 1.0,
-                                            "x": 1.0,
-                                            "y": 1.0,
-                                            "z": 1.0
-                                        }
-                                    },
-                                    "State::State": null,
-                                    "Transform::Transform": {
-                                        "Position": {
-                                            "x": -881.6994018554688,
-                                            "y": -479.7255859375
-                                        }
-                                    }
-                                },
-                                "MetaData": null
-                            },
-                            "Tags": [
-                                "objects"
-                            ]
-                        }
-                    }
-                },
-                {
-                    "Entity": {
-                        "MetaData": {
-                            "B_Locked": false,
-                            "Layer_ID": 1,
-                            "Layer_Order": 25,
                             "Name": "pink_tree4",
                             "Prefab_ID": "pink_tree.prefab",
                             "Prefab_Override": {
@@ -2264,7 +2215,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 26,
+                            "Layer_Order": 25,
                             "Name": "right_wall",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -2308,7 +2259,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 27,
+                            "Layer_Order": 26,
                             "Name": "left_wall",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -2352,7 +2303,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 28,
+                            "Layer_Order": 27,
                             "Name": "bottommid_wall",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -2396,7 +2347,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 29,
+                            "Layer_Order": 28,
                             "Name": "bottom_wall",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -2801,16 +2752,44 @@
                             "B_Locked": false,
                             "Layer_ID": 4,
                             "Layer_Order": 4,
+                            "Name": "portal_find_tex",
+                            "Prefab_ID": "text_find_portal.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Render::Text": {
+                                        "Color": {
+                                            "w": 0.0,
+                                            "x": 0.2666666805744171,
+                                            "y": 0.7921568751335144,
+                                            "z": 1.0
+                                        }
+                                    },
+                                    "Transform::Transform": null
+                                },
+                                "MetaData": null
+                            },
+                            "Tags": [
+                                "screen_text"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 4,
+                            "Layer_Order": 5,
                             "Name": "portal_text",
                             "Prefab_ID": "text_portal.prefab",
                             "Prefab_Override": {
                                 "Components": {
                                     "Render::Text": {
                                         "Color": {
-                                            "w": 0.0,
-                                            "x": 0.0,
-                                            "y": 0.0,
-                                            "z": 0.0
+                                            "w": 1.0,
+                                            "x": 0.2666666805744171,
+                                            "y": 0.7921568751335144,
+                                            "z": 1.0
                                         }
                                     },
                                     "Transform::Transform": null

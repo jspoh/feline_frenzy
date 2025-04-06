@@ -1,37 +1,40 @@
 {
-  "WindowsConfig": {
-    "Title": "Feline Frenzy",
-    "Window_Size": {
-      "x": 1600,
-      "y": 900
+    "AudioConfig": {
+        "BGM Channel Group": "BGM",
+        "BGMC Channel Group": "BGMC",
+        "GlobalBGMVolume": 0.5,
+        "GlobalSFXVolume": 0.5,
+        "SFX Channel Group": "SFX"
     },
-    "World_Size": {
-      "x": 1600.0,
-      "y": 900.0
+    "CameraConfig": {
+        "Height": 900.0,
+        "Position": {
+            "x": 0.0,
+            "y": 0.0
+        },
+        "Zoom": 1.0
+    },
+    "EditorConfig": {
+        "Auto_Save": true,
+        "Debug_Mode": false,
+        "Editor_State": true,
+        "Game_State": false,
+        "Gizmo_State": true,
+        "Grid_State": false
+    },
+    "PathsConfig": {
+        "Engine_Assets:/": "assets/Engine",
+        "Game_Assets:/": "assets"
+    },
+    "WindowsConfig": {
+        "Title": "Feline Frenzy",
+        "Window_Size": {
+            "x": 1600,
+            "y": 900
+        },
+        "World_Size": {
+            "x": 1600.0,
+            "y": 900.0
+        }
     }
-  },
-  "EditorConfig": {
-    "Editor_State": true,
-    "Debug_Mode": false,
-    "Game_State": false,
-    "Gizmo_State": true,
-    "Grid_State": false,
-    "Auto_Save" : true
-  },
-  "CameraConfig": {
-    "Height": 900.0,
-    "Position": {
-      "x": 0.0,
-      "y": 0.0
-    },
-    "Zoom" : 1.0
-  },
-  "PathsConfig": {
-    "Game_Assets:/": "assets",
-    "Engine_Assets:/": "assets/Engine"
-  },
-  "AudioConfig": {
-    "BGM Channel Group": "BGM",
-    "VFX Channel Group": "VFX"
-  }
 }

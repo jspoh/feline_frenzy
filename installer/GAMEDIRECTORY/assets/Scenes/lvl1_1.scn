@@ -30,6 +30,7 @@
     {
         "MetaData": {
             "Entity_Tags": [
+                "element_src",
                 "elementui",
                 "enemy",
                 "healAnimation",
@@ -38,6 +39,8 @@
                 "objects",
                 "player",
                 "portal_ui",
+                "screen_text",
+                "statusAnimation",
                 "vent"
             ]
         }
@@ -2144,7 +2147,9 @@
                             "Name": "fire_elem",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
-                            "Tags": []
+                            "Tags": [
+                                "element_src"
+                            ]
                         }
                     }
                 },
@@ -2205,68 +2210,39 @@
                             "Name": "grass_elem",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
-                            "Tags": []
+                            "Tags": [
+                                "element_src"
+                            ]
                         }
                     }
                 },
                 {
                     "Entity": {
-                        "Components": {
-                            "Audio::SFX": {
-                                "Audio_ID": "ChangeElement.wav",
-                                "B_Play_SFX": false,
-                                "Channel_Group_ID": "EnvironmentSFX",
-                                "Pitch": 1.0,
-                                "Volume": 1.0
-                            },
-                            "Element::Source": {
-                                "Element": 2
-                            },
-                            "Render::Texture": {
-                                "B_Blend": true,
-                                "B_Flip": {
-                                    "x": false,
-                                    "y": false
-                                },
-                                "B_Stretch": false,
-                                "Color": {
-                                    "w": 0.0,
-                                    "x": 0.0,
-                                    "y": 0.90816330909729,
-                                    "z": 1.0
-                                },
-                                "Frame_Index": {
-                                    "x": 0,
-                                    "y": 0
-                                },
-                                "Frame_Size": {
-                                    "x": 1,
-                                    "y": 1
-                                },
-                                "Intensity": 0.09999996423721313,
-                                "Texture_ID": "Water icon.png"
-                            },
-                            "Transform::Transform": {
-                                "Position": {
-                                    "x": 220.10928344726563,
-                                    "y": -173.82432556152344
-                                },
-                                "Rotation": 0.0,
-                                "Scale": {
-                                    "x": 215.8861541748047,
-                                    "y": 215.8861541748047
-                                },
-                                "Screen Position": false
-                            }
-                        },
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 3,
                             "Layer_Order": 2,
                             "Name": "water_elem",
-                            "Prefab_ID": "",
-                            "Prefab_Override": null,
-                            "Tags": []
+                            "Prefab_ID": "water_elem.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Audio::SFX": null,
+                                    "Element::Source": null,
+                                    "Render::Texture": {
+                                        "Color": {
+                                            "w": 0.0,
+                                            "x": 0.0,
+                                            "y": 0.90816330909729,
+                                            "z": 1.0
+                                        }
+                                    },
+                                    "Transform::Transform": null
+                                },
+                                "MetaData": null
+                            },
+                            "Tags": [
+                                "element_src"
+                            ]
                         }
                     }
                 }
@@ -2437,11 +2413,18 @@
                             "B_Locked": false,
                             "Layer_ID": 4,
                             "Layer_Order": 3,
-                            "Name": "portal_text",
-                            "Prefab_ID": "text_portal.prefab",
+                            "Name": "Portal_UI",
+                            "Prefab_ID": "ui_portal.prefab",
                             "Prefab_Override": {
                                 "Components": {
-                                    "Render::Text": null,
+                                    "Render::Texture": {
+                                        "Color": {
+                                            "w": 0.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        }
+                                    },
                                     "Transform::Transform": null
                                 },
                                 "MetaData": null
@@ -2458,11 +2441,74 @@
                             "B_Locked": false,
                             "Layer_ID": 4,
                             "Layer_Order": 4,
-                            "Name": "Portal_UI",
-                            "Prefab_ID": "ui_portal.prefab",
+                            "Name": "portal_text",
+                            "Prefab_ID": "text_portal.prefab",
                             "Prefab_Override": {
                                 "Components": {
-                                    "Render::Texture": null,
+                                    "Render::Text": {
+                                        "Color": {
+                                            "w": 1.0,
+                                            "x": 0.2666666805744171,
+                                            "y": 0.7921568751335144,
+                                            "z": 1.0
+                                        }
+                                    },
+                                    "Transform::Transform": null
+                                },
+                                "MetaData": null
+                            },
+                            "Tags": [
+                                "portal_ui"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 4,
+                            "Layer_Order": 5,
+                            "Name": "portal_find_tex",
+                            "Prefab_ID": "text_find_portal.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Render::Text": {
+                                        "Color": {
+                                            "w": 0.0,
+                                            "x": 0.2666666805744171,
+                                            "y": 0.7921568751335144,
+                                            "z": 1.0
+                                        }
+                                    },
+                                    "Transform::Transform": null
+                                },
+                                "MetaData": null
+                            },
+                            "Tags": [
+                                "screen_text"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 4,
+                            "Layer_Order": 6,
+                            "Name": "portal_text",
+                            "Prefab_ID": "text_portal.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Render::Text": {
+                                        "Color": {
+                                            "w": 0.0,
+                                            "x": 0.0,
+                                            "y": 0.0,
+                                            "z": 0.0
+                                        }
+                                    },
                                     "Transform::Transform": null
                                 },
                                 "MetaData": null

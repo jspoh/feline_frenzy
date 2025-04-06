@@ -4,18 +4,8 @@
             "BGM": {
                 "loop": true,
                 "tracks": [
-                    "BGM_Menu_v1.wav"
+                    "BGM_Level_Explore_v1.wav"
                 ]
-            },
-            "BGMC": {
-                "loop": true,
-                "tracks": [
-                    "BGM_Level_Combat_v1.wav"
-                ]
-            },
-            "SFX": {
-                "loop": false,
-                "tracks": []
             },
             "VFX": {
                 "loop": false,

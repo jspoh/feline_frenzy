@@ -354,7 +354,7 @@ namespace NIKE {
 		}
 
 		// Decrease tick timer
-		e_combo.tick_timer = max(0.0f, e_combo.tick_timer - NIKE_WINDOWS_SERVICE->getFixedDeltaTime());
+		e_combo.tick_timer = max(0.0f, e_combo.tick_timer - NIKE_WINDOWS_SERVICE->getDeltaTime());
 
 		// Apply status effect if tick timer reached
 		if (e_combo.tick_timer <= 0.0f) {
@@ -363,7 +363,7 @@ namespace NIKE {
 		}
 
 		// Decrease status effect duration
-		e_combo.status_timer = max(0.0f, e_combo.status_timer - NIKE_WINDOWS_SERVICE->getFixedDeltaTime());
+		e_combo.status_timer = max(0.0f, e_combo.status_timer - NIKE_WINDOWS_SERVICE->getDeltaTime());
 
 		// Remove status effect if expired
 		if (e_combo.status_timer <= 0.0f) {

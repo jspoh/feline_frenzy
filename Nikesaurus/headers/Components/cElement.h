@@ -112,14 +112,14 @@ namespace NIKE {
 				// If all elements in the queue are the same
 				if (last_hits[0] == last_hits[1] && last_hits[1] == last_hits[2]) {
 
-					// Roll a random chance (60%)
+					// Roll a random chance (90%) of hitting status effects
 					static std::random_device rd;
 					static std::mt19937 gen(rd());
 					std::uniform_real_distribution<float> dist(0.0f, 1.0f);
 
 					float chance = dist(gen);
 
-					if (chance <= 0.7f) {
+					if (chance <= 0.9f) {
 						switch (last_hits[0]) {
 						case Elements::FIRE:
 							status_effect = Status::BURN;

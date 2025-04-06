@@ -53,4 +53,12 @@ function Scenes:Pause()
 PauseScene()
 end
 
+--HowToPlayScreen
+function Scenes:ShowHowToPlay()
+ShowHowToPlay()
+end
+
+function Scenes:HideHowToPlay()
+HideHowToPlay()
+end
 return Scenes

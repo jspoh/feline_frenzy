@@ -2,24 +2,24 @@
     "Components": {
         "Render::Text": {
             "Color": {
-                "w": 0.0,
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
+                "w": 1.0,
+                "x": 0.2666666805744171,
+                "y": 0.7921568751335144,
+                "z": 1.0
             },
             "Font_ID": "Skranji-Bold.ttf",
             "Origin": 0,
-            "Scale": 1.0,
+            "Scale": 0.699999988079071,
             "Size": {
-                "x": 441.0,
-                "y": 38.0
+                "x": 329.6999816894531,
+                "y": 26.600000381469727
             },
-            "Text": "Press E to Interact"
+            "Text": "Press 'E' To Interact"
         },
         "Transform::Transform": {
             "Position": {
                 "x": 0.0,
-                "y": -400.0
+                "y": -320.0
             },
             "Rotation": 0.0,
             "Scale": {
