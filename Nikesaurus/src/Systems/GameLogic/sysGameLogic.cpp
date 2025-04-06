@@ -28,7 +28,7 @@ namespace NIKE {
 			if (!texture_comp) continue;
 
 			auto& intensity = texture_comp.value().get().intensity;
-			cout << intensity << endl;
+
 			float alpha_speed = 10.0f * NIKE_WINDOWS_SERVICE->getDeltaTime(); // Adjust based on deltaTime
 
 			intensity += (0.0f - intensity) * alpha_speed; // Fade towards 0
@@ -398,7 +398,7 @@ namespace NIKE {
 
 		case Element::Status::FREEZE:
 			NIKEE_CORE_INFO("FROZEN TICK");
-			NIKE_AUDIO_SERVICE->playAudio(slowSfx, "", NIKE_AUDIO_SERVICE->getSFXChannelGroupID(), 0.5f * NIKE_AUDIO_SERVICE->getGlobalSFXVolume(), .3f, false, false);
+			NIKE_AUDIO_SERVICE->playAudio(slowSfx, "", NIKE_AUDIO_SERVICE->getSFXChannelGroupID(), 0.5f * NIKE_AUDIO_SERVICE->getGlobalSFXVolume(), 1.f, false, false);
 			statusEntities[entity] = true;
 			applyFreeze(e_dynamic.max_speed, e_dynamic.max_speed / 2, e_combo.temp_max_speed);
 			break;

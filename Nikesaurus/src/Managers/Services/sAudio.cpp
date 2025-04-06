@@ -528,7 +528,6 @@ namespace NIKE {
 		// Check if the group already exists in the map
 		if (channel_groups.find(channel_group_id) != channel_groups.end())
 		{
-			NIKEE_CORE_ERROR("Error: Channel Group '{}' already exists! Skipping.", channel_group_id);
 			return;
 		}
 

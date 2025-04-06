@@ -821,16 +821,11 @@ namespace NIKE {
                 if (target_combo_comp) {
                     auto& target_combo = target_combo_comp.value().get();
 
-
-                    // Get the element corresponding to the status effect
-                    Element::Elements status_element = Element::getElementFromStatus(target_combo.status_effect);
-
-
                     // Don't apply to same element && Non advantaged
                     if (target_element_comp && Element::doesElementCounterTarget(attacker_element, target_element_comp.value().get().element)){
 
                         // Update combo component
-                        int status_applied = target_combo_comp.value().get().registerHit(attacker_element);
+                        int status_applied = target_combo.registerHit(attacker_element);
 
                         // Adding status animation
                         if (status_applied != 0) {
