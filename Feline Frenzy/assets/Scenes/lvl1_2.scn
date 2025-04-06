@@ -2802,103 +2802,6 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 4,
-                            "Layer_Order": 4,
-                            "Name": "portal_text",
-                            "Prefab_ID": "text_portal.prefab",
-                            "Prefab_Override": {
-                                "Components": {
-                                    "Animation::Base": {
-                                        "Animation_Count": 0,
-                                        "B_PingPong": false,
-                                        "B_Reverse": false,
-                                        "Frame_Duration": 0.20000000298023224
-                                    },
-                                    "Animation::Sprite": {
-                                        "End_Index": {
-                                            "x": 0,
-                                            "y": 0
-                                        },
-                                        "Sheet_Size": {
-                                            "x": 0,
-                                            "y": 0
-                                        },
-                                        "Start_Index": {
-                                            "x": 0,
-                                            "y": 0
-                                        }
-                                    },
-                                    "Physics::Collider": {
-                                        "B_Bind_To_Entity": false,
-                                        "Pos_Offset": {
-                                            "x": 6.900000095367432,
-                                            "y": -100.0
-                                        },
-                                        "Position": {
-                                            "x": -282.0063171386719,
-                                            "y": 120.67849731445313
-                                        },
-                                        "Resolution": 0,
-                                        "Rotation": 0.0,
-                                        "Scale": {
-                                            "x": 163.0,
-                                            "y": 34.0
-                                        }
-                                    },
-                                    "Render::Text": {
-                                        "Color": {
-                                            "w": 1.0,
-                                            "x": 0.2666666805744171,
-                                            "y": 0.7921568751335144,
-                                            "z": 1.0
-                                        }
-                                    },
-                                    "Render::Texture": {
-                                        "B_Blend": false,
-                                        "B_Flip": {
-                                            "x": false,
-                                            "y": false
-                                        },
-                                        "B_Stretch": false,
-                                        "Color": {
-                                            "w": 1.0,
-                                            "x": 0.0,
-                                            "y": 0.0,
-                                            "z": 0.0
-                                        },
-                                        "Frame_Index": {
-                                            "x": 0,
-                                            "y": 0
-                                        },
-                                        "Frame_Size": {
-                                            "x": 1,
-                                            "y": 1
-                                        },
-                                        "Intensity": 0.5,
-                                        "Texture_ID": "Barrel_highlighted.png"
-                                    },
-                                    "State::State": {
-                                        "State": "Default"
-                                    },
-                                    "Transform::Transform": {
-                                        "Scale": {
-                                            "x": 0.9999998807907104,
-                                            "y": 0.9999998807907104
-                                        }
-                                    }
-                                },
-                                "MetaData": null
-                            },
-                            "Tags": [
-                                "portal_ui"
-                            ]
-                        }
-                    }
-                },
-                {
-                    "Entity": {
-                        "MetaData": {
-                            "B_Locked": false,
-                            "Layer_ID": 4,
                             "Layer_Order": 5,
                             "Name": "portal_find_tex",
                             "Prefab_ID": "text_find_portal.prefab",
@@ -2918,6 +2821,34 @@
                             },
                             "Tags": [
                                 "screen_text"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 4,
+                            "Layer_Order": 5,
+                            "Name": "portal_text",
+                            "Prefab_ID": "text_portal.prefab",
+                            "Prefab_Override": {
+                                "Components": {
+                                    "Render::Text": {
+                                        "Color": {
+                                            "w": 1.0,
+                                            "x": 0.2666666805744171,
+                                            "y": 0.7921568751335144,
+                                            "z": 1.0
+                                        }
+                                    },
+                                    "Transform::Transform": null
+                                },
+                                "MetaData": null
+                            },
+                            "Tags": [
+                                "portal_ui"
                             ]
                         }
                     }
