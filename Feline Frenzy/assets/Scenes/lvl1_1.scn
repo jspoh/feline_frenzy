@@ -155,7 +155,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 1,
-                            "Name": "entity_1024",
+                            "Name": "entity_0145",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -279,7 +279,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 3,
-                            "Name": "entity_1026",
+                            "Name": "entity_0147",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -292,7 +292,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 4,
-                            "Name": "entity_1027",
+                            "Name": "entity_0148",
                             "Prefab_ID": "water_puddle.prefab",
                             "Prefab_Override": {
                                 "Components": {
@@ -2447,10 +2447,10 @@
                                 "Components": {
                                     "Render::Text": {
                                         "Color": {
-                                            "w": 0.0,
-                                            "x": 0.0,
-                                            "y": 0.0,
-                                            "z": 0.0
+                                            "w": 1.0,
+                                            "x": 0.2666666805744171,
+                                            "y": 0.7921568751335144,
+                                            "z": 1.0
                                         }
                                     },
                                     "Transform::Transform": null
@@ -2476,9 +2476,9 @@
                                     "Render::Text": {
                                         "Color": {
                                             "w": 0.0,
-                                            "x": 0.0,
-                                            "y": 0.0,
-                                            "z": 0.0
+                                            "x": 0.2666666805744171,
+                                            "y": 0.7921568751335144,
+                                            "z": 1.0
                                         }
                                     },
                                     "Transform::Transform": null
