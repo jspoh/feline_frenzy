@@ -132,7 +132,7 @@ namespace NIKE {
 		#endif
 
 		// Apply mouse offset only if its not free cam
-		if (mouse_effect && cam_name != "Free Cam" && cam.mouse_offset != 0.f) {
+		if (mouse_effect && cam_name == "player" && cam.mouse_offset != 0.f) {
 			NIKE_INPUT_SERVICE->setCrosshair(true);
 			Vector2f mouse_pos = NIKE_INPUT_SERVICE->getMouseWindowPos();
 			Vector2f screen_size = NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize();
