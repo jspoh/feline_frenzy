@@ -51,6 +51,8 @@
         "MetaData": {
             "Entity_Tags": [
                 "boss",
+                "boss_healthbar",
+                "bosshpcontainer",
                 "elementui",
                 "enemy",
                 "healAnimation",
@@ -174,7 +176,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 1,
-                            "Name": "entity_0875",
+                            "Name": "entity_0010",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -792,7 +794,7 @@
                                     "x": -1.8079999685287476,
                                     "y": -1162.5150146484375
                                 },
-                                "Zoom": 1.2225069999694824
+                                "Zoom": 1.0
                             },
                             "Render::Texture": {
                                 "B_Blend": false,
@@ -1385,6 +1387,112 @@
                             },
                             "Tags": [
                                 "portal_ui"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Render::Texture": {
+                                "B_Blend": false,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": true,
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "Frame_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Frame_Size": {
+                                    "x": 1,
+                                    "y": 1
+                                },
+                                "Intensity": 0.0,
+                                "Texture_ID": "BossHealthBar_Bar.png"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": 59.3182373046875,
+                                    "y": -386.5909118652344
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 790.0,
+                                    "y": 90.45506286621094
+                                },
+                                "Screen Position": true
+                            }
+                        },
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 4,
+                            "Layer_Order": 5,
+                            "Name": "boss_healthbar",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": [
+                                "boss_healthbar"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Render::Texture": {
+                                "B_Blend": false,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": false,
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "Frame_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Frame_Size": {
+                                    "x": 4,
+                                    "y": 1
+                                },
+                                "Intensity": 0.0,
+                                "Texture_ID": "BossHealthBar_Container_Spritesheet.png"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": 0.0,
+                                    "y": -382.4999694824219
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 1000.0,
+                                    "y": 159.326416015625
+                                },
+                                "Screen Position": true
+                            }
+                        },
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 4,
+                            "Layer_Order": 6,
+                            "Name": "bosshpcontainer",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": [
+                                "bosshpcontainer"
                             ]
                         }
                     }
