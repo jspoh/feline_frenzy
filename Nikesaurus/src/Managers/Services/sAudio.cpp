@@ -491,6 +491,29 @@ namespace NIKE {
 			createChannelGroup(sfx_channel_group_id);
 			createChannelGroup(bgmc_channel_group_id);
 
+			// Volume loading
+			// Load global volumes, defaulting to 0.5 if not found
+			float loadedBGMVol = data.value("GlobalBGMVolume", 0.5f);
+			float loadedSFXVol = data.value("GlobalSFXVolume", 0.5f);
+
+			// Clamp values just in case they are invalid in the file
+			gGlobalBGMVolume = std::clamp(loadedBGMVol, 0.0f, 1.0f);
+			gGlobalSFXVolume = std::clamp(loadedSFXVol, 0.0f, 1.0f);
+
+			// Apply the loaded volumes immediately
+			if (auto bgmGroup = getChannelGroup(bgm_channel_group_id)) {
+				bgmGroup->setVolume(gGlobalBGMVolume);
+			}
+			if (auto bgmcGroup = getChannelGroup(bgmc_channel_group_id)) { // Also apply to BGMC if it should share BGM volume logic
+				// Decide if BGMC uses gGlobalBGMVolume or its own saved value
+				// For simplicity, let's assume it mirrors BGM for now, adjust if needed
+				bgmcGroup->setVolume(gGlobalBGMVolume);
+			}
+			if (auto sfxGroup = getChannelGroup(sfx_channel_group_id)) {
+				sfxGroup->setVolume(gGlobalSFXVolume);
+			}
+			NIKEE_CORE_INFO("Loaded Global BGM Volume: {}", gGlobalBGMVolume);
+			NIKEE_CORE_INFO("Loaded Global SFX Volume: {}", gGlobalSFXVolume);
 		}
 		catch (const nlohmann::json::exception& e) {
 			NIKEE_CORE_WARN(e.what());
@@ -744,6 +767,26 @@ namespace NIKE {
 		NIKEE_CORE_INFO("BGMFadeOut: starting fade out over {} seconds", fadeTime);
 	}
 
+	// Save volume settings
+	void Audio::Service::saveAudioConfig(nlohmann::json& config_data) {
+		try {
+			// Find or create the "AudioConfig" section
+			if (!config_data.contains("AudioConfig")) {
+				config_data["AudioConfig"] = nlohmann::json::object();
+				NIKEE_CORE_WARN("Creating missing 'AudioConfig' section in JSON data for saving.");
+			}
+			auto& audio_config = config_data["AudioConfig"];
+
+			// Save the current global volumes
+			audio_config["GlobalBGMVolume"] = gGlobalBGMVolume;
+			audio_config["GlobalSFXVolume"] = gGlobalSFXVolume;
+
+			NIKEE_CORE_INFO("Prepared audio volumes for saving: BGM={}, SFX={}", gGlobalBGMVolume, gGlobalSFXVolume);
+		}
+		catch (const nlohmann::json::exception& e) {
+			NIKEE_CORE_ERROR("Error preparing audio config for saving: {}", e.what());
+		}
+	}
 
 	void Audio::Service::pauseAllChannels() {
 		for (auto& pair : getAllChannelGroups()) {

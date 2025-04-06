@@ -125,7 +125,7 @@
                     "Entity": {
                         "Components": {
                             "Enemy::Spawner": {
-                                "Cooldown": 3.0,
+                                "Cooldown": 4.5,
                                 "EnemiesSpawned": 0,
                                 "EnemyElement": 0,
                                 "EnemyLimit": 3,
@@ -183,7 +183,7 @@
                     "Entity": {
                         "Components": {
                             "Enemy::Spawner": {
-                                "Cooldown": 3.0,
+                                "Cooldown": 4.5,
                                 "EnemiesSpawned": 0,
                                 "EnemyElement": 0,
                                 "EnemyLimit": 3,

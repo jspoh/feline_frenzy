@@ -519,6 +519,9 @@ namespace NIKE {
 			void BGMFadeIn(float fadeTime);
 			void BGMFadeOut(float fadeTime);
 
+			// Save volume settings...
+			void saveAudioConfig(nlohmann::json& config_data);
+
 			/**
 			 * pauses all audio.
 			 *

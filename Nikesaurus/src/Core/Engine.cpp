@@ -331,6 +331,9 @@ namespace NIKE {
 
 	void Core::Engine::run() {
 
+		// Define config file path (adjust if it's not in the root relative to executable)
+		const std::string configFilePath = "Config.json";
+
 		//Update loop
 		while (NIKE_WINDOWS_SERVICE->getWindow()->windowState()) {
 
@@ -374,6 +377,39 @@ namespace NIKE {
 				//Implement update logic
 				updateLogic();
 			}
+		}
+		// Updating Config.json (currently only for volume settings)
+		try {
+			NIKEE_CORE_INFO("Attempting to save configuration to {}", configFilePath);
+			// 1. Load the current config data
+			nlohmann::json current_config_data = NIKE_SERIALIZE_SERVICE->loadJsonFile(configFilePath);
+
+			// Check if loading failed (e.g., file didn't exist or was invalid)
+			if (current_config_data.is_null()) {
+				NIKEE_CORE_WARN("Config file '{}' not found or invalid on shutdown. Creating new object for saving.", configFilePath);
+				current_config_data = nlohmann::json::object(); // Start with an empty object
+			}
+
+			// 2. Update the JSON object with current audio settings
+			NIKE_AUDIO_SERVICE->saveAudioConfig(current_config_data);
+
+			// --- Add calls here to save other services' settings if needed ---
+			// Example: NIKE_SOME_OTHER_SERVICE->saveSettings(current_config_data);
+
+			// 3. Save the modified JSON back to the file
+			std::fstream file(configFilePath, std::ios::out | std::ios::trunc);
+			if (file.is_open()) {
+				file << current_config_data.dump(4); // Use dump(4) for pretty printing
+				file.close();
+				NIKEE_CORE_INFO("Successfully saved configuration to {}", configFilePath);
+			}
+			else {
+				NIKEE_CORE_ERROR("Failed to open {} for saving configuration.", configFilePath);
+			}
+		}
+		catch (const std::exception& e) {
+			// Catch potential errors during load/save
+			NIKEE_CORE_ERROR("Exception caught during config save: {}", e.what());
 		}
 
 		//Stop watching all directories

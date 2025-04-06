@@ -240,11 +240,8 @@ namespace NIKE {
 							continue;
 						}
 
-						//const auto& player_pos = e_player_transform.value().get().position;
-						//const auto& player_scale = e_player_transform.value().get().scale;
 						auto& healthbar_pos = e_healthbar_transform.value().get().position;
 						auto& healthbar_scale = e_healthbar_transform.value().get().scale;
-						//const float offset_y = player_scale.y * 0.9f;
 
 						// Set healthbar to player health
 
@@ -260,6 +257,56 @@ namespace NIKE {
 
 						// Offset the health bar so it shrinks from right to left
 						healthbar_pos.x = original_healthbar_x - (original_healthbar_width * (1.0f - health_percentage)) * 0.5f;
+					}
+				}
+
+				// Boss entities and UI components
+				const auto boss_entities = NIKE_METADATA_SERVICE->getEntitiesByTag("boss");
+				const auto boss_healthbar_tag = NIKE_METADATA_SERVICE->getEntitiesByTag("boss_healthbar");
+				const auto boss_hp_container_tag = NIKE_METADATA_SERVICE->getEntitiesByTag("bosshpcontainer");
+
+				if (!boss_entities.empty()) {
+					for (const auto& boss : boss_entities) {
+
+						// Get required boss components
+						auto e_boss_health = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(boss);
+						auto e_boss_element = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(boss);
+
+						// Validate components
+						if (!e_boss_health || !e_boss_element) {
+							NIKEE_CORE_WARN("sysGameLogic: Boss missing required component(s)");
+							continue;
+						}
+
+						auto& boss_health = e_boss_health.value().get();
+						auto& boss_element = e_boss_element.value().get().element;
+
+						// Update Health Bar 
+						for (const auto& boss_healthbar : boss_healthbar_tag) {
+							auto transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(boss_healthbar);
+
+							if (!transform_comp) continue;
+
+							auto& transform = transform_comp.value().get();
+							auto& pos = transform.position;
+							auto& scale = transform.scale;
+
+							static float original_width = scale.x;
+							static float original_x = pos.x;
+
+							float health_percent = boss_health.health / boss_health.max_health;
+							scale.x = health_percent * original_width;
+							pos.x = original_x - (original_width * (1.0f - health_percent)) * 0.5f;
+						}
+
+						// Update Element Frame
+						for (const auto& boss_hp_container : boss_hp_container_tag) {
+							auto texture_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Texture>(boss_hp_container);
+
+							if (!texture_comp) continue;
+
+							texture_comp.value().get().frame_index.x = static_cast<int>(boss_element);
+						}
 					}
 				}
 

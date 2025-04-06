@@ -51,6 +51,8 @@
         "MetaData": {
             "Entity_Tags": [
                 "boss",
+                "boss_healthbar",
+                "bosshpcontainer",
                 "elementui",
                 "enemy",
                 "healAnimation",
@@ -174,7 +176,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 1,
-                            "Name": "entity_0786",
+                            "Name": "entity_0010",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -792,7 +794,7 @@
                                     "x": -1.8079999685287476,
                                     "y": -1162.5150146484375
                                 },
-                                "Zoom": 1.2225069999694824
+                                "Zoom": 1.0315251350402832
                             },
                             "Render::Texture": {
                                 "B_Blend": false,
@@ -1171,6 +1173,67 @@
                             "Tags": []
                         }
                     }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Audio::SFX": {
+                                "Audio_ID": "ChangeElement.wav",
+                                "B_Play_SFX": false,
+                                "Channel_Group_ID": "EnvironmentSFX",
+                                "Pitch": 1.0,
+                                "Volume": 1.0
+                            },
+                            "Element::Source": {
+                                "Element": 2
+                            },
+                            "Render::Texture": {
+                                "B_Blend": true,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": false,
+                                "Color": {
+                                    "w": 0.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "Frame_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Frame_Size": {
+                                    "x": 1,
+                                    "y": 1
+                                },
+                                "Intensity": 0.09000000357627869,
+                                "Texture_ID": "Water icon.png"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": -619.02392578125,
+                                    "y": -491.6417236328125
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 215.88560485839844,
+                                    "y": 215.88560485839844
+                                },
+                                "Screen Position": false
+                            }
+                        },
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 3,
+                            "Layer_Order": 2,
+                            "Name": "water_elem",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
+                        }
+                    }
                 }
             ],
             "ID": 3,
@@ -1351,7 +1414,12 @@
                                             "z": 0.0
                                         }
                                     },
-                                    "Transform::Transform": null
+                                    "Transform::Transform": {
+                                        "Position": {
+                                            "x": 0.0,
+                                            "y": -209.09088134765625
+                                        }
+                                    }
                                 },
                                 "MetaData": null
                             },
@@ -1379,12 +1447,123 @@
                                             "z": 1.0
                                         }
                                     },
-                                    "Transform::Transform": null
+                                    "Transform::Transform": {
+                                        "Position": {
+                                            "x": 0.0,
+                                            "y": -272.95452880859375
+                                        }
+                                    }
                                 },
                                 "MetaData": null
                             },
                             "Tags": [
                                 "portal_ui"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Render::Texture": {
+                                "B_Blend": false,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": true,
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "Frame_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Frame_Size": {
+                                    "x": 1,
+                                    "y": 1
+                                },
+                                "Intensity": 0.0,
+                                "Texture_ID": "BossHealthBar_Bar.png"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": 51.1363525390625,
+                                    "y": -386.5909118652344
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 700.0,
+                                    "y": 62.19944381713867
+                                },
+                                "Screen Position": true
+                            }
+                        },
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 4,
+                            "Layer_Order": 5,
+                            "Name": "boss_healthbar",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": [
+                                "boss_healthbar"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "Entity": {
+                        "Components": {
+                            "Render::Texture": {
+                                "B_Blend": false,
+                                "B_Flip": {
+                                    "x": false,
+                                    "y": false
+                                },
+                                "B_Stretch": false,
+                                "Color": {
+                                    "w": 1.0,
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "Frame_Index": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "Frame_Size": {
+                                    "x": 4,
+                                    "y": 1
+                                },
+                                "Intensity": 0.0,
+                                "Texture_ID": "BossHealthBar_Container_Spritesheet.png"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": 0.0,
+                                    "y": -382.4999694824219
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 900.0,
+                                    "y": 143.39378356933594
+                                },
+                                "Screen Position": true
+                            }
+                        },
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 4,
+                            "Layer_Order": 6,
+                            "Name": "bosshpcontainer",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": [
+                                "bosshpcontainer"
                             ]
                         }
                     }

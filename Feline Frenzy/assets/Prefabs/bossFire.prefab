@@ -33,7 +33,7 @@
         "Combat::Health": {
             "Health": 250.0,
             "Lives": 1,
-            "MaxHealth": 100.0,
+            "MaxHealth": 250.0,
             "invulnerable_flag": false
         },
         "Element::Entity": {
