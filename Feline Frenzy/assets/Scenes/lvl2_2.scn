@@ -176,7 +176,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 1,
-                            "Name": "entity_0107",
+                            "Name": "entity_0010",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -1491,8 +1491,8 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": 59.3182373046875,
-                                    "y": -360.0000305175781
+                                    "x": 51.1363525390625,
+                                    "y": -386.5909118652344
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
@@ -1545,7 +1545,7 @@
                             "Transform::Transform": {
                                 "Position": {
                                     "x": 0.0,
-                                    "y": -353.8635559082031
+                                    "y": -382.4999694824219
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
