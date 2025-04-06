@@ -155,7 +155,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 1,
-                            "Name": "entity_0084",
+                            "Name": "entity_0421",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -279,7 +279,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 3,
-                            "Name": "entity_0086",
+                            "Name": "entity_0423",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -292,7 +292,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 4,
-                            "Name": "entity_0087",
+                            "Name": "entity_0424",
                             "Prefab_ID": "water_puddle.prefab",
                             "Prefab_Override": {
                                 "Components": {
@@ -2496,7 +2496,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 4,
-                            "Layer_Order": 5,
+                            "Layer_Order": 6,
                             "Name": "portal_text",
                             "Prefab_ID": "text_portal.prefab",
                             "Prefab_Override": {

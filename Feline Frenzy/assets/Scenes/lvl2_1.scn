@@ -172,7 +172,7 @@
                             "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 1,
-                            "Name": "entity_0010",
+                            "Name": "entity_1727",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -771,6 +771,23 @@
                                     "y": 0
                                 }
                             },
+                            "Physics::Collider": {
+                                "B_Bind_To_Entity": false,
+                                "Pos_Offset": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "Position": {
+                                    "x": 0.0,
+                                    "y": 0.0
+                                },
+                                "Resolution": 0,
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 170.0,
+                                    "y": 80.0
+                                }
+                            },
                             "Render::Texture": {
                                 "B_Blend": false,
                                 "B_Flip": {
@@ -829,63 +846,6 @@
                                     "y": 0.0
                                 },
                                 "Position": {
-                                    "x": -8.594970703125,
-                                    "y": 925.9332275390625
-                                },
-                                "Resolution": 0,
-                                "Rotation": 90.0,
-                                "Scale": {
-                                    "x": 271.1050109863281,
-                                    "y": 2600.0
-                                }
-                            },
-                            "Physics::Dynamics": {
-                                "Drag": 0.0,
-                                "Force": {
-                                    "x": 0.0,
-                                    "y": 0.0
-                                },
-                                "Mass": 1.0,
-                                "Max_Speed": 0.0,
-                                "Velocity": {
-                                    "x": 0.0,
-                                    "y": 0.0
-                                }
-                            },
-                            "Transform::Transform": {
-                                "Position": {
-                                    "x": 890.20166015625,
-                                    "y": 426.669189453125
-                                },
-                                "Rotation": 90.0,
-                                "Scale": {
-                                    "x": 205.9320068359375,
-                                    "y": 205.9320068359375
-                                },
-                                "Screen Position": false
-                            }
-                        },
-                        "MetaData": {
-                            "B_Locked": false,
-                            "Layer_ID": 1,
-                            "Layer_Order": 8,
-                            "Name": "top_wall",
-                            "Prefab_ID": "",
-                            "Prefab_Override": null,
-                            "Tags": []
-                        }
-                    }
-                },
-                {
-                    "Entity": {
-                        "Components": {
-                            "Physics::Collider": {
-                                "B_Bind_To_Entity": true,
-                                "Pos_Offset": {
-                                    "x": 0.0,
-                                    "y": 0.0
-                                },
-                                "Position": {
                                     "x": 1419.773681640625,
                                     "y": 14.87762451171875
                                 },
@@ -912,7 +872,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 9,
+                            "Layer_Order": 8,
                             "Name": "middle_wall",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -995,7 +955,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 10,
+                            "Layer_Order": 9,
                             "Name": "barrel_3",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1010,7 +970,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 11,
+                            "Layer_Order": 10,
                             "Name": "Fire_Element",
                             "Prefab_ID": "lv2_fire.prefab",
                             "Prefab_Override": {
@@ -1045,7 +1005,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 12,
+                            "Layer_Order": 11,
                             "Name": "Spark5",
                             "Prefab_ID": "lv2_spark.prefab",
                             "Prefab_Override": {
@@ -1104,7 +1064,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 13,
+                            "Layer_Order": 12,
                             "Name": "middle_wall_6",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1161,7 +1121,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 14,
+                            "Layer_Order": 13,
                             "Name": "bottom_wall",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1218,7 +1178,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 15,
+                            "Layer_Order": 14,
                             "Name": "Right_Collision",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1275,7 +1235,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 16,
+                            "Layer_Order": 15,
                             "Name": "Left_Collision",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1288,7 +1248,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 17,
+                            "Layer_Order": 16,
                             "Name": "Grass_Element",
                             "Prefab_ID": "lv2_plant.prefab",
                             "Prefab_Override": {
@@ -1319,7 +1279,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 18,
+                            "Layer_Order": 17,
                             "Name": "Spark4",
                             "Prefab_ID": "lv2_spark.prefab",
                             "Prefab_Override": {
@@ -1383,7 +1343,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 19,
+                            "Layer_Order": 18,
                             "Name": "middle_wall_4",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1396,7 +1356,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 20,
+                            "Layer_Order": 19,
                             "Name": "barrel_2",
                             "Prefab_ID": "barrel2.prefab",
                             "Prefab_Override": {
@@ -1573,7 +1533,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 21,
+                            "Layer_Order": 20,
                             "Name": "player",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1632,7 +1592,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 22,
+                            "Layer_Order": 21,
                             "Name": "right_wall",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1689,7 +1649,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 23,
+                            "Layer_Order": 22,
                             "Name": "left_wall",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1733,7 +1693,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 24,
+                            "Layer_Order": 23,
                             "Name": "middle_wall_3",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
@@ -1790,8 +1750,8 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 25,
-                            "Name": "entity_0043",
+                            "Layer_Order": 24,
+                            "Name": "entity_1759",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
@@ -2245,7 +2205,7 @@
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 4,
-                            "Layer_Order": 6,
+                            "Layer_Order": 5,
                             "Name": "portal_find_tex",
                             "Prefab_ID": "text_find_portal.prefab",
                             "Prefab_Override": {
