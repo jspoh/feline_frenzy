@@ -426,7 +426,7 @@ namespace NIKE {
 		}
 
 		// Cutscene transitions
-		if (NIKE_SCENES_SERVICE->getCurrSceneID() == "cut_after_before_boss.scn" && video_comp.has_value())
+		if (NIKE_SCENES_SERVICE->getCurrSceneID() == "cut_scene_after_boss.scn" && video_comp.has_value())
 		{
 			//Trigger video to start playing
 			if (video_comp.value().get().video_mode == Render::VideoMode::PAUSED) {
