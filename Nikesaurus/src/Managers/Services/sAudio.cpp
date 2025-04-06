@@ -13,6 +13,7 @@
 #include "Core/Engine.h"
 #include "Managers/Services/sAudio.h"
 #include "Managers/Services/Assets/sAssets.h"
+#include <ShlObj.h>
 
 namespace NIKE {
 
@@ -491,8 +492,18 @@ namespace NIKE {
 			createChannelGroup(sfx_channel_group_id);
 			createChannelGroup(bgmc_channel_group_id);
 
+			static char documents_path[MAX_PATH] = "";
+
+			// Get the path to the Desktop folder
+			if (SHGetFolderPathA(NULL, CSIDL_PERSONAL, NULL, 0, documents_path) != S_OK) {
+				cerr << "Failed to get desktop path!" << endl;
+			}
+
+			// Open crash log file
+			std::string configFilePath(std::string{ documents_path } + R"(\feline-frenzy-logs\AudioSettings.json)");
+
 			//Deserialize Config File
-			auto audio_setting_config = NIKE_SERIALIZE_SERVICE->loadJsonFile("AudioSettings.json");
+			auto audio_setting_config = NIKE_SERIALIZE_SERVICE->loadJsonFile(configFilePath);
 
 			// Volume loading
 			// Load global volumes, defaulting to 0.5 if not found
