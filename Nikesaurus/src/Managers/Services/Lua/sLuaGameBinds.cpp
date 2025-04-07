@@ -20,14 +20,14 @@ namespace NIKE {
     const float Lua::player_shot_cooldown = 0.1f;
     float Lua::player_last_shot_time = player_shot_cooldown;
 
-    // --- ADD STATIC FOOTSTEP VARIABLES ---
-    static float s_footstep_timer = 0.0f;
-    //static const float S_FOOTSTEP_INTERVAL = 0.14f; // Debug
-    static const float S_FOOTSTEP_INTERVAL = 0.91f; // Release
-    // These store the scene-specific settings
-    static std::string g_current_footstep_basename = "Footstep_Grass_"; // Default
-    static int g_current_footstep_max_variations = 8; // Default
-    // --- END ADDITION ---
+    // --- REVISED STATIC FOOTSTEP VARIABLES for Cooldown Logic ---
+    static float s_footstep_cooldown_timer = 0.0f; // Time until next step is allowed
+    static const float S_FOOTSTEP_COOLDOWN = 0.35f; // Time between steps (Adjust as needed)
+    static bool s_was_moving_last_frame = false;   // Tracks previous movement state
+    // These still store the scene-specific settings
+    static std::string g_current_footstep_basename = "Footstep_Grass_";
+    static int g_current_footstep_max_variations = 8;
+    // --- END REVISED STATIC VARIABLES ---
     // Changing footsteps group
     void Lua::SetCurrentFootstepSet(const std::string& basename, int variations) {
         g_current_footstep_basename = basename;
@@ -248,33 +248,47 @@ namespace NIKE {
             });*/
         // Re-bind "PlaySFX" with revised footstep timer logic using dynamic filename generation
         lua_state.set_function("PlaySFX", [&]([[maybe_unused]] Entity::Type entity, bool is_player_moving) {
+            float dt = NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
+            bool play_sound_this_frame = false;
+
+            // Decrease cooldown timer if it's active
+            if (s_footstep_cooldown_timer > 0.0f) {
+                s_footstep_cooldown_timer -= dt;
+            }
+
             if (is_player_moving) {
-                float dt = NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
-                s_footstep_timer += dt;
-
-                if (s_footstep_timer >= S_FOOTSTEP_INTERVAL) {
-                    // Use the static variables from this file
-                    if (g_current_footstep_max_variations > 0) {
-                        int randomVariant = NIKE::GameLogic::getRandomNumber<int>(1, g_current_footstep_max_variations);
-
-                        std::string sfxToPlay = g_current_footstep_basename; // Use static var
-                        if (randomVariant < 10) sfxToPlay += "0";
-                        sfxToPlay += std::to_string(randomVariant);
-                        sfxToPlay += ".wav";
-
-                        NIKE_AUDIO_SERVICE->playAudio(
-                            sfxToPlay, "",
-                            NIKE_AUDIO_SERVICE->getSFXChannelGroupID(),
-                            0.5f * NIKE_AUDIO_SERVICE->getGlobalSFXVolume(),
-                            1.0f, false, false
-                        );
-                    }
-                    s_footstep_timer -= S_FOOTSTEP_INTERVAL;
+                // Condition to play:
+                // 1. Player JUST started moving (wasn't moving last frame)
+                // OR
+                // 2. Player IS moving, AND the cooldown has expired
+                if (!s_was_moving_last_frame || s_footstep_cooldown_timer <= 0.0f) {
+                    play_sound_this_frame = true;
+                    s_footstep_cooldown_timer = S_FOOTSTEP_COOLDOWN; // Reset cooldown timer
                 }
             }
-            else {
-                s_footstep_timer = 0.0f;
+
+            // Play the sound if conditions met
+            if (play_sound_this_frame) {
+                if (g_current_footstep_max_variations > 0) {
+                    int randomVariant = NIKE::GameLogic::getRandomNumber<int>(1, g_current_footstep_max_variations);
+                    std::string sfxToPlay = g_current_footstep_basename;
+                    if (randomVariant < 10) sfxToPlay += "0";
+                    sfxToPlay += std::to_string(randomVariant);
+                    sfxToPlay += ".wav";
+
+                    // NIKEE_CORE_INFO("Playing footstep: {}", sfxToPlay); // Optional debug log
+
+                    NIKE_AUDIO_SERVICE->playAudio(
+                        sfxToPlay, "",
+                        NIKE_AUDIO_SERVICE->getSFXChannelGroupID(),
+                        0.5f * NIKE_AUDIO_SERVICE->getGlobalSFXVolume(), // Volume multiplier remains
+                        1.0f, false, false
+                    );
+                }
             }
+
+            // Update state for the next frame
+            s_was_moving_last_frame = is_player_moving;
             });
         // --- END REPLACEMENT ---
 
