@@ -4,7 +4,7 @@
  *
  * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (100%)
  * \date   September 2024
- * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ * All content 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #include "Core/stdafx.h"
@@ -14,15 +14,33 @@
 namespace NIKE {
 
 	nlohmann::json MetaData::EntityData::serialize() const {
-		return {
-			{"Name", name},
-			{"Prefab_ID", prefab_id},
-			{"Prefab_Override", prefab_override},
-			{"B_Locked", b_locked},
-			{"Layer_ID", layer_id},
-			{"Layer_Order", layer_order},
-			{"Tags", tags}
-		};
+
+		//Get child
+		auto* child = std::get_if<Child>(&relation);
+
+		if (!child) {
+			return {
+				{"Name", name},
+				{"Prefab_ID", prefab_id},
+				{"Prefab_Override", prefab_override},
+				{"B_Locked", b_locked},
+				{"Layer_ID", layer_id},
+				{"Layer_Order", layer_order},
+				{"Tags", tags}
+			};
+		}
+		else {
+			return {
+				{"Name", name},
+				{"Prefab_ID", prefab_id},
+				{"Prefab_Override", prefab_override},
+				{"B_Locked", b_locked},
+				{"Layer_ID", layer_id},
+				{"Layer_Order", layer_order},
+				{"Tags", tags},
+				{"Parent", child->parent }
+			};
+		}
 	}
 
 	void MetaData::EntityData::deserialize(nlohmann::json const& data) {
@@ -43,6 +61,19 @@ namespace NIKE {
 		if (data.contains("Tags") && data["Tags"].is_array()) {
 			tags = data["Tags"].get<std::set<std::string>>();
 		}
+
+		//Get Parent
+		if (data.contains("Parent")) {
+			Child temp_child;
+			temp_child.parent = data["Parent"].get<std::string>();
+			relation = temp_child;
+		}
+		else {
+			relation = Parent();
+		}
+
+		//Update relation
+		NIKE_METADATA_SERVICE->updateRelation();
 	}
 
 	void MetaData::Service::onEvent(std::shared_ptr<Coordinator::EntitiesChanged> event) {
@@ -74,7 +105,6 @@ namespace NIKE {
 		entity_names.clear();
 
 		//Add new entities from the ECS that are not yet in the editor
-		int index = 0;
 		for (auto& entity : ecs_entities) {
 
 			//Update entities ref
@@ -82,7 +112,7 @@ namespace NIKE {
 
 				//Create identifier for entity
 				char entity_name[32];
-				snprintf(entity_name, sizeof(entity_name), (def_name + "%04d").data(), index);
+				snprintf(entity_name, sizeof(entity_name), (def_name + "%04d").data(), entity);
 				entities[entity].name = entity_name;
 
 				//Set a proper layer ID
@@ -92,15 +122,12 @@ namespace NIKE {
 
 				//Create identifier for entity
 				char entity_name[32];
-				snprintf(entity_name, sizeof(entity_name), (def_name + "%04d").data(), index);
+				snprintf(entity_name, sizeof(entity_name), (def_name + "%04d").data(), entity);
 				entities[entity].name = entity_name;
 			}
 
 			//Populate entity name
 			entity_names[entities[entity].name] = entity;
-
-			//Increment index
-			++index;
 		}
 	}
 
@@ -120,6 +147,22 @@ namespace NIKE {
 			for (auto entity : entities_to_destroy) {
 				if (NIKE_ECS_MANAGER->checkEntity(entity)) {
 
+					//Check if entity has childs and delete them
+					auto* parent = std::get_if<Parent>(&entities.at(entity).relation);
+					if (parent && !parent->childrens.empty()) {
+
+						//Destroy childrens
+						for (auto const& child : parent->childrens) {
+							
+							//Destroy children
+							auto c_entity = getEntityByName(child);
+							if (c_entity.has_value()) {
+								if (NIKE_ECS_MANAGER->checkEntity(c_entity.value())) NIKE_ECS_MANAGER->destroyEntity(c_entity.value());
+							}
+						}
+					}
+
+					//Destroy entity
 					NIKE_ECS_MANAGER->destroyEntity(entity);
 				}
 			}
@@ -181,7 +224,16 @@ namespace NIKE {
 
 	std::optional<Entity::Type> MetaData::Service::getEntityByName(std::string const& name) const {
 		if (entity_names.find(name) == entity_names.end()) {
-			return  std::nullopt;
+			if (name.find(def_name) != std::string::npos) {
+				for (auto const& data : entities) {
+					if (data.second.name == name) return data.first;
+				}
+
+				return std::nullopt;
+			}
+			else {
+				return std::nullopt;
+			}
 		}
 
 		return entity_names.at(name);
@@ -320,6 +372,22 @@ namespace NIKE {
 		return entities.at(entity).b_locked;
 	}
 
+	bool MetaData::Service::checkEntityTagExist(Entity::Type entity) const
+	{
+		// Check if the entity exists in the entities map
+		auto it = entities.find(entity);
+		if (it != entities.end()) {
+			// Iterate over the entity's tags and check if any exist in entity_tags
+			for (const auto& tag : it->second.tags) {
+				if (entity_tags.find(tag) != entity_tags.end()) {
+					return true; 
+				}
+			}
+		}
+
+		return false;
+	}
+
 	void MetaData::Service::setEntityLayerID(Entity::Type entity, unsigned int layer_id) {
 		//Check if entity exists
 		if (entities.find(entity) == entities.end()) {
@@ -396,6 +464,170 @@ namespace NIKE {
 		return entities.at(entity).layer_order;
 	}
 
+	void MetaData::Service::updateRelation() {
+
+		//Set of parents & childrens
+		std::unordered_map<std::string, Parent*> parents;
+		std::unordered_map<std::string, Child*> childs;
+
+		//Iterate through entities
+		for (auto& data : entities) {
+
+			//Get parent
+			auto* parent = std::get_if<Parent>(&data.second.relation);
+			if (parent) {
+				parent->childrens.clear();
+				parents[data.second.name] = parent;
+			}
+
+			//Get child
+			auto* child = std::get_if<Child>(&data.second.relation);
+			if (child) {
+				childs[data.second.name] = child;
+			}
+		}
+
+		//Update each set properly
+		for (auto& child : childs) {
+			auto parent_it = parents.find(child.second->parent);
+			if (parent_it != parents.end()) {
+				parent_it->second->childrens.insert(child.first);
+			}
+		}
+	}
+
+	void MetaData::Service::setEntityParentRelation(Entity::Type entity) {
+		//Check if entity exists
+		if (entities.find(entity) == entities.end()) {
+			NIKEE_CORE_WARN("Entity does not exist");
+			return;
+		}
+
+		//Get child
+		auto* child = std::get_if<Child>(&entities.at(entity).relation);
+
+		//Skip if relation is not a child
+		if (!child) return;
+
+		//Set relation
+		entities.at(entity).relation = Parent();
+
+		//Update relation
+		updateRelation();
+	}
+
+	void MetaData::Service::setEntityChildRelation(Entity::Type entity) {
+		//Check if entity exists
+		if (entities.find(entity) == entities.end()) {
+			NIKEE_CORE_WARN("Entity does not exist");
+			return;
+		}
+
+		//Get parent
+		auto* parent = std::get_if<Parent>(&entities.at(entity).relation);
+
+		//Skip if relation is not a parent
+		if (!parent) return;
+
+		//Set relation to child
+		entities.at(entity).relation = Child();
+
+		//Update relation
+		updateRelation();
+	}
+
+	void MetaData::Service::setEntityChildRelationParent(Entity::Type entity, std::string const& parent_name) {
+		//Check if entity exists
+		if (entities.find(entity) == entities.end()) {
+			NIKEE_CORE_WARN("Entity does not exist");
+			return;
+		}
+
+		//Get child
+		auto* child = std::get_if<Child>(&entities.at(entity).relation);
+
+		//Skip if relation is not child
+		if (!child) return;
+
+		//Set child's parent
+		child->parent = parent_name;
+
+		//Update relation
+		updateRelation();
+	}
+
+	std::variant<MetaData::Parent, MetaData::Child> MetaData::Service::getEntityRelation(Entity::Type entity) const {
+		//Check if entity exists
+		if (entities.find(entity) == entities.end()) {
+			NIKEE_CORE_WARN("Entity does not exist");
+			return Parent();
+		}
+
+		//Return relation
+		try {
+			return entities.at(entity).relation;
+		}
+		catch (...) {
+			NIKEE_CORE_ERROR("Relation is invalid");
+			return Parent();
+		}
+	}
+
+	std::vector<const char*> MetaData::Service::getAllParents() const {
+		std::vector<const char*> parents;
+		for (auto const& data : entities) {
+			auto* parent = std::get_if<Parent>(&data.second.relation);
+
+			if (parent) {
+				parents.push_back(data.second.name.c_str());
+			}
+		}
+
+		return parents;
+	}
+
+	bool MetaData::Service::checkParent(Entity::Type entity) const {
+		//Check if entity exists
+		if (entities.find(entity) == entities.end()) {
+			NIKEE_CORE_WARN("Entity does not exist");
+			return false;
+		}
+
+		//Get parent
+		auto* parent = std::get_if<Parent>(&entities.at(entity).relation);
+
+		//Check if relation is parent
+		if (parent) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
+	bool MetaData::Service::checkParent(std::string const& parent_name) const {
+
+		//Get entity
+		auto entity = getEntityByName(parent_name);
+
+		//Check if entity is valid
+		if (entity.has_value()) {
+			//Get parent
+			auto* parent = std::get_if<Parent>(&entities.at(entity.value()).relation);
+
+			//Check if relation is parent
+			if (parent) {
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+		else {
+			return false;
+		}
+	}
+
 	std::set<std::string> MetaData::Service::getEntityTags(Entity::Type entity) {
 		//Check if entity exists
 		if (entities.find(entity) == entities.end()) {
@@ -464,6 +696,12 @@ namespace NIKE {
 		//Serialize tags
 		data["Tags"] = metadata.tags;
 
+		//Serialize parent
+		auto* child = std::get_if<Child>(&metadata.relation);
+		if (child) {
+			data["Parent"] = child->parent;
+		}
+
 		return data;
 	}
 
@@ -478,6 +716,20 @@ namespace NIKE {
 		//Check if tags is the same as prefab
 		if (entity_data.tags != prefab_data.tags) {
 			data["Tags"] = entity_data.tags;
+		}
+
+		//Serialize parent
+		auto* e_child = std::get_if<Child>(&entity_data.relation);
+		auto* p_child = std::get_if<Child>(&prefab_data.relation);
+		if (e_child) {
+			if (!p_child || (p_child && (p_child->parent != e_child->parent))) {
+				data["Parent"] = e_child->parent;
+			}
+		}
+		else {
+			if (p_child) {
+				data["Not Child"] = true;
+			}
 		}
 
 		return data;
@@ -506,6 +758,20 @@ namespace NIKE {
 			success = false;
 		}
 
+		//Get Parent
+		if (data.contains("Parent")) {
+			NIKE_METADATA_SERVICE->setEntityChildRelation(entity);
+			NIKE_METADATA_SERVICE->setEntityChildRelationParent(entity, data["Parent"].get<std::string>());
+		}
+		else {
+			NIKE_METADATA_SERVICE->setEntityParentRelation(entity);
+		}
+
+		//Check for prefab overriders
+		if (data.contains("Not Child")) {
+			NIKE_METADATA_SERVICE->setEntityParentRelation(entity);
+		}
+
 		return success;
 	}
 
@@ -530,6 +796,21 @@ namespace NIKE {
 		}
 		else {
 			success = false;
+		}
+
+		//Get Parent
+		if (data.contains("Parent")) {
+			Child temp_child;
+			temp_child.parent = data["Parent"].get<std::string>();
+			metadata.relation = temp_child;
+		}
+		else {
+			metadata.relation = Parent();
+		}
+
+		//Check for prefab overriders
+		if (data.contains("Not Child")) {
+			metadata.relation = Parent();
 		}
 
 		return success;
@@ -569,5 +850,24 @@ namespace NIKE {
 				entity_tags.insert(tag.value());
 			}
 		}
+	}
+
+	void MetaData::Service::setEntityPrefab(Entity::Type entity, std::string const& prefab_id) {
+		//Check if entity exists
+		if (entities.find(entity) == entities.end()) {
+			NIKEE_CORE_WARN("Entity does not exist");
+			return;
+		}
+
+		//Check if prefab id is valid
+		if (!entities.at(entity).prefab_id.empty() && entities.at(entity).prefab_id.find(".prefab") != std::string::npos) {
+			//Load entity with prefab
+			NIKE_SERIALIZE_SERVICE->loadEntityFromPrefab(entity, prefab_id);
+		}
+
+		NIKE_SERIALIZE_SERVICE->loadEntityFromPrefab(entity, prefab_id);
+
+		//Set prefab master id
+		entities.at(entity).prefab_id = prefab_id;
 	}
 }

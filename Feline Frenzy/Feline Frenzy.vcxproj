@@ -170,6 +170,9 @@ del /s /q "$(SolutionDir)installer\GAMEDIRECTORY\*.lib" &gt;nul 2&gt;&amp;1
     <None Include="assets\Engine\Shaders\text.vert" />
     <None Include="assets\Engine\Shaders\texture.frag" />
     <None Include="assets\Engine\Shaders\texture.vert" />
+    <None Include="assets\Scenes\SettingsTest.scn" />
+    <None Include="assets\Engine\Shaders\textured_particle.frag" />
+    <None Include="assets\Engine\Shaders\textured_particle.vert" />
     <None Include="assets\Scripts\createBullet.lua" />
     <None Include="assets\Scenes\main_menu.scn" />
     <None Include="assets\Scripts\enemyBullet.lua" />
@@ -177,6 +180,7 @@ del /s /q "$(SolutionDir)installer\GAMEDIRECTORY\*.lib" &gt;nul 2&gt;&amp;1
     <None Include="assets\Scripts\move.lua" />
     <None Include="assets\Scripts\Player.lua" />
     <None Include="assets\Scripts\ChangeScene.lua" />
+    <None Include="assets\Scripts\UISlider.lua" />
     <None Include="assets\Shaders\base.frag" />
     <None Include="assets\Shaders\base.vert" />
     <None Include="assets\Shaders\batched_base.frag" />

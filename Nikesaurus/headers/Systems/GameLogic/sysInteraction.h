@@ -19,35 +19,66 @@
 namespace NIKE {
     namespace Interaction {
 
+        static std::unordered_map<Entity::Type, bool> hitEntities;
+
+        static bool show_pause_menu;
+
+
+        /*****************************************************************//**
+         * UI Interactions
+         *********************************************************************/
+        void initPauseOverlay(const std::string& background_texture, const std::string& resume, const std::string& settings, const std::string& how_to_play, const std::string& quit);
+
+        void togglePauseOverlay(bool show);
+
+        void toggle_how_to_play_overlay();
+
+        // HARD CODED
+        void gameOverlay(const std::string& background_texture, const std::string& play_again, const std::string& quit_game_text);
+
+        // Screen text overlay
+        void handleScreenOverlay();
+
+        /*****************************************************************//**
+         * VFX and SFX Interactions
+         *********************************************************************/
+
+        void playSFX([[maybe_unused]] Entity::Type& entity, [[maybe_unused]] bool play_or_no);
+
+        void animationSet(Entity::Type const& entity, int start_x, int start_y, int end_x, int end_y);
+
+        void flipX(Entity::Type const& entity, bool yes_or_no);
+
+        void flipY(Entity::Type const& entity, bool yes_or_no);
+
+        void setLastDirection(Entity::Type const& entity, int dir);
+
+        int getLastDirection(Entity::Type const& entity);
+
+        // Spawn Heal Animation
+        void spawnHealAnimation(Entity::Type player);
+
+        /*****************************************************************//**
+         * Player Interactions
+         *********************************************************************/
+
+        // Restore Health
+        void restoreHealth(Entity::Type healer, Entity::Type target);
+
         // Handles interaction logic between two entities
         void handleCollision(Entity::Type entity_a, Entity::Type entity_b);
 
         // Apply damage
         void applyDamage(Entity::Type attacker, Entity::Type target);
 
-        // Restore Health
-        void restoreHealth(Entity::Type healer, Entity::Type target);
-
         // Change element
         void changeElement(Entity::Type player, Entity::Type source);
 
-        // Get Elemental Multiplier for Elements
-        float getElementMultiplier(Element::Elements attacker, Element::Elements target);
+        // For world-space calculation
+        bool isWithinWorldRange(Entity::Type source, Entity::Type player);
 
-        // Check if player is within range
-        bool withinRange(Entity::Type source, Entity::Type player);
-
-        void playSFX([[maybe_unused]] Entity::Type& entity, [[maybe_unused]] bool play_or_no);
-        // Play SFX once
-        void playOneShotSFX(Entity::Type& entity, const std::string& custom_audio_id, const std::string& custom_channel_group_id, float custom_volume, float custom_pitch);
-
-        /***********************
-        * Animation handling
-        ************************/
-        void flipX(Entity::Type& entity, bool yes_or_no);
-        void flipY(Entity::Type& entity, bool yes_or_no);
-        void setLastDirection(Entity::Type& entity, int dir);
-        int getLastDirection(Entity::Type& entity);
+        // Status Animation
+        void spawnStatusAnimation(const Entity::Type entity, const int status);
 
         class Manager : 
             public System::ISystem {

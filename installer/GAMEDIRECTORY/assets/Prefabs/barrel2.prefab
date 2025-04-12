@@ -1,0 +1,78 @@
+{
+    "Components": {
+        "Animation::Base": {
+            "Animation_Count": 0,
+            "B_PingPong": false,
+            "B_Reverse": false,
+            "Frame_Duration": 0.20000000298023224
+        },
+        "Combat::Health": {
+            "Health": 100.0,
+            "Lives": 1,
+            "MaxHealth": 100.0,
+            "invulnerable_flag": false
+        },
+        "Physics::Collider": {
+            "B_Bind_To_Entity": false,
+            "Pos_Offset": {
+                "x": 0.0,
+                "y": -10.0
+            },
+            "Position": {
+                "x": -779.4362182617188,
+                "y": 155.28192138671875
+            },
+            "Resolution": 0,
+            "Rotation": 0.0,
+            "Scale": {
+                "x": 160.0,
+                "y": 80.0
+            }
+        },
+        "Render::Texture": {
+            "B_Blend": true,
+            "B_Flip": {
+                "x": false,
+                "y": false
+            },
+            "B_Stretch": false,
+            "Color": {
+                "w": 1.0,
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "Frame_Index": {
+                "x": 0,
+                "y": 0
+            },
+            "Frame_Size": {
+                "x": 1,
+                "y": 1
+            },
+            "Intensity": 0.0,
+            "Texture_ID": "Chest_highlighted.png"
+        },
+        "State::State": {
+            "State": "Default"
+        },
+        "Transform::Transform": {
+            "Position": {
+                "x": -603.52587890625,
+                "y": 716.608642578125
+            },
+            "Rotation": 0.0,
+            "Scale": {
+                "x": 209.99998474121094,
+                "y": 209.99998474121094
+            },
+            "Screen Position": false
+        }
+    },
+    "MetaData": {
+        "Layer ID": 1,
+        "Tags": [
+            "objects"
+        ]
+    }
+}

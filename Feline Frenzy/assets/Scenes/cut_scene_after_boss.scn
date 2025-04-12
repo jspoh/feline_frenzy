@@ -1,0 +1,92 @@
+[
+    {
+        "Channels": {
+            "BGM": {
+                "loop": true,
+                "tracks": [
+                    "Cutscene_3.wav"
+                ]
+            },
+            "BGMC": {
+                "loop": true,
+                "tracks": [
+                    "BGM_Level_Combat_v1.wav"
+                ]
+            },
+            "SFX": {
+                "loop": false,
+                "tracks": []
+            },
+            "VFX": {
+                "loop": false,
+                "tracks": []
+            }
+        }
+    },
+    {
+        "Grid ID": "cut_scene_after_boss.grid"
+    },
+    {
+        "Camera": {
+            "Active Cam ID": "background"
+        }
+    },
+    {
+        "MetaData": {
+            "Entity_Tags": []
+        }
+    },
+    {
+        "Layer Count": 2
+    },
+    {
+        "Layer": {
+            "B_State": true,
+            "B_YSort": false,
+            "Entities": [
+                {
+                    "Entity": {
+                        "Components": {
+                            "Render::Video": {
+                                "B_Loop": false,
+                                "Video_ID": "EndingCutscene.mpg"
+                            },
+                            "Transform::Transform": {
+                                "Position": {
+                                    "x": -5.89056396484375,
+                                    "y": -1.8759002685546875
+                                },
+                                "Rotation": 0.0,
+                                "Scale": {
+                                    "x": 1631.5250244140625,
+                                    "y": 917.7327880859375
+                                },
+                                "Screen Position": true
+                            }
+                        },
+                        "MetaData": {
+                            "B_Locked": false,
+                            "Layer_ID": 0,
+                            "Layer_Order": 0,
+                            "Name": "cut_scene_png",
+                            "Prefab_ID": "",
+                            "Prefab_Override": null,
+                            "Tags": []
+                        }
+                    }
+                }
+            ],
+            "ID": 0,
+            "Mask": 1
+        }
+    },
+    {
+        "Layer": {
+            "B_State": true,
+            "B_YSort": false,
+            "Entities": [],
+            "ID": 1,
+            "Mask": 2
+        }
+    }
+]

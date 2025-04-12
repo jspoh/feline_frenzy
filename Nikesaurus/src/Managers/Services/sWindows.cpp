@@ -115,12 +115,12 @@ namespace NIKE {
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 		glDebugMessageCallback([]([[maybe_unused]] GLenum source, [[maybe_unused]] GLenum type, [[maybe_unused]] GLuint id, [[maybe_unused]] GLenum severity, [[maybe_unused]] GLsizei length, [[maybe_unused]] const GLchar* message, [[maybe_unused]] const void* userParam) {
 			//cerr << "GL Debug Message: " << message << "\nSource: " << source << endl;
-			//NIKEE_CORE_WARN("GL Debug Message: {0}\nSource: {1}", message, source);
+			//NIKEE_CORE_WARN("GL Debug Message: {0}\nSource: {1}\nType: {2}\nSeverity: {3}", message, source, type, severity);
 			}, nullptr);
 #endif
 
 		// set window icon
-		static constexpr const char* ICON_PATH = "./assets/icons/Icon_32x32.png";
+		static constexpr const char* ICON_PATH = "./assets/icons/Icon_256x256.png";
 
 
 		int width, height, size;
@@ -257,6 +257,7 @@ namespace NIKE {
 		glfwSetScrollCallback(ptr_window, Events::Service::mousescroll_cb);
 		glfwSetWindowFocusCallback(ptr_window, Events::Service::windowfocus_cb);
 		glfwSetDropCallback(ptr_window, Events::Service::dropfile_cb);
+		glfwSetCursorEnterCallback(ptr_window, Events::Service::cursorenter_cb);
 	}
 
 	void Windows::NIKEWindow::setInputMode(int mode, int value) {
@@ -277,9 +278,9 @@ namespace NIKE {
 		// Ensure framebuffer is bound and valid
 		GLint framebuffer_id;
 		glGetIntegerv(GL_FRAMEBUFFER_BINDING, &framebuffer_id);
-		if (framebuffer_id != 0) {
-			glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		}
+		//if (framebuffer_id != 0) {
+		//	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		//}
 
 		GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 		if (status != GL_FRAMEBUFFER_COMPLETE) {
@@ -299,13 +300,15 @@ namespace NIKE {
 			}
 		}
 
-		// !NOTE: n.loo
-		//glFinish(); //  NICHOLAS SOLUTION 1
+		glFinish();
+
+		while ((err = glGetError()) != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error after call to glFinish in {0}: {1}", __FUNCTION__, err);
+		}
 
 		glfwSwapBuffers(ptr_window);
 
-		err = glGetError();
-		if (err != GL_NO_ERROR) {
+		while ((err = glGetError()) != GL_NO_ERROR) {
 			NIKEE_CORE_ERROR("OpenGL error at the end of {0}: {1}", __FUNCTION__, err);
 		}
 	}
@@ -441,6 +444,8 @@ namespace NIKE {
 			if (NIKE_LVLEDITOR_SERVICE->getGameState()) {
 				NIKE_AUDIO_SERVICE->resumeAllChannels();
 			}
+#else
+			NIKE_AUDIO_SERVICE->resumeAllChannels();
 #endif
 
 		}
@@ -575,8 +580,8 @@ namespace NIKE {
 		glBindVertexArray(0);  // Unbind VAO
 		glBindBuffer(GL_ARRAY_BUFFER, 0);  // Unbind VBO
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);  // Unbind EBO
-		glEnable(GL_DEPTH_TEST);  // Re-enable depth testing for 3D scene rendering
-		glEnable(GL_CULL_FACE);  // Re-enable face culling if used
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);  // Reset to default framebuffer
+		glDisable(GL_DEPTH_TEST);
+		glDisable(GL_CULL_FACE);
+		//glBindFramebuffer(GL_FRAMEBUFFER, 0);  // Reset to default framebuffer
 	}
 }

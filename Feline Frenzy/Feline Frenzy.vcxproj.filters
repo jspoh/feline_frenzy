@@ -68,5 +68,9 @@
     <None Include="assets\Engine\Shaders\texture.vert" />
     <None Include="assets\Engine\Shaders\quad_particle.frag" />
     <None Include="assets\Engine\Shaders\quad_particle.vert" />
+    <None Include="assets\Scripts\UISlider.lua" />
+    <None Include="assets\Scenes\SettingsTest.scn" />
+    <None Include="assets\Engine\Shaders\textured_particle.frag" />
+    <None Include="assets\Engine\Shaders\textured_particle.vert" />
   </ItemGroup>
 </Project>

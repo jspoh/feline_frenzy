@@ -13,9 +13,11 @@
 #include "Systems/GameLogic/sysInteraction.h"
 #include "Core/Engine.h"
 
-// Transitions
+ // Transitions
 #include "Managers/Services/State Machine/enemyTransitions.h"
 #include "Managers/Services/State Machine/destructableTransitions.h"
+// Random number
+#include "Systems/GameLogic/sysGameLogic.h"
 
 namespace NIKE {
 
@@ -27,6 +29,7 @@ namespace NIKE {
 	{
 		// Add transitions here
 		addTransition("DefaultToEnemyIdle", std::make_shared<Transition::DefaultToEnemyIdle>());
+		addTransition("DefaultToBossIdle", std::make_shared<Transition::DefaultToBossIdle>());
 		addTransition("DefaultToDestructableDeath", std::make_shared<Transition::DefaultToDestructableDeath>());
 	}
 
@@ -126,7 +129,7 @@ namespace NIKE {
 			// If shot on cooldown
 			if (enemy_comp.last_shot_time <= enemy_comp.cooldown) {
 				// Accumulate time since last shot
-				enemy_comp.last_shot_time += NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
+				enemy_comp.last_shot_time += NIKE_WINDOWS_SERVICE->getDeltaTime();
 			}
 
 			// Look for entity w player component
@@ -142,7 +145,8 @@ namespace NIKE {
 						dyna_comp.velocity = { 0,0 };
 						// Shoot bullet towards player pos from enemy pos
 						Enemy::shootBullet(entity, other_entity);
-						updateEnemyAttackAnimation(entity);
+						float dir = atan2(e_enemy_dyna.value().get().force.y, e_enemy_dyna.value().get().force.x);
+						updateEnemyAttackAnimation(entity, dir);
 						auto e_audio_comp = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity);
 						if (e_audio_comp.has_value())
 						{
@@ -197,29 +201,50 @@ namespace NIKE {
 		}
 	}
 
-	void State::EnemyAttackState::updateEnemyAttackAnimation([[maybe_unused]] Entity::Type& entity)
+	void State::EnemyAttackState::updateEnemyAttackAnimation([[maybe_unused]] Entity::Type& entity, float& dir)
 	{
-		int get_last_direction = getLastDirection(entity);
-		if (get_last_direction == 0)
+
+		if (dir >= -M_PI / 8 && dir < M_PI / 8)
 		{
 			// Attack right
-			animationSet(entity, 0, 5, 5, 5);
-			flipX(entity, false);
+			Interaction::animationSet(entity, 0, 5, 5, 5);
+			Interaction::flipX(entity, false);
 		}
-		else if (get_last_direction == 2) {
+		else if (dir >= M_PI / 8 && dir < 3 * M_PI / 8)
+		{
+			// Attack up-right
+			Interaction::animationSet(entity, 0, 7, 5, 7);
+			Interaction::flipX(entity, false);
+		}
+		else if (dir >= 3 * M_PI / 8 && dir < 5 * M_PI / 8) {
 			// Attack up
-			animationSet(entity, 0, 7, 5, 7);
-			flipX(entity, false);
+			Interaction::animationSet(entity, 0, 7, 5, 7);
+			Interaction::flipX(entity, false);
 		}
-		else if (get_last_direction == 5) {
+		else if (dir >= 5 * M_PI / 8 && dir < 7 * M_PI / 8) {
+			// Attack up-left
+			Interaction::animationSet(entity, 0, 7, 5, 7);
+			Interaction::flipX(entity, false);
+		}
+		else if (dir >= -3 * M_PI / 8 && dir < -M_PI / 8) {
+			// Attack down-right
+			Interaction::animationSet(entity, 0, 4, 5, 4);
+			Interaction::flipX(entity, false);
+		}
+		else if (dir >= -5 * M_PI / 8 && dir < -3 * M_PI / 8) {
 			// Attack down
-			animationSet(entity, 0, 4, 5, 4);
-			flipX(entity, false);
+			Interaction::animationSet(entity, 0, 4, 5, 4);
+			Interaction::flipX(entity, false);
+		}
+		else if (dir >= -7 * M_PI / 8 && dir < -5 * M_PI / 8) {
+			// Attack up
+			Interaction::animationSet(entity, 0, 4, 5, 4);
+			Interaction::flipX(entity, false);
 		}
 		else {
 			// Attack left
-			animationSet(entity, 0, 5, 5, 5);
-			flipX(entity, true);
+			Interaction::animationSet(entity, 0, 5, 5, 5);
+			Interaction::flipX(entity, true);
 		}
 	}
 
@@ -279,7 +304,7 @@ namespace NIKE {
 				auto e_audio_comp = NIKE_ECS_MANAGER->getEntityComponent<Audio::SFX>(entity);
 				if (e_audio_comp.has_value())
 				{
-					playSFX(entity, true);
+					//playSFX(entity, true); // FOOTSTEPS SFX
 				}
 			}
 
@@ -331,51 +356,51 @@ namespace NIKE {
 	{
 		if (dir >= -M_PI / 8 && dir < M_PI / 8) {
 			// Moving right
-			animationSet(entity, 0, 1, 9, 1);
-			flipX(entity, false);
-			setLastDirection(entity, 0);
+			Interaction::animationSet(entity, 0, 1, 9, 1);
+			Interaction::flipX(entity, false);
+			Interaction::setLastDirection(entity, 0);
 		}
 		else if (dir >= M_PI / 8 && dir < 3 * M_PI / 8) {
 			// Moving up-right (diagonal)
-			animationSet(entity, 0, 2, 9, 2);
-			flipX(entity, false);
-			setLastDirection(entity, 1);
+			Interaction::animationSet(entity, 0, 2, 9, 2);
+			Interaction::flipX(entity, false);
+			Interaction::setLastDirection(entity, 1);
 		}
 		else if (dir >= 3 * M_PI / 8 && dir < 5 * M_PI / 8) {
 			// Moving up
-			animationSet(entity, 0, 3, 9, 3);
-			flipX(entity, false);
-			setLastDirection(entity, 2);
+			Interaction::animationSet(entity, 0, 3, 9, 3);
+			Interaction::flipX(entity, false);
+			Interaction::setLastDirection(entity, 2);
 		}
 		else if (dir >= 5 * M_PI / 8 && dir < 7 * M_PI / 8) {
 			// Moving up-left (diagonal)
-			animationSet(entity, 0, 2, 9, 2);
-			flipX(entity, true);
-			setLastDirection(entity, 3);
+			Interaction::animationSet(entity, 0, 2, 9, 2);
+			Interaction::flipX(entity, true);
+			Interaction::setLastDirection(entity, 3);
 		}
 		else if (dir >= -3 * M_PI / 8 && dir < -M_PI / 8) {
 			// Moving down-right (diagonal)
-			animationSet(entity, 0, 1, 9, 1);
-			flipX(entity, false);
-			setLastDirection(entity, 4);
+			Interaction::animationSet(entity, 0, 1, 9, 1);
+			Interaction::flipX(entity, false);
+			Interaction::setLastDirection(entity, 4);
 		}
 		else if (dir >= -5 * M_PI / 8 && dir < -3 * M_PI / 8) {
 			// Moving down
-			animationSet(entity, 0, 0, 9, 0);
-			flipX(entity, false);
-			setLastDirection(entity, 5);
+			Interaction::animationSet(entity, 0, 0, 9, 0);
+			Interaction::flipX(entity, false);
+			Interaction::setLastDirection(entity, 5);
 		}
 		else if (dir >= -7 * M_PI / 8 && dir < -5 * M_PI / 8) {
 			// Moving down-left (diagonal)
-			animationSet(entity, 0, 1, 9, 1);
-			flipX(entity, true);
-			setLastDirection(entity, 6);
+			Interaction::animationSet(entity, 0, 1, 9, 1);
+			Interaction::flipX(entity, true);
+			Interaction::setLastDirection(entity, 6);
 		}
 		else {
 			// Moving left
-			animationSet(entity, 0, 1, 9, 1);
-			flipX(entity, true);
-			setLastDirection(entity, 7);
+			Interaction::animationSet(entity, 0, 1, 9, 1);
+			Interaction::flipX(entity, true);
+			Interaction::setLastDirection(entity, 7);
 		}
 	}
 
@@ -389,30 +414,72 @@ namespace NIKE {
 	}
 
 	void State::EnemyDeathState::onEnter([[maybe_unused]] Entity::Type& entity) {
+		// Stop enemy from moving
+		auto dynamics = NIKE_ECS_MANAGER->getEntityComponent<Physics::Dynamics>(entity);
+		auto animation = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
+		if (dynamics.has_value()) {
+
+			dynamics.value().get().max_speed = { 0.0f };
+		}
+		if (animation.has_value())
+		{
+			// Set death animation frame duration
+			animation.value().get().frame_duration = 0.03f;
+		}
+
 		// Play EnemyDeathState animation
-		animationSet(entity, 0, 8, 10, 8);
-		flipX(entity, false);
-		playSFX(entity, true);
+		Interaction::animationSet(entity, 0, 8, 10, 8);
+		Interaction::flipX(entity, false);
+		//Interaction::playSFX(entity, true); // ENEMY DEATH SFX, BUGGED
+		// Temporary hardcoded SFX
+		int randomVariant = NIKE::GameLogic::getRandomNumber<int>(1, 6);
+		std::string sfxToPlay = "Enemy_Death_0" + std::to_string(randomVariant) + ".wav";
+		NIKE_AUDIO_SERVICE->playAudio(sfxToPlay, "", NIKE_AUDIO_SERVICE->getSFXChannelGroupID(), 0.5f * NIKE_AUDIO_SERVICE->getGlobalSFXVolume(), 1.f, false, false);
 	}
 	void State::EnemyDeathState::onUpdate([[maybe_unused]] Entity::Type& entity) {
+
 		auto animation_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Base>(entity);
 		if (animation_comp.has_value())
 		{
-			if (animation_comp.value().get().completed_animations >= 1) { 
+			if (animation_comp.value().get().completed_animations >= 1) {
 				playSFX(entity, false);
+
+				// destroy children
+				{
+					auto relation = NIKE_METADATA_SERVICE->getEntityRelation(entity);
+					auto* parent = std::get_if<MetaData::Parent>(&relation);
+					//auto* child = std::get_if<MetaData::Child>(&relation);
+
+					if (parent) {
+						for (const auto child : parent->childrens) {
+							auto e = NIKE_METADATA_SERVICE->getEntityByName(child);
+
+							if (!e.has_value()) {
+								continue;
+							}
+
+							Entity::Type de = e.value();
+							NIKE_METADATA_SERVICE->destroyEntity(de);
+						}
+					}
+				}
+
 				NIKE_METADATA_SERVICE->destroyEntity(entity);
 			}
 		}
 	}
-	void State::EnemyDeathState::onExit([[maybe_unused]] Entity::Type& entity){
-		
+	void State::EnemyDeathState::onExit([[maybe_unused]] Entity::Type& entity) {
+
 	}
 
-	void State::EnemyDeathState::playSFX(Entity::Type& entity, bool play_or_no)
+	void State::EnemyDeathState::playSFX([[maybe_unused]] Entity::Type& entity, [[maybe_unused]] bool play_or_no)
 	{
-		if (play_or_no) {
+		UNREFERENCED_PARAMETER(entity);
+		/*if (play_or_no) {
 			// Temporary hardcoded SFX
-			Interaction::playOneShotSFX(entity, "EnemyDeath1.wav", "EnemySFX", 1.0f, 1.0f);
+			int randomVariant = NIKE::GameLogic::getRandomNumber<int>(1, 6);
+			std::string sfxToPlay = "Enemy_Death_0" + std::to_string(randomVariant) + ".wav";
+			NIKE_AUDIO_SERVICE->playAudio(sfxToPlay, "", NIKE_AUDIO_SERVICE->getSFXChannelGroupID(), NIKE_AUDIO_SERVICE->getGlobalSFXVolume(), 1.f, false, false);
 
 			// Delay for 0.5 seconds using engine's delta time (careful busy-wait loop)
 			float secondsToDelay = 0.5f;
@@ -420,7 +487,7 @@ namespace NIKE {
 			while (currentDelay < secondsToDelay) {
 				currentDelay += NIKE_WINDOWS_SERVICE->getDeltaTime();
 			}
-		}	
+		}*/
 	}
 
 	/*******************************

@@ -13,6 +13,7 @@
 
 #include "Core/stdafx.h"
 #include "Managers/Services/sEvents.h"
+#include "Managers/Services/sAudio.h"
 
 namespace NIKE {
 
@@ -42,10 +43,11 @@ namespace NIKE {
 		struct Cam {
 			Vector2f position;	// Position of camera
 			float zoom;	// represents how much of the world is visible vertically (zoom level).
+			float mouse_offset;
 
-			Cam() : position(), zoom{ 1.0f } {}
-			Cam(float zoom) : position(), zoom{ zoom } {}
-			Cam(Vector2f const& position, float zoom) : position{ position }, zoom{ zoom } {}
+			Cam() : position(), zoom{ 1.0f }, mouse_offset{ 0.f } {}
+			Cam(float zoom) : position(), zoom{ zoom }, mouse_offset{ 0.f } {}
+			Cam(Vector2f const& position, float zoom, float mouse_offset = 0.f) : position{ position }, zoom{ zoom }, mouse_offset{ mouse_offset } {}
 		};
 
 		//Change camera event
@@ -105,32 +107,98 @@ namespace NIKE {
 			Vector2b b_flip;
 
 			Texture() : texture_id{}, color(0.f,0.f,0.f,1.f), b_blend{ false }, intensity{ 0.0f }, b_stretch{ false }, frame_size(1,1), frame_index(0,0), b_flip{false, false} {}
-			Texture(std::string const& texture_id, Vector4f const& color, bool b_blend = false, float intensity = 0.5f, bool b_stretch = false, Vector2i const& frame_size = { 1, 1 }, Vector2i const& frame_index = { 0, 0 }, Vector2b const& b_flip = {false, false})
+			Texture(std::string const& texture_id, Vector4f const& color, bool b_blend = false, float intensity = 0.f, bool b_stretch = false, Vector2i const& frame_size = { 1, 1 }, Vector2i const& frame_index = { 0, 0 }, Vector2b const& b_flip = {false, false})
 				:texture_id{ texture_id }, color{ color }, b_blend{ b_blend }, intensity{ intensity }, b_stretch{ b_stretch }, frame_size{ frame_size }, frame_index{ frame_index }, b_flip{ b_flip } {}
 		};
 
 		struct ParticleEmitter {
-			Vector2f offset;		// offset from entity position
-			int render_type;	// ParticleRenderType type
-			int preset;			// ParticlePresets type
-			std::string ref;		// reference to particle system
-			float duration;		// -1 for infinite
+			Vector2f offset{};		// offset from entity position
+			int render_type{};	// ParticleRenderType type
+			int preset{};			// ParticlePresets type
+			std::string ref{};		// reference to particle system
+			float duration{};		// -1 for infinite
 
 			//Particle system
 			std::shared_ptr<SysParticle::ParticleSystem> p_system;
 
+			// particle
+			int num_new_particles_per_second{10};
+			float particle_lifespan{1.f};
+			float particle_acceleration{};
+			Vector2f particle_velocity_range{5.f, 100.f};
+			Vector2f particle_vector_x_range{-1.f, 1.f};
+			Vector2f particle_vector_y_range{-1.f, 1.f};
+			bool particle_color_is_random{true};
+			Vector4f particle_color{1.f, 1.f, 1.f, 1.f};
+			Vector2f particle_rand_x_offset_range{0.f, 0.f};
+			Vector2f particle_rand_y_offset_range{0.f, 0.f};
+			float particle_rotation{};
+			Vector2f particle_rand_width_range{5.f, 10.f};
+
+			// particle behaviour over time
+			bool particle_size_changes_over_time{false};
+			Vector2f particle_final_size{};
+			bool particle_color_changes_over_time{false};
+			Vector4f particle_final_color{};
+			float particle_rotation_speed{};		// in degrees (anticlockwise) per second !NOTE: rmb to convert to radians lol
+			
+			// texture
+			std::string texture_ref{};
+
 			ParticleEmitter();
 		};
 
-		struct Batch {
-			struct Renderable {
-				std::variant<Text, Shape, Texture> render_type;
-				Transform::Transform transform;
+		enum class VideoMode {
+			PLAYING = 0,
+			PAUSED,
+			RESTART,
+			END
+		};
 
-				Renderable() : render_type{Texture()}, transform() {}
-			};
+		struct Video {
 
-			std::vector<Renderable> render_queue;
+			//Video ID
+			std::string video_id;
+
+			//Mpeg object
+			plm_t* mpeg;
+			uint8_t* rgb_data;
+			bool b_init;
+
+			//Texture ID
+			unsigned int texture_id;
+			Vector2f texture_size;
+
+			//Audio
+			std::shared_ptr<Audio::IAudio> audio;
+			std::shared_ptr<Audio::IChannel> channel;
+			static std::shared_ptr<Audio::IChannelGroup> channel_group;
+
+			//Video variables
+			VideoMode video_mode;
+			bool b_loop;
+			float curr_time;
+			float duration;
+
+			//Timers
+			float frame_timer;
+			float audio_timer;
+
+			Video() : video_id{ "" }, mpeg{ nullptr }, rgb_data{ nullptr }, b_init{ true }, texture_id{ 0 }, texture_size(),
+				video_mode{ VideoMode::PAUSED }, b_loop{ true }, curr_time{ 0.0f }, duration{ 0.0f },
+				frame_timer{ 0.0f }, audio_timer{ 0.0f } {}
+
+			~Video() {
+				if (mpeg) {
+					plm_destroy(mpeg);
+					mpeg = nullptr;
+				}
+
+				if (rgb_data) {
+					delete[] rgb_data;
+					rgb_data = nullptr;
+				}
+			}
 		};
 
 		void registerComponents();

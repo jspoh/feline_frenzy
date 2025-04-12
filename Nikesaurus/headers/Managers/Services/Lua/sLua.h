@@ -23,10 +23,15 @@ namespace NIKE {
 		//Lua script component
 		struct NIKE_API Script {
 			std::string script_id;
-			std::string function;
+
+			std::string start_function;
+			std::string update_function;
+
+			bool start_function_executed;
+
 			std::unordered_map<std::string, LuaValue> named_args;
 
-			Script() : script_id{ "" }, function{ "" } {}
+			Script() : script_id{ "" }, start_function{ "" }, update_function{ "" }, start_function_executed{ false } {}
 
 			//Serialize script comp
 			nlohmann::json serialize() const;
@@ -150,7 +155,7 @@ namespace NIKE {
 
 			//Execute lua script based on asset service id
 			template<typename ...Args>
-			sol::object executeScript(Script const& script) {
+			sol::object executeScript(Script & script) {
 
 				try {
 					//Get script table from asset service
@@ -164,8 +169,27 @@ namespace NIKE {
 					//Execute script
 					sol::protected_function_result result = (*loaded_script)();
 
+					//Convert result into a table
+					sol::table script_table = result;
+
+					if (!script.start_function.empty() && !script.start_function_executed) {
+						sol::function start_function = script_table[script.start_function];
+						if (start_function.valid()) {
+							NIKEE_CORE_INFO("Executing start function: {}", script.start_function);
+
+							// Execute the start function
+							start_function(script.named_args.size(), convertScriptArgs(script));
+
+							// Mark the start function as executed
+							script.start_function_executed = true;
+						}
+						else {
+							throw std::runtime_error("Start function not found in script table: " + script.start_function);
+						}
+					}
+
 					//No function to be called
-					if (script.function.empty()) {
+					if (script.update_function.empty()) {
 
 						//Execute script table
 						if (result.get_type() == sol::type::table) {
@@ -185,13 +209,12 @@ namespace NIKE {
 						throw std::runtime_error("Error! Cant call a function from a function script!");
 					}
 
-					//Convert result into a table
-					sol::table script_table = result;
+
 
 					//Function to be called
-					sol::function script_function = script_table[script.function];
+					sol::function script_function = script_table[script.update_function];
 					if (!script_function.valid()) {
-						throw std::runtime_error("Function not found in script table: " + script.function);
+						throw std::runtime_error("Function not found in script table: " + script.update_function);
 					}
 
 					//Execute the Lua function with provided arguments

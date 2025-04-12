@@ -1,6 +1,31 @@
 [
     {
-        "Channels": null
+        "Channels": {
+            "BGM": {
+                "loop": true,
+                "tracks": [
+                    "Cutscene_1.wav"
+                ]
+            },
+            "BGMC": {
+                "loop": true,
+                "tracks": [
+                    "BGM_Level_1_Combat.wav"
+                ]
+            },
+            "SFX": {
+                "loop": false,
+                "tracks": []
+            },
+            "VFX": {
+                "loop": false,
+                "tracks": []
+            },
+            "Video Channels": {
+                "loop": false,
+                "tracks": []
+            }
+        }
     },
     {
         "Grid ID": "cut_scene_1.grid"
@@ -21,33 +46,14 @@
     {
         "Layer": {
             "B_State": true,
+            "B_YSort": false,
             "Entities": [
                 {
                     "Entity": {
                         "Components": {
-                            "Render::Texture": {
-                                "B_Blend": false,
-                                "B_Flip": {
-                                    "x": false,
-                                    "y": false
-                                },
-                                "B_Stretch": false,
-                                "Color": {
-                                    "w": 1.0,
-                                    "x": 0.0,
-                                    "y": 0.0,
-                                    "z": 0.0
-                                },
-                                "Frame_Index": {
-                                    "x": 0,
-                                    "y": 0
-                                },
-                                "Frame_Size": {
-                                    "x": 1,
-                                    "y": 1
-                                },
-                                "Intensity": 0.0,
-                                "Texture_ID": "Intro_Cutscene_1.png"
+                            "Render::Video": {
+                                "B_Loop": false,
+                                "Video_ID": "OpeningCutscene.mpg"
                             },
                             "Transform::Transform": {
                                 "Position": {
@@ -57,13 +63,13 @@
                                 "Rotation": 0.0,
                                 "Scale": {
                                     "x": 1631.5250244140625,
-                                    "y": 917.7328491210938
+                                    "y": 917.7327880859375
                                 },
                                 "Screen Position": true
                             }
                         },
                         "MetaData": {
-                            "B_Locked": true,
+                            "B_Locked": false,
                             "Layer_ID": 0,
                             "Layer_Order": 0,
                             "Name": "cut_scene_png",
@@ -81,6 +87,7 @@
     {
         "Layer": {
             "B_State": true,
+            "B_YSort": false,
             "Entities": [
                 {
                     "Entity": {
@@ -97,8 +104,8 @@
                                     "y": 0
                                 },
                                 "Sheet_Size": {
-                                    "x": 1,
-                                    "y": 1
+                                    "x": 0,
+                                    "y": 0
                                 },
                                 "Start_Index": {
                                     "x": 1,
@@ -107,7 +114,7 @@
                             },
                             "Render::Shape": {
                                 "Color": {
-                                    "w": 1.0,
+                                    "w": 0.0,
                                     "x": 1.0,
                                     "y": 1.0,
                                     "z": 1.0
@@ -115,122 +122,15 @@
                                 "Model_ID": "square-texture.model"
                             },
                             "Render::Text": {
-                                "Color": {
-                                    "w": 1.0,
-                                    "x": 1.1676470041275024,
-                                    "y": 1.104901909828186,
-                                    "z": 1.4499999284744263
-                                },
-                                "Font_ID": "Skranji-Regular.ttf",
-                                "Origin": 0,
-                                "Scale": 10.0,
-                                "Size": {
-                                    "x": 0.0,
-                                    "y": 0.0
-                                },
-                                "Text": ""
-                            },
-                            "Render::Texture": {
-                                "B_Blend": false,
-                                "B_Flip": {
-                                    "x": false,
-                                    "y": false
-                                },
-                                "B_Stretch": false,
                                 "Color": {
                                     "w": 1.0,
                                     "x": 0.0,
                                     "y": 0.0,
                                     "z": 0.0
                                 },
-                                "Frame_Index": {
-                                    "x": 0,
-                                    "y": 0
-                                },
-                                "Frame_Size": {
-                                    "x": 1,
-                                    "y": 1
-                                },
-                                "Intensity": 0.0,
-                                "Texture_ID": ""
-                            },
-                            "Transform::Transform": {
-                                "Position": {
-                                    "x": -12.65999984741211,
-                                    "y": -74.33599853515625
-                                },
-                                "Rotation": 0.0,
-                                "Scale": {
-                                    "x": 1543.499755859375,
-                                    "y": 810.3373413085938
-                                },
-                                "Screen Position": false
-                            }
-                        },
-                        "MetaData": {
-                            "B_Locked": false,
-                            "Layer_ID": 1,
-                            "Layer_Order": 0,
-                            "Name": "next_button",
-                            "Prefab_ID": "",
-                            "Prefab_Override": null,
-                            "Tags": []
-                        },
-                        "UI Btn": {
-                            "Input_State": 1,
-                            "Script": {
-                                "Function": "Change",
-                                "Named_Args": {
-                                    "scene": "cut_scene_2.scn"
-                                },
-                                "Script_ID": "ChangeScene.lua"
-                            }
-                        },
-                        "UI ID": "next_button"
-                    }
-                },
-                {
-                    "Entity": {
-                        "Components": {
-                            "Animation::Base": {
-                                "Animation_Count": 0,
-                                "B_PingPong": false,
-                                "B_Reverse": false,
-                                "Frame_Duration": 0.0
-                            },
-                            "Animation::Sprite": {
-                                "End_Index": {
-                                    "x": 0,
-                                    "y": 0
-                                },
-                                "Sheet_Size": {
-                                    "x": 0,
-                                    "y": 0
-                                },
-                                "Start_Index": {
-                                    "x": 0,
-                                    "y": 0
-                                }
-                            },
-                            "Render::Shape": {
-                                "Color": {
-                                    "w": 0.0,
-                                    "x": 1.0,
-                                    "y": 1.0,
-                                    "z": 1.0
-                                },
-                                "Model_ID": "square-texture.model"
-                            },
-                            "Render::Text": {
-                                "Color": {
-                                    "w": 1.0,
-                                    "x": 0.7176470756530762,
-                                    "y": 0.6549019813537598,
-                                    "z": 1.0
-                                },
-                                "Font_ID": "Skranji-Regular.ttf",
+                                "Font_ID": "",
                                 "Origin": 0,
-                                "Scale": 10.0,
+                                "Scale": 1.0,
                                 "Size": {
                                     "x": 0.0,
                                     "y": 0.0
@@ -239,117 +139,38 @@
                             },
                             "Transform::Transform": {
                                 "Position": {
-                                    "x": -733.7400512695313,
-                                    "y": 411.7725524902344
+                                    "x": 0.0,
+                                    "y": 0.0
                                 },
                                 "Rotation": 0.0,
                                 "Scale": {
-                                    "x": 183.5,
-                                    "y": 73.5
+                                    "x": 1631.0,
+                                    "y": 917.7329711914063
                                 },
-                                "Screen Position": false
+                                "Screen Position": true
                             }
                         },
                         "MetaData": {
                             "B_Locked": false,
                             "Layer_ID": 1,
-                            "Layer_Order": 1,
-                            "Name": "back_button",
-                            "Prefab_ID": "",
-                            "Prefab_Override": null,
-                            "Tags": []
-                        },
-                        "UI Btn": {
-                            "Input_State": 1,
-                            "Script": {
-                                "Function": "Change",
-                                "Named_Args": {
-                                    "scene": "main_menu.scn"
-                                },
-                                "Script_ID": "ChangeScene.lua"
-                            }
-                        },
-                        "UI ID": "back_button"
-                    }
-                },
-                {
-                    "Entity": {
-                        "Components": {
-                            "Animation::Base": {
-                                "Animation_Count": 0,
-                                "B_PingPong": false,
-                                "B_Reverse": false,
-                                "Frame_Duration": 0.0
-                            },
-                            "Animation::Sprite": {
-                                "End_Index": {
-                                    "x": 0,
-                                    "y": 0
-                                },
-                                "Sheet_Size": {
-                                    "x": 0,
-                                    "y": 0
-                                },
-                                "Start_Index": {
-                                    "x": 0,
-                                    "y": 0
-                                }
-                            },
-                            "Render::Shape": {
-                                "Color": {
-                                    "w": 0.0,
-                                    "x": 1.0,
-                                    "y": 1.0,
-                                    "z": 1.0
-                                },
-                                "Model_ID": "square-texture.model"
-                            },
-                            "Render::Text": {
-                                "Color": {
-                                    "w": 1.0,
-                                    "x": 0.7176470756530762,
-                                    "y": 0.6549019813537598,
-                                    "z": 1.0
-                                },
-                                "Font_ID": "Skranji-Regular.ttf",
-                                "Origin": 0,
-                                "Scale": 0.9660493731498718,
-                                "Size": {
-                                    "x": 78.25,
-                                    "y": 37.675926208496094
-                                },
-                                "Text": "Skip"
-                            },
-                            "Transform::Transform": {
-                                "Position": {
-                                    "x": 725.4962158203125,
-                                    "y": -398.91058349609375
-                                },
-                                "Rotation": 0.0,
-                                "Scale": {
-                                    "x": 156.5,
-                                    "y": 100.0
-                                },
-                                "Screen Position": false
-                            }
-                        },
-                        "MetaData": {
-                            "B_Locked": false,
-                            "Layer_ID": 1,
-                            "Layer_Order": 2,
+                            "Layer_Order": 0,
                             "Name": "skip_button",
                             "Prefab_ID": "",
                             "Prefab_Override": null,
                             "Tags": []
                         },
                         "UI Btn": {
-                            "Input_State": 1,
-                            "Script": {
-                                "Function": "Change",
-                                "Named_Args": {
-                                    "scene": "lvl1Copy.scn"
-                                },
-                                "Script_ID": "ChangeScene.lua"
+                            "Disabled": false,
+                            "Input_State": 0,
+                            "Scripts": {
+                                "OnClick": {
+                                    "Named_Args": {
+                                        "scene": "lvl1_1.scn"
+                                    },
+                                    "Script_ID": "ChangeScene.lua",
+                                    "Start_Function": "",
+                                    "Update_Function": "Change"
+                                }
                             }
                         },
                         "UI ID": "skip_button"

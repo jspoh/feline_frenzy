@@ -20,6 +20,9 @@ namespace NIKE {
 		p_system = std::make_shared<SysParticle::ParticleSystem>();
 	}
 
+	//Definition for video component static channel group
+	std::shared_ptr<Audio::IChannelGroup> Render::Video::channel_group = nullptr;
+
 	void Render::registerComponents() {
 
 		//Register render components
@@ -28,85 +31,256 @@ namespace NIKE {
 		NIKE_ECS_MANAGER->registerComponent<Render::Shape>();
 		NIKE_ECS_MANAGER->registerComponent<Render::Texture>();
 		NIKE_ECS_MANAGER->registerComponent<Render::ParticleEmitter>();
-		NIKE_ECS_MANAGER->registerComponent<Render::Batch>();
+		NIKE_ECS_MANAGER->registerComponent<Render::Video>();
 
 		NIKE_SERIALIZE_SERVICE->registerComponent<Render::ParticleEmitter>(
 			//Serialize
 			[](Render::ParticleEmitter const& comp) -> nlohmann::json {
 				return	{
-					{ "preset", static_cast<int>(comp.preset) },
-					{ "render_type", static_cast<int>(comp.render_type) },
+					{ "preset", static_cast<int>(comp.p_system->preset) },
+					{ "render_type", static_cast<int>(comp.p_system->render_type) },
 					{ "offset", comp.offset.toJson() },
-					{ "duration", comp.duration },
+					{ "duration", comp.p_system->duration },
+
+					{ "num_new_particles_per_second", comp.p_system->num_new_particles_per_second },
+					{ "particle_lifespan", comp.p_system->particle_lifespan },
+					{ "particle_acceleration", comp.p_system->particle_acceleration },
+					{ "particle_velocity_range", comp.p_system->particle_velocity_range.toJson() },
+					{ "particle_vector_x_range", comp.p_system->particle_vector_x_range.toJson() },
+					{ "particle_vector_y_range", comp.p_system->particle_vector_y_range.toJson() },
+					{ "particle_color_is_random", comp.p_system->particle_color_is_random },
+					{ "particle_color", comp.p_system->particle_color.toJson()},
+					{ "particle_rand_x_offset_range", comp.p_system->particle_rand_x_offset_range.toJson()},
+					{ "particle_rand_y_offset_range", comp.p_system->particle_rand_y_offset_range.toJson()},
+					{ "particle_rotation", comp.p_system->particle_rotation },
+					{ "particle_rand_width_range", comp.p_system->particle_rand_width_range.toJson()},
+
+					{ "particle_size_changes_over_time", comp.p_system->particle_size_changes_over_time },
+					{ "particle_final_size", comp.p_system->particle_final_size.toJson()},
+					{ "particle_color_changes_over_time", comp.p_system->particle_color_changes_over_time },
+					{ "particle_final_color", comp.p_system->particle_final_color.toJson()},
+					{ "particle_rotation_speed", comp.p_system->particle_rotation_speed },
+
+					{ "texture_ref", comp.p_system->texture_ref }
+
 					//{ "ref", comp.ref }
 				};
 			},
 			//Deserialize
 			[](Render::ParticleEmitter& comp, nlohmann::json const& data) {
-				//const std::string particle_emitter_ref = NIKE::SysParticle::Manager::ENTITY_PARTICLE_EMITTER_PREFIX + std::to_string(NIKE::SysParticle::Manager::getInstance().getNewPSID());
-
-				comp.preset = static_cast<int>(data.at("preset").get<int>());
-				comp.render_type = static_cast<int>(data.at("render_type").get<int>());
-				comp.offset.fromJson(data.at("offset"));
-				comp.duration = data.at("duration").get<float>();
 
 				//Initialize particle system
-				comp.p_system->particles.reserve(SysParticle::MAX_PARTICLE_SYSTEM_ACTIVE_PARTICLES);
-				comp.p_system->preset = static_cast<SysParticle::Data::ParticlePresets>(comp.preset);
-				comp.p_system->origin = comp.offset; // Will be updated to proper origin through the particle update function
-				comp.p_system->is_alive = true;
-				comp.p_system->duration = comp.duration;
-				comp.p_system->time_alive = 0.f;
-				comp.p_system->using_world_pos = true; // Temporary set to true
-				comp.p_system->render_type = static_cast<SysParticle::Data::ParticleRenderType>(comp.render_type);
+				try {
+					comp.offset.fromJson(data.at("offset"));
+					comp.duration = data.at("duration").get<float>();
+					comp.preset = comp.preset;
+					comp.duration = data.at("duration").get<float>();
+					comp.render_type = data.at("render_type").get<int>();
+
+					comp.num_new_particles_per_second = data.at("num_new_particles_per_second").get<int>();
+					comp.particle_lifespan = data.at("particle_lifespan").get<float>();
+					comp.particle_acceleration = data.at("particle_acceleration").get<float>();
+					comp.particle_velocity_range.fromJson(data.at("particle_velocity_range"));
+					comp.particle_vector_x_range.fromJson(data.at("particle_vector_x_range"));
+					comp.particle_vector_y_range.fromJson(data.at("particle_vector_y_range"));
+					comp.particle_color_is_random = data.at("particle_color_is_random").get<bool>();
+					comp.particle_color.fromJson(data.at("particle_color"));
+					comp.particle_rand_x_offset_range.fromJson(data.at("particle_rand_x_offset_range"));
+					comp.particle_rand_y_offset_range.fromJson(data.at("particle_rand_y_offset_range"));
+					comp.particle_rotation = data.at("particle_rotation").get<float>();
+					comp.particle_rand_width_range.fromJson(data.at("particle_rand_width_range"));
+					comp.particle_size_changes_over_time = data.at("particle_size_changes_over_time").get<bool>();
+					comp.particle_final_size.fromJson(data.at("particle_final_size"));
+					comp.particle_color_changes_over_time = data.at("particle_color_changes_over_time").get<bool>();
+					comp.particle_final_color.fromJson(data.at("particle_final_color"));
+					comp.particle_rotation_speed = data.at("particle_rotation_speed").get<float>();
+					comp.texture_ref = data.at("texture_ref").get<std::string>();
+					
+					comp.p_system->particles.reserve(SysParticle::MAX_PARTICLE_SYSTEM_ACTIVE_PARTICLES);
+
+					comp.p_system->preset = static_cast<SysParticle::Data::ParticlePresets>(comp.preset);
+					comp.p_system->origin = comp.offset; // Will be updated to proper origin through the particle update function
+					comp.p_system->is_alive = true;
+					comp.p_system->duration = comp.duration;
+					comp.p_system->time_alive = 0.f;
+					comp.p_system->using_world_pos = true; // Temporary set to true
+					comp.p_system->render_type = static_cast<SysParticle::Data::ParticleRenderType>(comp.render_type);
+
+					//	comp.p_system->num_new_particles_per_second
+					//	comp.p_system->particle_lifespan
+					//	comp.p_system->particle_acceleration
+					//	comp.p_system->particle_velocity_range
+					//	comp.p_system->particle_vector_x_range
+					//	comp.p_system->particle_vector_y_range
+					//	comp.p_system->particle_color_is_random
+					//	comp.p_system->particle_color
+					//	comp.p_system->particle_rand_x_offset_range
+					//	comp.p_system->particle_rand_y_offset_range
+					//	comp.p_system->particle_rotation
+					//	comp.p_system->particle_rand_width_range
+					//	comp.p_system->particle_size_changes_over_time
+					//	comp.p_system->particle_final_size
+					//	comp.p_system->particle_color_changes_over_time
+					//	comp.p_system->particle_color_changes_over_time
+					//	comp.p_system->particle_final_color
+					//	comp.p_system->particle_rotation_speed
+
+				}
+				catch (std::exception& e) {
+					(void)e;
+				}
 			},
 			// Override Serialize
 			[](Render::ParticleEmitter const& comp, Render::ParticleEmitter const& other_comp) -> nlohmann::json {
 				nlohmann::json delta;
 
-				if (comp.preset != other_comp.preset) {
-					delta["preset"] = comp.preset;
+				if (comp.p_system->preset != other_comp.p_system->preset) {
+					delta["preset"] = comp.p_system->preset;
 				}
-				if (comp.render_type != other_comp.render_type) {
-					delta["render_type"] = comp.render_type;
+				if (comp.p_system->render_type != other_comp.p_system->render_type) {
+					delta["render_type"] = comp.p_system->render_type;
 				}
 				if (comp.offset != other_comp.offset) {
 					delta["offset"] = comp.offset.toJson();
 				}
-				if (comp.duration != other_comp.duration) {
-					delta["duration"] = comp.duration;
+				if (comp.p_system->duration != other_comp.p_system->duration) {
+					delta["duration"] = comp.p_system->duration;
 				}
-				//if (comp.ref != other_comp.ref) {
-				//	delta["ref"] = comp.ref;
+				//if (comp.p_system->ref != other_comp.p_system->ref) {
+				//	delta["ref"] = comp.p_system->ref;
 				//}
+
+				if (comp.p_system->num_new_particles_per_second != other_comp.p_system->num_new_particles_per_second) {
+					delta["num_new_particles_per_second"] = comp.p_system->num_new_particles_per_second;
+				}
+				if (comp.p_system->particle_lifespan != other_comp.p_system->particle_lifespan) {
+					delta["particle_lifespan"] = comp.p_system->particle_lifespan;
+				}
+				if (comp.p_system->particle_acceleration != other_comp.p_system->particle_acceleration) {
+					delta["particle_acceleration"] = comp.p_system->particle_acceleration;
+				}
+				if (comp.p_system->particle_velocity_range != other_comp.p_system->particle_velocity_range) {
+					delta["particle_velocity_range"] = comp.p_system->particle_velocity_range.toJson();
+				}
+				if (comp.p_system->particle_vector_x_range != other_comp.p_system->particle_vector_x_range) {
+					delta["particle_vector_x_range"] = comp.p_system->particle_vector_x_range.toJson();
+				}
+				if (comp.p_system->particle_vector_y_range != other_comp.p_system->particle_vector_y_range) {
+					delta["particle_vector_y_range"] = comp.p_system->particle_vector_y_range.toJson();
+				}
+				if (comp.p_system->particle_color_is_random != other_comp.p_system->particle_color_is_random) {
+					delta["particle_color_is_random"] = comp.p_system->particle_color_is_random;
+				}
+				if (comp.p_system->particle_color != other_comp.p_system->particle_color) {
+					delta["particle_color"] = comp.p_system->particle_color.toJson();
+				}
+				if (comp.p_system->particle_rand_x_offset_range != other_comp.p_system->particle_rand_x_offset_range) {
+					delta["particle_rand_x_offset_range"] = comp.p_system->particle_rand_x_offset_range.toJson();
+				}
+				if (comp.p_system->particle_rand_y_offset_range != other_comp.p_system->particle_rand_y_offset_range) {
+					delta["particle_rand_y_offset_range"] = comp.p_system->particle_rand_y_offset_range.toJson();
+				}
+				if (comp.p_system->particle_rotation != other_comp.p_system->particle_rotation) {
+					delta["particle_rotation"] = comp.p_system->particle_rotation;
+				}
+				if (comp.p_system->particle_rand_width_range != other_comp.p_system->particle_rand_width_range) {
+					delta["particle_rand_width_range"] = comp.p_system->particle_rand_width_range.toJson();
+				}
+
+				if (comp.p_system->particle_size_changes_over_time != other_comp.p_system->particle_size_changes_over_time) {
+					delta["particle_size_changes_over_time"] = comp.p_system->particle_size_changes_over_time;
+				}
+				if (comp.p_system->particle_final_size != other_comp.p_system->particle_final_size) {
+					delta["particle_final_size"] = comp.p_system->particle_final_size.toJson();
+				}
+				if (comp.p_system->particle_color_changes_over_time != other_comp.p_system->particle_color_changes_over_time) {
+					delta["particle_color_changes_over_time"] = comp.p_system->particle_color_changes_over_time;
+				}
+				if (comp.p_system->particle_final_color != other_comp.p_system->particle_final_color) {
+					delta["particle_final_color"] = comp.p_system->particle_final_color.toJson();
+				}
+				if (comp.p_system->particle_rotation_speed != other_comp.p_system->particle_rotation_speed) {
+					delta["particle_rotation_speed"] = comp.p_system->particle_rotation_speed;
+				}
+				if (comp.p_system->texture_ref != other_comp.p_system->texture_ref) {
+					delta["texture_ref"] = comp.p_system->texture_ref;
+				}
+
 				return delta;
 			},
 			// Override Deserialize
 			[](Render::ParticleEmitter& comp, nlohmann::json const& delta) {
-				//const std::string particle_emitter_ref = NIKE::SysParticle::Manager::ENTITY_PARTICLE_EMITTER_PREFIX + std::to_string(NIKE::SysParticle::Manager::getInstance().getNewPSID());
-
 				if (delta.contains("preset")) {
-					comp.preset = delta["preset"];
+					comp.p_system->preset = delta["preset"];
 				}
 				if (delta.contains("render_type")) {
-					comp.render_type = delta["render_type"];
+					comp.p_system->render_type = delta["render_type"];
 				}
 				if (delta.contains("offset")) {
 					comp.offset.fromJson(delta["offset"]);
 				}
 				if (delta.contains("duration")) {
-					comp.duration = delta["duration"];
+					comp.p_system->duration = delta["duration"];
 				}
 
-				//Initialize particle system
-				comp.p_system->particles.reserve(SysParticle::MAX_PARTICLE_SYSTEM_ACTIVE_PARTICLES);
-				comp.p_system->preset = static_cast<SysParticle::Data::ParticlePresets>(comp.preset);
-				comp.p_system->origin = comp.offset; // Will be updated to proper origin through the particle update function
-				comp.p_system->is_alive = true;
-				comp.p_system->duration = comp.duration;
-				comp.p_system->time_alive = 0.f;
-				comp.p_system->using_world_pos = true; // Temporary set to true
-				comp.p_system->render_type = static_cast<SysParticle::Data::ParticleRenderType>(comp.render_type);
+				if (delta.contains("num_new_particles_per_second")) {
+					comp.p_system->num_new_particles_per_second = delta["num_new_particles_per_second"];
+				}
+				if (delta.contains("particle_lifespan")) {
+					comp.p_system->particle_lifespan = delta["particle_lifespan"];
+				}
+				if (delta.contains("particle_acceleration")) {
+					comp.p_system->particle_acceleration = delta["particle_acceleration"];
+				}
+				if (delta.contains("particle_velocity_range")) {
+					comp.p_system->particle_velocity_range.fromJson(delta["particle_velocity_range"]);
+				}
+				if (delta.contains("particle_vector_x_range")) {
+					comp.p_system->particle_vector_x_range.fromJson(delta["particle_vector_x_range"]);
+				}
+				if (delta.contains("particle_vector_y_range")) {
+					comp.p_system->particle_vector_y_range.fromJson(delta["particle_vector_y_range"]);
+				}
+				if (delta.contains("particle_color_is_random")) {
+					comp.p_system->particle_color_is_random = delta["particle_color_is_random"];
+				}
+				if (delta.contains("particle_color")) {
+					comp.p_system->particle_color.fromJson(delta["particle_color"]);
+				}
+				if (delta.contains("particle_rand_x_offset_range")) {
+					comp.p_system->particle_rand_x_offset_range.fromJson(delta["particle_rand_x_offset_range"]);
+				}
+				if (delta.contains("particle_rand_y_offset_range")) {
+					comp.p_system->particle_rand_y_offset_range.fromJson(delta["particle_rand_y_offset_range"]);
+				}
+				if (delta.contains("particle_rotation")) {
+					comp.p_system->particle_rotation = delta["particle_rotation"];
+				}
+				if (delta.contains("particle_rand_width_range")) {
+					comp.p_system->particle_rand_width_range.fromJson(delta["particle_rand_width_range"]);
+				}
+
+				if (delta.contains("particle_size_changes_over_time")) {
+					comp.p_system->particle_size_changes_over_time = delta["particle_size_changes_over_time"];
+				}
+				if (delta.contains("particle_final_size")) {
+					comp.p_system->particle_final_size.fromJson(delta["particle_final_size"]);
+				}
+				if (delta.contains("particle_color_changes_over_time")) {
+					comp.p_system->particle_color_changes_over_time = delta["particle_color_changes_over_time"];
+				}
+				if (delta.contains("particle_final_color")) {
+					comp.p_system->particle_final_color.fromJson(delta["particle_final_color"]);
+				}
+				if (delta.contains("particle_rotation_speed")) {
+					comp.p_system->particle_rotation_speed = delta["particle_rotation_speed"];
+				}
+				if (delta.contains("texture_ref")) {
+					comp.p_system->texture_ref = delta["texture_ref"];
+				}
+
+				// add particle system
+				//NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem(particle_emitter_ref, NIKE::SysParticle::Data::ParticlePresets(comp.p_system->preset), comp.p_system->offset, static_cast<NIKE::SysParticle::Data::ParticleRenderType>(comp.p_system->render_type), comp.p_system->duration);
 			}
 		);
 
@@ -118,7 +292,8 @@ namespace NIKE {
 			[](Render::Cam const& comp) -> nlohmann::json {
 				return	{
 						{ "Position", comp.position.toJson() },
-						{ "Zoom", comp.zoom }
+						{ "Zoom", comp.zoom },
+						{ "Mouse_Offset", comp.mouse_offset}
 				};
 			},
 
@@ -126,6 +301,7 @@ namespace NIKE {
 			[](Render::Cam& comp, nlohmann::json const& data) {
 				comp.position.fromJson(data.value("Position", Vector2f::def_json));
 				comp.zoom = data.value("Zoom", 1.0f);
+				comp.mouse_offset = data.value("Mouse_Offset", 0.f);
 			},
 
 			// Override Serialize
@@ -138,6 +314,9 @@ namespace NIKE {
 				if (comp.zoom != other_comp.zoom) {
 					delta["Zoom"] = comp.zoom;
 				}
+				if (comp.mouse_offset != other_comp.mouse_offset) {
+					delta["Mouse_Offset"] = comp.mouse_offset;
+				}
 
 				return delta;
 			},
@@ -149,6 +328,9 @@ namespace NIKE {
 				}
 				if (delta.contains("Zoom")) {
 					comp.zoom = delta["Zoom"];
+				}
+				if (delta.contains("Mouse_Offset")) {
+					comp.mouse_offset = delta["Mouse_Offset"];
 				}
 			}
 		);
@@ -364,209 +546,50 @@ namespace NIKE {
 
 		NIKE_SERIALIZE_SERVICE->registerComponentAdding<Render::Texture>();
 
-		//Register Batch for serialization
-		NIKE_SERIALIZE_SERVICE->registerComponent<Render::Batch>(
+		//Register texture for serialization
+		NIKE_SERIALIZE_SERVICE->registerComponent<Render::Video>(
 			//Serialize
-			[](Render::Batch const& comp) -> nlohmann::json {
-				nlohmann::json batch_json;
-
-				//Storage of multiple renders
-				batch_json["RenderQueue"] = nlohmann::json::array();
-
-				for (auto const& render : comp.render_queue) {
-					nlohmann::json render_json;
-
-					//Get text variant
-					if (auto* e_text = std::get_if<Render::Text>(&render.render_type)) {
-						render_json["Type"] = "Text";
-						render_json["Data"] = NIKE_SERIALIZE_SERVICE->serializeComponent(Utility::convertTypeString(typeid(Render::Text).name()), e_text);
-					}
-					//Get shape variant
-					else if (auto* e_shape = std::get_if<Render::Shape>(&render.render_type)) {
-						render_json["Type"] = "Shape";
-						render_json["Data"] = NIKE_SERIALIZE_SERVICE->serializeComponent(Utility::convertTypeString(typeid(Render::Shape).name()), e_shape);
-					}
-					//Get texture variant
-					else if (auto* e_texture = std::get_if<Render::Texture>(&render.render_type)) {
-						render_json["Type"] = "Texture";
-						render_json["Data"] = NIKE_SERIALIZE_SERVICE->serializeComponent(Utility::convertTypeString(typeid(Render::Texture).name()), e_texture);
-					}
-
-					//Serialize transform
-					render_json["Transform"] = NIKE_SERIALIZE_SERVICE->serializeComponent(Utility::convertTypeString(typeid(Transform::Transform).name()), &render.transform);
-
-					//Add to batch render queue
-					batch_json["RenderQueue"].push_back(render_json);
-				}
-
-				return batch_json;
+			[](Render::Video const& comp) -> nlohmann::json {
+				return	{
+						{ "Video_ID", comp.video_id },
+						{ "B_Loop", comp.b_loop }
+				};
 			},
 
 			//Deserialize
-			[](Render::Batch& comp, nlohmann::json const& data) {
-
-				//Clear the render queue
-				comp.render_queue.clear();
-
-				//Double check if there is valid data
-				if (!data.contains("RenderQueue") || !data["RenderQueue"].is_array()) return;
-
-				//Iterate through data
-				for (const auto& render_json : data["RenderQueue"]) {
-					Render::Batch::Renderable item;
-
-					//Get data type
-					std::string type = render_json.value("Type", "");
-
-					//Deserialize renders
-					if (type == "Text") {
-						Render::Text text;
-						NIKE_SERIALIZE_SERVICE->deserializeComponent(Utility::convertTypeString(typeid(Render::Text).name()), &text, render_json["Data"]);
-						item.render_type = text;
-					}
-					else if (type == "Shape") {
-						Render::Shape shape;
-						NIKE_SERIALIZE_SERVICE->deserializeComponent(Utility::convertTypeString(typeid(Render::Shape).name()), &shape, render_json["Data"]);
-						item.render_type = shape;
-					}
-					else if (type == "Texture") {
-						Render::Texture texture;
-						NIKE_SERIALIZE_SERVICE->deserializeComponent(Utility::convertTypeString(typeid(Render::Texture).name()), &texture, render_json["Data"]);
-						item.render_type = texture;
-					}
-
-					//Deserialize transform
-					if (render_json.contains("Transform")) {
-						NIKE_SERIALIZE_SERVICE->deserializeComponent(Utility::convertTypeString(typeid(Transform::Transform).name()), &item.transform, render_json["Transform"]);
-					}
-
-					//Insert into render queue
-					comp.render_queue.push_back(item);
-				}
+			[](Render::Video& comp, nlohmann::json const& data) {
+				comp.video_id = data.value("Video_ID", "");
+				comp.b_loop = data.value("B_Loop", true);
 			},
 
 			// Override Serialize
-			[](Render::Batch const& comp, Render::Batch const& other_comp) -> nlohmann::json {
-				nlohmann::json batch_json;
+			[](Render::Video const& comp, Render::Video const& other_comp) -> nlohmann::json {
+				nlohmann::json delta;
 
-				//Storage of multiple renders
-				batch_json["RenderQueue"] = nlohmann::json::array();
-
-				//Iterate through
-				for (size_t i = 0; i < comp.render_queue.size(); ++i) {
-					nlohmann::json render_json;
-
-					const auto& render = comp.render_queue[i];
-
-					//Get text variant
-					auto* e_text = std::get_if<Render::Text>(&render.render_type);
-					if (e_text) {
-						render_json["Type"] = "Text";
-
-						if (i < other_comp.render_queue.size()) {
-							auto* other_text = std::get_if<Render::Text>(&other_comp.render_queue[i].render_type);
-							if (other_text) {
-								render_json["Data"] = NIKE_SERIALIZE_SERVICE->serializeOverrideComponent(Utility::convertTypeString(typeid(Render::Text).name()), &e_text, &other_text);
-								continue;
-							}
-						}
-
-						render_json["Data"] = NIKE_SERIALIZE_SERVICE->serializeComponent(Utility::convertTypeString(typeid(Render::Text).name()), &e_text);
-						continue;
-					}
-
-					//Get shape variant
-					auto* e_shape = std::get_if<Render::Shape>(&render.render_type);
-					if (e_shape) {
-						render_json["Type"] = "Shape";
-
-						if (i < other_comp.render_queue.size()) {
-							auto* other_shape = std::get_if<Render::Shape>(&other_comp.render_queue[i].render_type);
-							if (other_shape) {
-								render_json["Data"] = NIKE_SERIALIZE_SERVICE->serializeOverrideComponent(Utility::convertTypeString(typeid(Render::Shape).name()), &e_shape, &other_shape);
-								continue;
-							}
-						}
-
-						render_json["Data"] = NIKE_SERIALIZE_SERVICE->serializeComponent(Utility::convertTypeString(typeid(Render::Shape).name()), &e_shape);
-						continue;
-					}
-
-					//Get texture variant
-					auto* e_texture = std::get_if<Render::Texture>(&render.render_type);
-					if (e_texture) {
-						render_json["Type"] = "Texture";
-
-						if (i < other_comp.render_queue.size()) {
-							auto* other_texture = std::get_if<Render::Texture>(&other_comp.render_queue[i].render_type);
-							if (other_texture) {
-								render_json["Data"] = NIKE_SERIALIZE_SERVICE->serializeOverrideComponent(Utility::convertTypeString(typeid(Render::Texture).name()), &e_texture, &other_texture);
-								continue;
-							}
-						}
-
-						render_json["Data"] = NIKE_SERIALIZE_SERVICE->serializeComponent(Utility::convertTypeString(typeid(Render::Texture).name()), &e_texture);
-						continue;
-					}
-
-					if (i < other_comp.render_queue.size()) {
-						render_json["Transform"] = NIKE_SERIALIZE_SERVICE->serializeOverrideComponent(Utility::convertTypeString(typeid(Transform::Transform).name()), &render.transform, &other_comp.render_queue[i].transform);
-					}
-					else {
-						render_json["Transform"] = NIKE_SERIALIZE_SERVICE->serializeComponent(Utility::convertTypeString(typeid(Transform::Transform).name()), &render.transform);
-					}
-
-					//Add to batch render queue
-					batch_json["RenderQueue"].push_back(render_json);
+				if (comp.video_id != other_comp.video_id) {
+					delta["Video_ID"] = comp.video_id;
 				}
 
-				return batch_json;
+				if (comp.b_loop != other_comp.b_loop) {
+					delta["B_Loop"] = comp.b_loop;
+				}
+
+				return delta;
 			},
 
 			// Override Deserialize
-			[](Render::Batch& comp, nlohmann::json const& data) {
-				//Clear the render queue
-				comp.render_queue.clear();
+			[](Render::Video& comp, nlohmann::json const& delta) {
+				if (delta.contains("Video_ID")) {
+					comp.video_id = delta["Video_ID"];
+				}
 
-				//Double check if there is valid data
-				if (!data.contains("RenderQueue") || !data["RenderQueue"].is_array()) return;
-
-				//Iterate through data
-				for (const auto& render_json : data["RenderQueue"]) {
-					Render::Batch::Renderable item;
-
-					//Get data type
-					std::string type = render_json.value("Type", "");
-
-					//Deserialize renders
-					if (type == "Text") {
-						Render::Text text;
-						NIKE_SERIALIZE_SERVICE->deserializeOverrideComponent(Utility::convertTypeString(typeid(Render::Text).name()), &text, render_json["Data"]);
-						item.render_type = text;
-					}
-					else if (type == "Shape") {
-						Render::Shape shape;
-						NIKE_SERIALIZE_SERVICE->deserializeOverrideComponent(Utility::convertTypeString(typeid(Render::Shape).name()), &shape, render_json["Data"]);
-						item.render_type = shape;
-					}
-					else if (type == "Texture") {
-						Render::Texture texture;
-						NIKE_SERIALIZE_SERVICE->deserializeOverrideComponent(Utility::convertTypeString(typeid(Render::Texture).name()), &texture, render_json["Data"]);
-						item.render_type = texture;
-					}
-
-					//Deserialize transform
-					if (render_json.contains("Transform")) {
-						NIKE_SERIALIZE_SERVICE->deserializeOverrideComponent(Utility::convertTypeString(typeid(Transform::Transform).name()), &item.transform, render_json["Transform"]);
-					}
-
-					//Insert into render queue
-					comp.render_queue.push_back(item);
+				if (delta.contains("B_Loop")) {
+					comp.b_loop = delta["B_Loop"];
 				}
 			}
 		);
 
-		NIKE_SERIALIZE_SERVICE->registerComponentAdding<Render::Batch>();
+		NIKE_SERIALIZE_SERVICE->registerComponentAdding<Render::Video>();
 	}
 
 	void Render::registerEditorComponents() {
@@ -578,6 +601,23 @@ namespace NIKE {
 					// Before change
 					static int before_change_preset;
 					static Vector2f before_change_offset;
+					static int before_change_num_new_particles_per_second;
+					static float before_change_particle_lifespan;
+					static float before_change_particle_acceleration;
+					static Vector2f before_change_particle_velocity_range;
+					static Vector2f before_change_particle_vector_x_range;
+					static Vector2f before_change_particle_vector_y_range;
+					static bool before_change_particle_color_is_random;
+					static Vector4f before_change_particle_color;
+					static Vector2f before_change_particle_rand_x_offset_range;
+					static Vector2f before_change_particle_rand_y_offset_range;
+					static float before_change_particle_rotation;
+					static Vector2f before_change_particle_rand_width_range;
+					static bool before_change_particle_final_size_changes_over_time;
+					static float before_change_particle_final_size;
+					static bool before_particle_color_changes_over_time;
+					static Vector4f before_change_particle_final_color;
+					static float before_change_particle_rotation_speed;
 
 					// Preset
 					ImGui::Text("Particle Preset:");
@@ -619,38 +659,121 @@ namespace NIKE {
 					}
 
 					// render type
-					ImGui::Text("Particle Render Type:");
-					std::string render_type_options{};
-					for (const auto& [render_type, render_type_ref] : SysParticle::Data::particle_render_type_map) {
-						render_type_options += render_type_ref + '\0';
-					}
-					render_type_options += '\0';
+					{
+						ImGui::Text("Particle Render Type:");
+						std::string render_type_options{};
+						for (const auto& [render_type, render_type_ref] : SysParticle::Data::particle_render_type_map) {
+							render_type_options += render_type_ref + '\0';
+						}
+						render_type_options += '\0';
 
-					int selected_render_type = static_cast<int>(comp.render_type);
-					static int previous_render_type = selected_render_type;
-					if (ImGui::Combo("##Render Type", &selected_render_type, render_type_options.c_str())) {
-						// If the value changed, process the change
-						if (selected_render_type != previous_render_type) {
-							previous_render_type = selected_render_type;
-							LevelEditor::Action change_render_type;
-							// Store the value before the change
-							change_render_type.do_action = [&, render_type = selected_render_type]() {
-								comp.render_type = render_type;
+						int selected_render_type = static_cast<int>(comp.render_type);
+						static int previous_render_type = selected_render_type;
+						if (ImGui::Combo("##Render Type", &selected_render_type, render_type_options.c_str())) {
+							// If the value changed, process the change
+							if (selected_render_type != previous_render_type) {
+								previous_render_type = selected_render_type;
+								LevelEditor::Action change_render_type;
+								// Store the value before the change
+								change_render_type.do_action = [&, render_type = selected_render_type]() {
+									comp.render_type = render_type;
 
-								//Clear all particles
-								comp.p_system->particles.clear();
-								};
-							// Store the undo action
-							change_render_type.undo_action = [&, render_type = previous_render_type]() {
-								comp.render_type = render_type;
+									//Clear all particles
+									comp.p_system->particles.clear();
+									};
+								// Store the undo action
+								change_render_type.undo_action = [&, render_type = previous_render_type]() {
+									comp.render_type = render_type;
 
-								//Clear all particles
-								comp.p_system->particles.clear();
-								};
-							// Execute the action
-							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_render_type));
+									//Clear all particles
+									comp.p_system->particles.clear();
+									};
+								// Execute the action
+								NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_render_type));
+							}
 						}
 					}
+
+					ImGui::BeginDisabled(comp.render_type != static_cast<int>(NIKE::SysParticle::Data::ParticleRenderType::TEXTURED));
+
+					// For texture id
+					{
+						// Hold the current and previous texture selection
+						static std::string previous_texture = comp.texture_ref;
+						std::string current_texture = comp.texture_ref;
+
+						ImGui::Text("Select Texture");
+
+						auto const& all_loaded_textures = NIKE_ASSETS_SERVICE->getAssetRefs(Assets::Types::Texture);
+
+						// Find the index of the currently selected texture in the list
+						int current_index = -1;
+						for (size_t i = 0; i < all_loaded_textures.size(); ++i) {
+							if (current_texture == all_loaded_textures[i]) {
+								current_index = static_cast<int>(i);
+								break;
+							}
+						}
+
+						// Display combo box for texture selection
+						if (ImGui::Combo("##SelectTexture", &current_index, all_loaded_textures.data(), static_cast<int>(all_loaded_textures.size()))) {
+
+							// Validate the selected index and get the new texture
+							if (current_index >= 0 && current_index < static_cast<int>(all_loaded_textures.size())) {
+								std::string new_texture = all_loaded_textures[current_index];
+
+								if (new_texture != comp.texture_ref) {
+									// Save action
+									LevelEditor::Action change_font_action;
+									change_font_action.do_action = [&, texture_ref = new_texture]() {
+										comp.texture_ref = texture_ref;
+										};
+
+									// Undo action
+									change_font_action.undo_action = [&, texture_ref = previous_texture]() {
+										comp.texture_ref = texture_ref;
+										};
+
+									// Execute the action
+									NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_font_action));
+
+									// Update the previous texture
+									previous_texture = new_texture;
+								}
+							}
+						}
+						if (ImGui::IsItemHovered()) {
+							ImGui::SetTooltip("Select a texture or drag & drop a texture file.");
+						}
+						if (ImGui::BeginDragDropTarget()) {
+							if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Texture_FILE")) {
+								const char* dropped_file = static_cast<const char*>(payload->Data);
+								if (dropped_file) {
+									std::string new_texture = dropped_file;
+
+									// Ensure it's a valid texture format
+
+									LevelEditor::Action change_texture_action;
+									change_texture_action.do_action = [&, texture_ref = new_texture]() {
+										comp.texture_ref = texture_ref;
+										};
+
+									change_texture_action.undo_action = [&, texture_ref = previous_texture]() {
+										comp.texture_ref = texture_ref;
+										};
+
+									NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_texture_action));
+									previous_texture = new_texture;
+
+								}
+							}
+							ImGui::EndDragDropTarget();
+						}
+					}
+
+					ImGui::EndDisabled();
+
+					// !TODO: jspoh add fadeout option, considering color change over time, and texture fadeout. but only if required lol
 
 					// Offset
 					ImGui::Text("Particle Offset:");
@@ -673,6 +796,291 @@ namespace NIKE {
 						//Execute action
 						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_offset));
 					}
+
+					ImGui::BeginDisabled(comp.preset != static_cast<int>(SysParticle::Data::ParticlePresets::NONE));
+
+					// particle settings
+					ImGui::Spacing();
+					ImGui::Text("Custom particle settings:");
+					ImGui::Spacing();
+
+					// Num new particles per second
+					{
+						ImGui::Text("Num New Particles Per Second:");
+						ImGui::DragInt("##Num New Particles Per Second", &comp.num_new_particles_per_second, 1, 0, 20, "%d", ImGuiSliderFlags_AlwaysClamp);
+						if (ImGui::IsItemActivated()) {
+							before_change_num_new_particles_per_second = comp.num_new_particles_per_second;
+						}
+						if (ImGui::IsItemDeactivatedAfterEdit()) {
+							LevelEditor::Action change_num_new_particles_per_second;
+							change_num_new_particles_per_second.do_action = [&, num_new_particles_per_second = comp.num_new_particles_per_second]() {
+								comp.num_new_particles_per_second = num_new_particles_per_second;
+								};
+							change_num_new_particles_per_second.undo_action = [&, num_new_particles_per_second = before_change_num_new_particles_per_second]() {
+								comp.num_new_particles_per_second = num_new_particles_per_second;
+								};
+							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_num_new_particles_per_second));
+						}
+					}
+
+					// Particle Lifespan
+					{
+						ImGui::Text("Particle Lifespan:");
+						ImGui::DragFloat("##Particle Lifespan", &comp.particle_lifespan, 0.1f, 0.f, 1000.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+						if (ImGui::IsItemActivated()) {
+							before_change_particle_lifespan = comp.particle_lifespan;
+						}
+						if (ImGui::IsItemDeactivatedAfterEdit()) {
+							LevelEditor::Action change_particle_lifespan;
+							change_particle_lifespan.do_action = [&, particle_lifespan = comp.particle_lifespan]() {
+								comp.particle_lifespan = particle_lifespan;
+								};
+							change_particle_lifespan.undo_action = [&, particle_lifespan = before_change_particle_lifespan]() {
+								comp.particle_lifespan = particle_lifespan;
+								};
+							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_particle_lifespan));
+						}
+					}
+
+					// Particle Velocity Range
+					{
+						ImGui::Text("Particle Velocity Range:");
+						ImGui::DragFloat2("##Particle Velocity Range", reinterpret_cast<float*>(&comp.particle_velocity_range), 0.1f, 0.f, 1000.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+						if (ImGui::IsItemActivated()) {
+							before_change_particle_velocity_range = comp.particle_velocity_range;
+						}
+						if (ImGui::IsItemDeactivatedAfterEdit()) {
+							LevelEditor::Action change_particle_velocity_range;
+							change_particle_velocity_range.do_action = [&, particle_velocity_range = comp.particle_velocity_range]() {
+								comp.particle_velocity_range = particle_velocity_range;
+								};
+							change_particle_velocity_range.undo_action = [&, particle_velocity_range = before_change_particle_velocity_range]() {
+								comp.particle_velocity_range = particle_velocity_range;
+								};
+							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_particle_velocity_range));
+						}
+					}
+
+					// Particle directional vector range
+					{
+						ImGui::Text("Particle Directional Vector Range:");
+						ImGui::DragFloat2("##Particle Vector X Range", reinterpret_cast<float*>(&comp.particle_vector_x_range), 0.1f, -1.f, 1.f, "%.1f", ImGuiSliderFlags_AlwaysClamp);
+						if (ImGui::IsItemActivated()) {
+							before_change_particle_vector_x_range = comp.particle_vector_x_range;
+						}
+						if (ImGui::IsItemDeactivatedAfterEdit()) {
+							LevelEditor::Action change_particle_vector_x_range;
+							change_particle_vector_x_range.do_action = [&, particle_vector_x_range = comp.particle_vector_x_range]() {
+								comp.particle_vector_x_range = particle_vector_x_range;
+								};
+							change_particle_vector_x_range.undo_action = [&, particle_vector_x_range = before_change_particle_vector_x_range]() {
+								comp.particle_vector_x_range = particle_vector_x_range;
+								};
+							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_particle_vector_x_range));
+						}
+
+						ImGui::Text("##Particle Vector Y Range");
+						ImGui::DragFloat2("##Particle Vector Y Range", reinterpret_cast<float*>(&comp.particle_vector_y_range), 0.1f, -1.f, 1.f, "%.1f", ImGuiSliderFlags_AlwaysClamp);
+						if (ImGui::IsItemActivated()) {
+							before_change_particle_vector_y_range = comp.particle_vector_y_range;
+						}
+						if (ImGui::IsItemDeactivatedAfterEdit()) {
+							LevelEditor::Action change_particle_vector_y_range;
+							change_particle_vector_y_range.do_action = [&, particle_vector_y_range = comp.particle_vector_y_range]() {
+								comp.particle_vector_y_range = particle_vector_y_range;
+								};
+							change_particle_vector_y_range.undo_action = [&, particle_vector_y_range = before_change_particle_vector_y_range]() {
+								comp.particle_vector_y_range = particle_vector_y_range;
+								};
+							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_particle_vector_y_range));
+						}
+					}
+
+					// Particle Color
+					{
+						ImGui::Text("Particle color is random:");
+						ImGui::Checkbox("##Particle Color Is Random", &comp.particle_color_is_random);
+						if (ImGui::IsItemActivated()) {
+							before_change_particle_color_is_random = comp.particle_color_is_random;
+						}
+
+						ImGui::BeginDisabled(comp.particle_color_is_random);
+						{
+							static float particle_color[4] = { comp.particle_color.x, comp.particle_color.y, comp.particle_color.z, comp.particle_color.w };
+							ImGui::Text("Particle Color:");
+							if (ImGui::ColorPicker4("##Particle Color", particle_color, ImGuiColorEditFlags_AlphaBar)) {
+								comp.particle_color = { particle_color[0], particle_color[1], particle_color[2], particle_color[3] };
+							}
+						}
+						ImGui::EndDisabled();
+					}
+
+					// Particle Color Changes Over Time
+					{
+						ImGui::Text("Particle color changes over time:");
+						ImGui::Checkbox("##Particle color changes over time", &comp.particle_color_changes_over_time);
+						if (ImGui::IsItemActivated()) {
+							before_particle_color_changes_over_time = comp.particle_color_changes_over_time;
+						}
+
+						ImGui::BeginDisabled(!comp.particle_color_changes_over_time);
+
+						// Particle Final Color
+						ImGui::Text("Particle Final Color:");
+						static float particle_final_color[4] = { comp.particle_final_color.x, comp.particle_final_color.y, comp.particle_final_color.z, comp.particle_final_color.w };
+						if (ImGui::ColorPicker4("##Particle Final Color", particle_final_color, ImGuiColorEditFlags_AlphaBar)) {
+							comp.particle_final_color = { particle_final_color[0], particle_final_color[1], particle_final_color[2], particle_final_color[3] };
+						}
+
+						ImGui::EndDisabled();
+					}
+
+					// Particle Rand Offset Range
+					{
+						ImGui::Text("Particle Rand Offset Range:");
+						ImGui::DragFloat2("##Particle Rand X Offset Range", &comp.particle_rand_x_offset_range.x, 0.1f, -1000.f, 1000.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+						if (ImGui::IsItemActivated()) {
+							before_change_particle_rand_x_offset_range = comp.particle_rand_x_offset_range;
+						}
+						if (ImGui::IsItemDeactivatedAfterEdit()) {
+							LevelEditor::Action change_particle_rand_x_offset_range;
+							change_particle_rand_x_offset_range.do_action = [&, particle_rand_x_offset_range = comp.particle_rand_x_offset_range]() {
+								comp.particle_rand_x_offset_range = particle_rand_x_offset_range;
+								};
+							change_particle_rand_x_offset_range.undo_action = [&, particle_rand_x_offset_range = before_change_particle_rand_x_offset_range]() {
+								comp.particle_rand_x_offset_range = particle_rand_x_offset_range;
+								};
+							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_particle_rand_x_offset_range));
+						}
+
+						//ImGui::SameLine();
+
+						ImGui::DragFloat2("##Particle Rand Y Offset Range", &comp.particle_rand_y_offset_range.x, 0.1f, -1000.f, 1000.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+						if (ImGui::IsItemActivated()) {
+							before_change_particle_rand_y_offset_range = comp.particle_rand_y_offset_range;
+						}
+						if (ImGui::IsItemDeactivatedAfterEdit()) {
+							LevelEditor::Action change_particle_rand_y_offset_range;
+							change_particle_rand_y_offset_range.do_action = [&, particle_rand_y_offset_range = comp.particle_rand_y_offset_range]() {
+								comp.particle_rand_y_offset_range = particle_rand_y_offset_range;
+								};
+							change_particle_rand_y_offset_range.undo_action = [&, particle_rand_y_offset_range = before_change_particle_rand_y_offset_range]() {
+								comp.particle_rand_y_offset_range = particle_rand_y_offset_range;
+								};
+							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_particle_rand_y_offset_range));
+						}
+					}
+
+					// Particle Rand Width Range
+					{
+						ImGui::Text("Particle Rand Size Range:");
+						ImGui::DragFloat2("##Particle Rand Size Range", &comp.particle_rand_width_range.x, 0.1f, 0.f, 1000.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+						if (ImGui::IsItemActivated()) {
+							before_change_particle_rand_width_range = comp.particle_rand_width_range;
+						}
+						if (ImGui::IsItemDeactivatedAfterEdit()) {
+							LevelEditor::Action change_particle_rand_width_range;
+							change_particle_rand_width_range.do_action = [&, particle_rand_width_range = comp.particle_rand_width_range]() {
+								comp.particle_rand_width_range = particle_rand_width_range;
+								};
+							change_particle_rand_width_range.undo_action = [&, particle_rand_width_range = before_change_particle_rand_width_range]() {
+								comp.particle_rand_width_range = particle_rand_width_range;
+								};
+							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_particle_rand_width_range));
+						}
+					}
+
+					// Particle Rotation
+					{
+						ImGui::Text("Particle Rotation:");
+						ImGui::DragFloat("##Particle Rotation", &comp.particle_rotation, 0.1f, 0.f, 359.9f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+						if (ImGui::IsItemActivated()) {
+							before_change_particle_rotation = comp.particle_rotation;
+						}
+						if (ImGui::IsItemDeactivatedAfterEdit()) {
+							LevelEditor::Action change_particle_rotation;
+							change_particle_rotation.do_action = [&, particle_rotation = comp.particle_rotation]() {
+								comp.particle_rotation = particle_rotation;
+								};
+							change_particle_rotation.undo_action = [&, particle_rotation = before_change_particle_rotation]() {
+								comp.particle_rotation = particle_rotation;
+								};
+							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_particle_rotation));
+						}
+					}
+
+					ImGui::Spacing();
+					ImGui::Text("Particle behaviour over time");
+					ImGui::Spacing();
+
+					// Particle acceleration
+					{
+						ImGui::Text("Particle Acceleration:");
+						ImGui::DragFloat("##Particle Acceleration", &comp.particle_acceleration, 0.1f, -1000.f, 1000.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+						if (ImGui::IsItemActivated()) {
+							before_change_particle_acceleration = comp.particle_acceleration;
+						}
+						if (ImGui::IsItemDeactivatedAfterEdit()) {
+							LevelEditor::Action change_particle_acceleration;
+							change_particle_acceleration.do_action = [&, particle_acceleration = comp.particle_acceleration]() {
+								comp.particle_acceleration = particle_acceleration;
+								};
+							change_particle_acceleration.undo_action = [&, particle_acceleration = before_change_particle_acceleration]() {
+								comp.particle_acceleration = particle_acceleration;
+								};
+							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_particle_acceleration));
+						}
+					}
+
+					// particle size changes over time
+					{
+						ImGui::Text("Particle size changes over time:");
+						ImGui::Checkbox("##Particle size changes over time", &comp.particle_size_changes_over_time);
+						if (ImGui::IsItemActivated()) {
+							before_change_particle_final_size_changes_over_time = comp.particle_size_changes_over_time;
+						}
+
+						ImGui::BeginDisabled(!comp.particle_size_changes_over_time);
+
+						// Particle Final Size
+						ImGui::Text("Particle Final Size:");
+						ImGui::DragFloat2("##Particle Final Size", reinterpret_cast<float*>(& comp.particle_final_size), 0.1f, 0.f, 1000.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+						if (ImGui::IsItemActivated()) {
+							before_change_particle_final_size = comp.particle_final_size.x;
+						}
+						if (ImGui::IsItemDeactivatedAfterEdit()) {
+							LevelEditor::Action change_particle_final_size;
+							change_particle_final_size.do_action = [&, particle_final_size = comp.particle_final_size]() {
+								comp.particle_final_size = particle_final_size;
+								};
+							change_particle_final_size.undo_action = [&, particle_final_size = before_change_particle_final_size]() {
+								comp.particle_final_size.x = particle_final_size;
+								comp.particle_final_size.y = particle_final_size;
+								};
+							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_particle_final_size));
+						}
+
+						ImGui::EndDisabled();
+					}
+
+					// Particle rotation speed
+					ImGui::Text("Particle Rotation Speed(degrees anticlockwise / second):");
+					ImGui::DragFloat("##Particle Rotation Speed", &comp.particle_rotation_speed, 0.1f, 0.f, 1000.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+					if (ImGui::IsItemActivated()) {
+						before_change_particle_rotation_speed = comp.particle_rotation_speed;
+					}
+					if (ImGui::IsItemDeactivatedAfterEdit()) {
+						LevelEditor::Action change_particle_rotation_speed;
+						change_particle_rotation_speed.do_action = [&, particle_rotation_speed = comp.particle_rotation_speed]() {
+							comp.particle_rotation_speed = particle_rotation_speed;
+							};
+						change_particle_rotation_speed.undo_action = [&, particle_rotation_speed = before_change_particle_rotation_speed]() {
+							comp.particle_rotation_speed = particle_rotation_speed;
+							};
+						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_particle_rotation_speed));
+					}
+
+					ImGui::EndDisabled();		// end custom particle settings
 
 					// advanced options (for programmatic usage only)
 
@@ -729,6 +1137,38 @@ namespace NIKE {
 
 						//Execute action
 						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_zoom));
+					}
+
+				}
+
+				// For cam offset
+				{
+					//Position before change
+					static float before_move_offset;
+
+					ImGui::DragFloat("Camera move offset", &comp.mouse_offset, 0.005f, 0.f, float(UINT16_MAX), "%.3f", ImGuiSliderFlags_AlwaysClamp);
+
+					//Check if position has begun editing
+					if (ImGui::IsItemActivated()) {
+						before_move_offset = comp.mouse_offset;
+					}
+
+					//Check if position has finished editing
+					if (ImGui::IsItemDeactivatedAfterEdit()) {
+						LevelEditor::Action change_mouse_offset;
+
+						//Change pos do action
+						change_mouse_offset.do_action = [&, mouse_offset = comp.mouse_offset]() {
+							comp.mouse_offset = mouse_offset;
+							};
+
+						//Change pos undo action
+						change_mouse_offset.undo_action = [&, mouse_offset = before_move_offset]() {
+							comp.mouse_offset = mouse_offset;
+							};
+
+						//Execute action
+						NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_mouse_offset));
 					}
 
 				}
@@ -878,7 +1318,7 @@ namespace NIKE {
 					{
 						//Set Text input
 						ImGui::Text("Enter Text:");
-						if (ImGui::InputText("##TextInput", text_input.data(), text_input.capacity() + 1)) {
+						if (ImGui::InputText("##TextInput", text_input.data(), text_input.capacity() + 10)) {
 							text_input.resize(strlen(text_input.c_str()));
 						}
 
@@ -1071,9 +1511,11 @@ namespace NIKE {
 
 					// Display combo box for texture selection
 					if (ImGui::Combo("##SelectTexture", &current_index, all_loaded_textures.data(), static_cast<int>(all_loaded_textures.size()))) {
+
 						// Validate the selected index and get the new texture
 						if (current_index >= 0 && current_index < static_cast<int>(all_loaded_textures.size())) {
 							std::string new_texture = all_loaded_textures[current_index];
+
 							if (new_texture != comp.texture_id) {
 								// Save action
 								LevelEditor::Action change_font_action;
@@ -1093,6 +1535,33 @@ namespace NIKE {
 								previous_texture = new_texture;
 							}
 						}
+					}
+					if (ImGui::IsItemHovered()) {
+						ImGui::SetTooltip("Select a texture or drag & drop a texture file.");
+					}
+					if (ImGui::BeginDragDropTarget()) {
+						if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Texture_FILE")) {
+							const char* dropped_file = static_cast<const char*>(payload->Data);
+							if (dropped_file) {
+								std::string new_texture = dropped_file;
+
+								// Ensure it's a valid texture format
+								
+									LevelEditor::Action change_texture_action;
+									change_texture_action.do_action = [&, texture_id = new_texture]() {
+										comp.texture_id = texture_id;
+										};
+
+									change_texture_action.undo_action = [&, texture_id = previous_texture]() {
+										comp.texture_id = texture_id;
+										};
+
+									NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_texture_action));
+									previous_texture = new_texture;
+								
+							}
+						}
+						ImGui::EndDragDropTarget();
 					}
 				}
 
@@ -1365,134 +1834,146 @@ namespace NIKE {
 			}
 		);
 
-		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Render::Batch>(
-			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Render::Batch& comp) {
-				//Get components ui for render;
-				auto& comps_ui = NIKE_LVLEDITOR_SERVICE->getComponentsUI();
+		NIKE_LVLEDITOR_SERVICE->registerCompUIFunc<Render::Video>(
+			[]([[maybe_unused]] LevelEditor::ComponentsPanel& comp_panel, Render::Video& comp) {
 
-				//Combo selector
-				static int select_render_comp = 0;
+				ImGui::Text("Edit Video variables");
 
-				//Comp names
-				static std::vector<std::string> comp_names = {
-					Utility::convertTypeString(typeid(Render::Text).name()),
-					Utility::convertTypeString(typeid(Render::Shape).name()),
-					Utility::convertTypeString(typeid(Render::Texture).name())
-				};
-
-				//Store char* pointers for ImGui::Combo
-				static std::vector<const char*> comp_container;
-				comp_container.clear();
-				for (const auto& name : comp_names) {
-					comp_container.push_back(name.c_str());
-				}
-
-				//Select render component to add
-				ImGui::Text("Add To Render Queue");
-				ImGui::Combo("##TagDropDown", &select_render_comp, comp_container.data(), static_cast<int>(comp_container.size()));
-				ImGui::SameLine();
-				if (ImGui::Button("Add##RenderComp")) {
-
-					//Create render component
-					Render::Batch::Renderable render;
-
-					//Component to add
-					switch (select_render_comp) {
-					case 0:
-						render.render_type = Render::Text();
-						break;
-					case 1:
-						render.render_type = Render::Shape();
-						break;
-					case 2:
-						render.render_type = Render::Texture();
-						break;
-					default:
-						break;
-					}
-
-					comp.render_queue.push_back(render);
-				}
-
-				//Separators
-				ImGui::Spacing();
-				ImGui::SeparatorText("Render Queue");
 				ImGui::Spacing();
 
-				//Empty queue
-				if (comp.render_queue.empty()) {
-					ImGui::Text("Render Queue Empty.");
+				// For Video id
+				{
+					// Hold the current and previous video selection
+					static std::string prev_video = comp.video_id;
+					std::string current_video = comp.video_id;
+
+					ImGui::Text("Select Video");
+
+					auto const& all_loaded_video = NIKE_ASSETS_SERVICE->getAssetRefs(Assets::Types::Video);
+
+					// Find the index of the currently selected video in the list
+					int current_index = -1;
+					for (size_t i = 0; i < all_loaded_video.size(); ++i) {
+						if (current_video == all_loaded_video[i]) {
+							current_index = static_cast<int>(i);
+							break;
+						}
+					}
+
+					// Display combo box for video selection
+					if (ImGui::Combo("##SelectVideo", &current_index, all_loaded_video.data(), static_cast<int>(all_loaded_video.size()))) {
+
+						// Validate the selected index and get the new video
+						if (current_index >= 0 && current_index < static_cast<int>(all_loaded_video.size())) {
+							std::string new_video = all_loaded_video[current_index];
+
+							if (new_video != comp.video_id) {
+								// Save action
+								LevelEditor::Action change_video_action;
+								change_video_action.do_action = [&, video_id = new_video]() {
+									comp.video_id = video_id;
+									comp.b_init = true;
+									};
+
+								// Undo action
+								change_video_action.undo_action = [&, video_id = prev_video]() {
+									comp.video_id = video_id;
+									comp.b_init = true;
+									};
+
+								// Execute the action
+								NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_video_action));
+
+								// Update the previous texture
+								prev_video = new_video;
+							}
+						}
+					}
+
+					if (ImGui::IsItemHovered()) {
+						ImGui::SetTooltip("Select a video or drag & drop a video file.");
+					}
+
+					if (ImGui::BeginDragDropTarget()) {
+						if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Video_FILE")) {
+							const char* dropped_file = static_cast<const char*>(payload->Data);
+							if (dropped_file) {
+								std::string new_video = dropped_file;
+
+								// Save action
+								LevelEditor::Action change_video_action;
+								change_video_action.do_action = [&, video_id = new_video]() {
+									comp.video_id = video_id;
+									comp.b_init = true;
+									};
+
+								change_video_action.undo_action = [&, video_id = prev_video]() {
+									comp.video_id = video_id;
+									comp.b_init = true;
+									};
+
+								// Execute the action
+								NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_video_action));
+
+								// Update the previous texture
+								prev_video = new_video;
+
+							}
+						}
+						ImGui::EndDragDropTarget();
+					}
 				}
 
-				//Iterate through render queue
-				for (auto& render : comp.render_queue) {
-					//Get text variant
-					if (auto* e_text = std::get_if<Render::Text>(&render.render_type)) {
-						//Create a collapsible header for the component
-						if (ImGui::TreeNode((Utility::convertTypeString(typeid(Render::Text).name()) + "##BatchedRender").c_str())) {
-							auto it = comps_ui.find(Utility::convertTypeString(typeid(Render::Text).name()));
-							if (it != comps_ui.end()) {
-								it->second(comp_panel, e_text);
+				//To control video
+				{
+					ImGui::Text("Video Duration: %.3f secs / %.3f secs", comp.curr_time, comp.duration);
+
+					//Video Mode
+					{
+						ImGui::Text("Adjust Video Mode:");
+						const char* mode_names[] = { "PLAYING", "PAUSE", "RESTART", "END" };
+
+						// Hold the current selection and the previous value
+						static Render::VideoMode before_selected_mode;
+						static int previous_mode = static_cast<int>(comp.video_mode);
+						int current_mode = static_cast<int>(comp.video_mode);
+
+						// Combo returns one bool check
+						if (ImGui::Combo("##VideoMode", &current_mode, mode_names, IM_ARRAYSIZE(mode_names))) {
+							Render::VideoMode new_mode = static_cast<Render::VideoMode>(current_mode);
+							if (new_mode != comp.video_mode) {
+
+								// Save action
+								LevelEditor::Action save_mode;
+								save_mode.do_action = [&, mode = new_mode]() {
+									comp.video_mode = mode;
+									};
+
+								// Undo action
+								save_mode.undo_action = [&, mode = before_selected_mode]() {
+									comp.video_mode = mode;
+									};
+
+								NIKE_LVLEDITOR_SERVICE->executeAction(std::move(save_mode));
+
+								// Update the previous value
+								before_selected_mode = comp.video_mode;
+
+								// Apply the new origin
+								comp.video_mode = new_mode;
 							}
-
-							//Render transform
-							auto trans_it = comps_ui.find(Utility::convertTypeString(typeid(Transform::Transform).name()));
-							if (trans_it != comps_ui.end()) {
-								trans_it->second(comp_panel, &render.transform);
-							}
-
-							if(ImGui::SmallButton("Remove##RenderText")) {
-
-							}
-
-							ImGui::TreePop();
 						}
 					}
-					//Get shape variant
-					else if (auto* e_shape = std::get_if<Render::Shape>(&render.render_type)) {
-						//Create a collapsible header for the component
-						if (ImGui::TreeNode((Utility::convertTypeString(typeid(Render::Shape).name()) + "##BatchedRender").c_str())) {
-							auto it = comps_ui.find(Utility::convertTypeString(typeid(Render::Shape).name()));
-							if (it != comps_ui.end()) {
-								it->second(comp_panel, e_shape);
-							}
 
-							//Render transform
-							auto trans_it = comps_ui.find(Utility::convertTypeString(typeid(Transform::Transform).name()));
-							if (trans_it != comps_ui.end()) {
-								trans_it->second(comp_panel, &render.transform);
-							}
+					ImGui::Text("Video Looping:");
 
-							if (ImGui::SmallButton("Remove##RenderText")) {
+					ImGui::SameLine();
 
-							}
-
-							ImGui::TreePop();
-						}
-					}
-					//Get texture variant
-					else if (auto* e_texture = std::get_if<Render::Texture>(&render.render_type)) {
-						//Create a collapsible header for the component
-						if (ImGui::TreeNode((Utility::convertTypeString(typeid(Render::Texture).name()) + "##BatchedRender").c_str())) {
-							auto it = comps_ui.find(Utility::convertTypeString(typeid(Render::Texture).name()));
-							if (it != comps_ui.end()) {
-								it->second(comp_panel, e_texture);
-							}
-
-							//Render transform
-							auto trans_it = comps_ui.find(Utility::convertTypeString(typeid(Transform::Transform).name()));
-							if (trans_it != comps_ui.end()) {
-								trans_it->second(comp_panel, &render.transform);
-							}
-
-							if (ImGui::SmallButton("Remove##RenderText")) {
-
-							}
-
-							ImGui::TreePop();
-						}
+					if (ImGui::SmallButton(comp.b_loop ? "True" : "False")) {
+						comp.b_loop = !comp.b_loop;
 					}
 				}
+
 			}
 		);
 #endif

@@ -14,40 +14,35 @@
 
  // !TODO: jspoh reorg
 namespace {
-
-	Matrix_33 getWorldToScreenMtx() {
-		// transform to screen coords
+	Vector2f worldToScreen(const Vector2f& world_pos, bool use_world_pos) {
+		// Get the active camera
 		NIKE::Render::Cam cam = NIKE_CAMERA_SERVICE->getActiveCamera();
 
-		Matrix_33 view_xform{
-			1, 0,  -cam.position.x,
-			0, 1,  -cam.position.y,
-			0, 0, 1
-		};
+		// Get the appropriate world-to-NDC transformation matrix
+		Matrix_33 world_to_ndc_xform = use_world_pos
+			? NIKE_CAMERA_SERVICE->getWorldToNDCXform()
+			: NIKE_CAMERA_SERVICE->getFixedWorldToNDCXform();
 
-		const float cam_height = NIKE_CAMERA_SERVICE->getCameraHeight();
-
-		Matrix_33 cam_to_ndc_xform{
-			2.0f / NIKE_WINDOWS_SERVICE->getWindow()->getAspectRatio() / (cam_height * cam.zoom), 0, 0,
-			0, 2.0f / (cam_height * cam.zoom), 0,
-			0, 0, 1
-		};
-
+		// Get screen dimensions
 		const float screenWidth = static_cast<float>(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x);
 		const float screenHeight = static_cast<float>(NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y);
 
-		Matrix_33 screen_xform = Matrix_33{
+		// Convert NDC (-1 to 1) to screen space (0 to width/height)
+		Matrix_33 screen_xform{
 			screenWidth * 0.5f, 0, screenWidth * 0.5f,
 			0, screenHeight * 0.5f, screenHeight * 0.5f,
 			0, 0, 1
-		} *cam_to_ndc_xform * view_xform;
+		};
 
-		return screen_xform;
-	};
+		// Final transformation
+		Matrix_33 final_xform = screen_xform * world_to_ndc_xform;
 
-	Vector2f worldToScreen(const Vector2f& world_pos) {
-		Matrix_33 screen_xform = getWorldToScreenMtx();
-		return screen_xform * world_pos;
+		// Apply transformation
+		return final_xform * world_pos;
+	}
+
+	float lerp(float a, float b, float t) {
+		return a + t * (b - a);
 	}
 }
 
@@ -55,6 +50,20 @@ namespace {
 namespace NIKE {
 
 	void Render::Service::onEvent(std::shared_ptr<Windows::WindowResized> event) {
+		
+		// update main fbo
+		{
+			glDeleteFramebuffers(1, &fbo);
+			glDeleteTextures(1, &fbo_texture);
+
+			// create new framebuffer
+			glCreateFramebuffers(1, &fbo);
+			glCreateTextures(GL_TEXTURE_2D, 1, &fbo_texture);
+			glTextureStorage2D(fbo_texture, 1, GL_RGBA8, NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x, NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y);
+			glTextureParameteri(fbo_texture, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTextureParameteri(fbo_texture, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glNamedFramebufferTexture(fbo, GL_COLOR_ATTACHMENT0, fbo_texture, 0);
+		}
 
 		//Iterate through all frame buffers
 		for (auto& frame_buffer : frame_buffers) {
@@ -96,7 +105,7 @@ namespace NIKE {
 				NIKEE_CORE_ERROR("ERROR::FRAMEBUFFER:: Framebuffer is not complete! (Not an issue if triggered by focus loss)");
 
 			glBindTexture(GL_TEXTURE_2D, 0);
-			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+			glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
 			err = glGetError();
 			if (err != GL_NO_ERROR) {
@@ -180,6 +189,9 @@ namespace NIKE {
 		//Particle manager
 		particle_manager = std::make_unique<SysParticle::Manager>();
 
+		//Video manager
+		video_manager = std::make_unique<VideoPlayer::Manager>();
+
 		if (!shader_manager) {
 			NIKEE_CORE_ERROR("Failed to initialize Shader Manager.");
 			return;
@@ -195,6 +207,30 @@ namespace NIKE {
 
 		//Start counter
 		counter = 0;
+
+		// framebuffer init
+		{
+			glCreateFramebuffers(1, &fbo);
+			glCreateTextures(GL_TEXTURE_2D, 1, &fbo_texture);
+			glTextureStorage2D(fbo_texture, 1, GL_RGBA8, NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().x, NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize().y);
+			glTextureParameteri(fbo_texture, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTextureParameteri(fbo_texture, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glNamedFramebufferTexture(fbo, GL_COLOR_ATTACHMENT0, fbo_texture, 0);
+		}
+
+		GLenum err;
+		while ((err = glGetError()) != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at the end of {0}: {1}", __FUNCTION__, err);
+		}
+
+	}
+
+	void Render::Service::bindShader(std::string const& shader_ref) {
+		shader_manager->useShader(shader_ref);
+	}
+
+	void Render::Service::unbindShader() {
+		shader_manager->unuseShader();
 	}
 
 	/*****************************************************************//**
@@ -244,7 +280,8 @@ namespace NIKE {
 	}
 
 	void Render::Service::unbindFrameBuffer() {
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+		//glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
 	/*****************************************************************//**
@@ -348,7 +385,6 @@ namespace NIKE {
 		if (err != GL_NO_ERROR) {
 			NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
 		}
-		// !TODO: batched rendering for texture incomplete
 
 		//Caculate UV Offset
 		const Vector2f framesize{ (1.0f / e_texture.frame_size.x) , (1.0f / e_texture.frame_size.y) };
@@ -415,6 +451,95 @@ namespace NIKE {
 			instance.to_blend_color = e_texture.b_blend;
 			instance.color = e_texture.color;
 			instance.blend_intensity = e_texture.intensity;
+
+			render_instances_texture.push_back(instance);
+
+			// used to track number of unique texture handles
+			// system can only handle max 32 unique texture binding units, hence have to clear texture render instances or not all textures will render properly.
+			curr_instance_unique_tex_hdls.insert(tex_hdl);
+
+			if (render_instances_texture.size() >= MAX_INSTANCES || curr_instance_unique_tex_hdls.size() >= MAX_UNIQUE_TEX_HDLS) {
+				batchRenderTextures();
+			}
+		}
+		err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at end of {0}: {1}", __FUNCTION__, err);
+		}
+	}
+
+	void Render::Service::renderObject(Matrix_33 const& x_form, Render::Video const& e_video) {
+		GLenum err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
+		}
+		// !TODO: batched rendering for texture incomplete
+
+		//Render variables
+		const Vector2f framesize{ 1.0f, 1.0f };
+		Vector2f uv_offset{ 1.0f, 1.0f };
+		Vector4f color = { 0.0f, 0.0f, 0.0f, 1.0f };
+		bool blend_mode = false;
+		float intensity = 1.0f;
+
+		const unsigned int tex_hdl = e_video.texture_id;
+
+		if (!BATCHED_RENDERING) {
+			//Set polygon mode
+			//glPolygonMode(GL_FRONT, GL_FILL);			// do not use this, 1280: invalid enum
+
+			// use shader
+			shader_manager->useShader("texture");
+
+			//Texture unit
+			static constexpr int texture_unit = 6;
+
+			// set texture
+			glBindTextureUnit(
+				texture_unit, // texture unit (binding index)
+				tex_hdl
+			);
+
+			glTextureParameteri(tex_hdl, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTextureParameteri(tex_hdl, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+			//Set uniforms for texture rendering
+			shader_manager->setUniform("texture", "u_tex2d", texture_unit);
+			shader_manager->setUniform("texture", "u_opacity", color.a);
+			shader_manager->setUniform("texture", "u_transform", x_form);
+			shader_manager->setUniform("texture", "uvOffset", uv_offset);
+			shader_manager->setUniform("texture", "frameSize", framesize);
+
+			//Blending options for texture
+			shader_manager->setUniform("texture", "u_color", Vector3f(color.r, color.g, color.b));
+			shader_manager->setUniform("texture", "u_blend", blend_mode);
+			shader_manager->setUniform("texture", "u_intensity", intensity);
+
+			//Flip texture options
+			//shader_manager->setUniform("texture", "u_fliphorizontal", e_texture.b_flip.x);
+			//shader_manager->setUniform("texture", "u_flipvertical", e_texture.b_flip.y);
+
+			//Get model
+			auto& model = *NIKE_ASSETS_SERVICE->getAsset<Assets::Model>("square-texture.model");
+
+			//Draw
+			glBindVertexArray(model.vaoid);
+			glDrawElements(model.primitive_type, model.draw_count, GL_UNSIGNED_INT, nullptr);
+
+			//Unuse texture
+			glBindVertexArray(0);
+			shader_manager->unuseShader();
+		}
+		else {
+			// prepare for batched rendering
+			RenderInstance instance;
+			instance.xform = x_form;
+			instance.tex = tex_hdl;
+			instance.framesize = framesize;
+			instance.uv_offset = uv_offset;
+			instance.to_blend_color = blend_mode;
+			instance.color = color;
+			instance.blend_intensity = intensity;
 
 			render_instances_texture.push_back(instance);
 
@@ -577,280 +702,46 @@ namespace NIKE {
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
-	void Render::Service::renderComponents(std::unordered_map<std::string, std::shared_ptr<void>> comps, bool debug) {
+	void Render::Service::renderCursor(bool is_crosshair, [[maybe_unused]]bool cursor_entered) {
 
-		//Get transform
-		auto trans_it = comps.find(Utility::convertTypeString(typeid(Transform::Transform).name()));
-		if (trans_it == comps.end()) {
+		//Render cursor 
+		// FIX CURSOR IN FULLSCREEN, CURSOR OFFSET
+
+#ifndef NDEBUG
+		if (!NIKE_LVLEDITOR_SERVICE->getGameState())
+			return;
+
+		if (!cursor_entered) {
+			NIKE_WINDOWS_SERVICE->getWindow()->setInputMode(NIKE_CURSOR, NIKE_CURSOR_NORMAL);
 			return;
 		}
-		auto& e_transform = *std::static_pointer_cast<Transform::Transform>(trans_it->second);
+#endif
 
-		//Camera matrix
-		Matrix_33 cam_ndcx = e_transform.use_screen_pos ? NIKE_CAMERA_SERVICE->getFixedWorldToNDCXform() : NIKE_CAMERA_SERVICE->getWorldToNDCXform();
+		//Setup show cursor
+		NIKE_WINDOWS_SERVICE->getWindow()->setInputMode(NIKE_CURSOR, NIKE_CURSOR_HIDDEN);
 
-		//Get Texture
-		auto tex_it = comps.find(Utility::convertTypeString(typeid(Render::Texture).name()));
-		if (tex_it != comps.end()) {
+		auto texture_render = [bool_ch = is_crosshair, this]() {
+			static Render::Texture crosshair = { "crosshair.png", { 1.f, 1.f, 1.f, 1.f }, false, 1.f, false, Vector2i{ 1, 1 }, Vector2i{ 0, 0 }, Vector2b{false, false} };
+			static Render::Texture cursor = { "cursor_highlighted.png", { 1.f, 1.f, 1.f, 1.f }, false, 1.f, false, Vector2i{ 1, 1 }, Vector2i{ 0, 0 }, Vector2b{false, false} };
 
-			//Texture component
-			auto& e_texture = *std::static_pointer_cast<Render::Texture>(tex_it->second);
+			Matrix_33 cur_matrix;
+			Transform::Transform cur_transform = { Vector2f(0.f, 0.f), Vector2f(50.0f, 50.0f), 0.0f };
+			cur_transform.scale.x *= NIKE_CAMERA_SERVICE->getActiveCamera().zoom;
+			cur_transform.scale.y *= NIKE_CAMERA_SERVICE->getActiveCamera().zoom;
+			cur_transform.position.x = bool_ch ? NIKE_INPUT_SERVICE->getMouseWorldPos().x : NIKE_INPUT_SERVICE->getMouseWorldPos().x + cur_transform.scale.x / 2;
+			cur_transform.position.y = bool_ch ? NIKE_INPUT_SERVICE->getMouseWorldPos().y : NIKE_INPUT_SERVICE->getMouseWorldPos().y - cur_transform.scale.y / 2;;
+			cur_transform.use_screen_pos = true;
 
-			//Check if texture is loaded
-			if (NIKE_ASSETS_SERVICE->isAssetRegistered(e_texture.texture_id)) {
+			// Render cursor
+			transformMatrix(cur_transform, cur_matrix, NIKE_CAMERA_SERVICE->getWorldToNDCXform(false));
+			renderObject(cur_matrix, bool_ch ? crosshair : cursor);
+		};
 
-				//Allow stretching of texture
-				if (!e_texture.b_stretch) {
-					//Copy transform for texture mapping ( Locks the transformation of a texture )
-					Vector2f tex_size{ 
-						static_cast<float>(NIKE_ASSETS_SERVICE->getAsset<Assets::Texture>(e_texture.texture_id)->size.x) / e_texture.frame_size.x,
-						static_cast<float>(NIKE_ASSETS_SERVICE->getAsset<Assets::Texture>(e_texture.texture_id)->size.y) / e_texture.frame_size.y 
-					};
-
-					e_transform.scale = tex_size.normalized() * e_transform.scale.length();
-				}
-
-				//Texture render function
-				auto texture_render = [cam_ndcx, e_texture, e_transform]() {
-					//Matrix used for rendering
-					Matrix_33 matrix;
-
-					// Transform matrix here
-					NIKE_RENDER_SERVICE->transformMatrix(e_transform, matrix, cam_ndcx, Vector2b{ e_texture.b_flip.x, e_texture.b_flip.y });
-
-					// Render Texture
-					NIKE_RENDER_SERVICE->renderObject(matrix, e_texture);
-				};
-
-				//Check for screen position
-				if (e_transform.use_screen_pos) {
-					screen_render_queue.push(texture_render);
-				}
-				else {
-					world_render_queue.push(texture_render);
-				}
-			}
-		}
-
-		//Get Shape
-		auto shape_it = comps.find(Utility::convertTypeString(typeid(Render::Shape).name()));
-		if (shape_it != comps.end()) {
-
-			//Shape component
-			auto& e_shape = *std::static_pointer_cast<Render::Shape>(shape_it->second);
-
-			//Check if model exists
-			if (NIKE_ASSETS_SERVICE->isAssetRegistered(e_shape.model_id)) {
-
-				//Shape render function
-				auto shape_render = [e_shape, e_transform, cam_ndcx]() {
-					//Matrix used for rendering
-					Matrix_33 matrix;
-
-					// Transform matrix here
-					NIKE_RENDER_SERVICE->transformMatrix(e_transform, matrix, cam_ndcx);
-
-					//Render Shape
-					NIKE_RENDER_SERVICE->renderObject(matrix, e_shape);
-				};
-
-				//Check for screen position
-				if (e_transform.use_screen_pos) {
-					screen_render_queue.push(shape_render);
-				}
-				else {
-					world_render_queue.push(shape_render);
-				}
-			}
-		}
-
-		//Debug mode rendering
-		if (debug) {
-			// Render debugging bounding box
-			Vector4f bounding_box_color{ 1.0f, 0.0f, 0.0f, 1.0f };
-
-			//Get Collider
-			auto collider_it = comps.find(Utility::convertTypeString(typeid(Physics::Collider).name()));
-			if (collider_it != comps.end()) {
-
-				//Collider comp
-				auto& e_collider = *std::static_pointer_cast<Physics::Collider>(collider_it->second);
-
-				//Change color of bounding box on collision
-				if (e_collider.b_collided) {
-					bounding_box_color = { 0.0f, 1.0f, 0.0f, 1.0f };
-				}
-
-				//Shape render function
-				auto collider_render = [e_collider, bounding_box_color, cam_ndcx]() {
-					//Matrix used for rendering
-					Matrix_33 matrix;
-
-					//Calculate bounding box matrix
-					NIKE_RENDER_SERVICE->transformMatrix(e_collider.transform, matrix, cam_ndcx);
-					NIKE_RENDER_SERVICE->renderBoundingBox(matrix, bounding_box_color);
-				};
-
-				//Check for screen position
-				if (e_transform.use_screen_pos) {
-					screen_render_queue.push(collider_render);
-				}
-				else {
-					world_render_queue.push(collider_render);
-				}
-			}
-			else {
-
-				//Shape render function
-				auto collider_render = [bounding_box_color, e_transform, cam_ndcx]() {
-					//Matrix used for rendering
-					Matrix_33 matrix;
-
-					//Calculate bounding box matrix
-					NIKE_RENDER_SERVICE->transformMatrix(e_transform, matrix, cam_ndcx);
-					NIKE_RENDER_SERVICE->renderBoundingBox(matrix, bounding_box_color);
-				};
-
-				//Check for screen position
-				if (e_transform.use_screen_pos) {
-					screen_render_queue.push(collider_render);
-				}
-				else {
-					world_render_queue.push(collider_render);
-				}
-			}
-
-			//Get Dynamics
-			auto dynamics_it = comps.find(Utility::convertTypeString(typeid(Physics::Dynamics).name()));
-			if (dynamics_it != comps.end()) {
-
-				//Collider comp
-				auto& e_dynamics = *std::static_pointer_cast<Physics::Dynamics>(dynamics_it->second);
-
-				if (e_dynamics.velocity.x != 0.0f || e_dynamics.velocity.y != 0.0f) {
-
-					//Shape render function
-					auto dir_render = [e_transform, e_dynamics, cam_ndcx, bounding_box_color]() {
-						//Matrix used for rendering
-						Matrix_33 matrix;
-
-						Transform::Transform dir_transform = e_transform;
-						dir_transform.scale.x = 1.0f;
-						dir_transform.rotation = -atan2(e_dynamics.velocity.x, e_dynamics.velocity.y) * static_cast<float>(180.0f / M_PI);
-						dir_transform.position += {0.0f, e_transform.scale.y / 2.0f};
-						NIKE_RENDER_SERVICE->transformDirectionMatrix(dir_transform, matrix, cam_ndcx);
-						NIKE_RENDER_SERVICE->renderBoundingBox(matrix, bounding_box_color);
-					};
-
-					//Check for screen position
-					if (e_transform.use_screen_pos) {
-						screen_render_queue.push(dir_render);
-					}
-					else {
-						world_render_queue.push(dir_render);
-					}
-				}
-			}
-		}
-
-		//Get Text
-		auto text_it = comps.find(Utility::convertTypeString(typeid(Render::Text).name()));
-		if (text_it != comps.end()) {
-
-			//Text component
-			auto& e_text = *std::static_pointer_cast<Render::Text>(text_it->second);
-
-			//Check if font exists
-			if (NIKE_ASSETS_SERVICE->isAssetRegistered(e_text.font_id)) {
-
-				//Text render function
-				auto text_render = [e_transform, cam_ndcx, &e_text]() {
-
-					//Transform matrix
-					Matrix_33 matrix;
-
-					//Make copy of transform, scale to 1.0f for calculating matrix
-					Transform::Transform copy = e_transform;
-					copy.scale = { 1.0f, 1.0f };
-
-					//Transform text matrix
-					NIKE_RENDER_SERVICE->transformMatrix(copy, matrix, cam_ndcx);
-
-					//Render text
-					NIKE_RENDER_SERVICE->renderText(matrix, e_text);
-				};
-
-				//Check for screen position
-				if (e_transform.use_screen_pos) {
-					screen_text_render_queue.push(text_render);
-				}
-				else {
-					world_text_render_queue.push(text_render);
-				}
-			}
-		}
-
-		//Get particle emitter
-		auto particle_it = comps.find(Utility::convertTypeString(typeid(Render::ParticleEmitter).name()));
-		if (particle_it != comps.end()) {
-
-			//Particle component
-			auto& e_particle = *std::static_pointer_cast<Render::ParticleEmitter>(particle_it->second);
-
-			//Get particle system
-			auto& particle_sys = *e_particle.p_system;
-
-			//Update particle system with updated particle emitter data
-			particle_sys.preset = static_cast<SysParticle::Data::ParticlePresets>(e_particle.preset);
-			particle_sys.origin = e_transform.position + e_particle.offset;
-			particle_sys.duration = e_particle.duration;
-			particle_sys.render_type = static_cast<SysParticle::Data::ParticleRenderType>(e_particle.render_type);
-
-			//Update particle system
-			particle_manager->updateParticleSystem(particle_sys);
-
-			//const unsigned int vao = PM.getVAO(ps.preset);
-			const unsigned int vbo = particle_manager->getVBO(particle_sys.preset);
-
-			//Particles to render
-			auto particles = particle_sys.particles;
-
-			// assume world pos
-			if (particle_sys.using_world_pos) {
-				std::for_each(particles.begin(), particles.end(), [&](SysParticle::Particle& p) {
-					p.pos = worldToScreen(p.pos);
-				});
-			}
-
-			//Bind buffer
-			GLenum err = glGetError();
-			if (err != GL_NO_ERROR) {
-				NIKEE_CORE_ERROR("OpenGL error before updating particle system vbo {0}: {1}", __FUNCTION__, err);
-			}
-			glNamedBufferSubData(vbo, 0, particles.size() * sizeof(SysParticle::Particle), particles.data());
-			err = glGetError();
-			if (err != GL_NO_ERROR) {
-				NIKEE_CORE_ERROR("OpenGL error after updating particle system vbo {0}: {1}", __FUNCTION__, err);
-			}
-			const int num_particles = max(1, static_cast<int>(particles.size()));
-
-			//Particle render function
-			auto particle_render = [num_particles, &particle_sys, ref = e_particle.ref]() {
-
-				NIKE_RENDER_SERVICE->renderParticleSystem(static_cast<int>(particle_sys.preset), particle_sys.origin, static_cast<int>(particle_sys.render_type), num_particles, ref == "mouseps1");
-			};
-
-			//Check for screen position !!!More work to be done here to ensure screen particles are rendered correctly
-			if (e_transform.use_screen_pos) {
-				screen_particle_render_queue.push(particle_render);
-			}
-			else {
-				world_particle_render_queue.push(particle_render);
-			}
-		}
+		screen_render_queue.push(texture_render);
 	}
 
-	void Render::Service::renderParticleSystem(int preset, const Vector2f& origin, int render_type, int draw_count, bool use_screen_pos) {
+	void Render::Service::renderParticleSystem(const NIKE::SysParticle::ParticleSystem& ps, [[maybe_unused]] bool use_screen_pos, const std::string& texture_ref) {
+
 		GLenum err = glGetError();
 		if (err != GL_NO_ERROR) {
 			NIKEE_CORE_ERROR("OpenGL error at beginning of {0}: {1}", __FUNCTION__, err);
@@ -859,8 +750,8 @@ namespace NIKE {
 		int NUM_VERTICES = 6;		// defined in vertex shader
 		GLenum PRIMITIVE = GL_TRIANGLES;
 
-		std::string ref = NIKE::SysParticle::Data::particle_render_type_map.at(static_cast<NIKE::SysParticle::Data::ParticleRenderType>(render_type));
-		if (preset == static_cast<int>(NIKE::SysParticle::Data::ParticlePresets::BASE)) {
+		std::string ref = NIKE::SysParticle::Data::particle_render_type_map.at(static_cast<NIKE::SysParticle::Data::ParticleRenderType>(ps.render_type));
+		if (ps.preset == NIKE::SysParticle::Data::ParticlePresets::BASE) {
 			ref = "base";
 			NUM_VERTICES = 4;
 			PRIMITIVE = GL_TRIANGLE_STRIP;
@@ -872,10 +763,29 @@ namespace NIKE {
 
 		shader_manager->setUniform(shader_name, "iTime", (float)glfwGetTime());
 		shader_manager->setUniform(shader_name, "iResolution", Vector2f{ NIKE_WINDOWS_SERVICE->getWindow()->getWindowSize() }); // window size
-		shader_manager->setUniform(shader_name, "particleScreenOrigin", worldToScreen(origin));			// particle screen pos
+		// Transform origin correctly based on screen position flag
+		Vector2f particle_origin = worldToScreen(ps.origin, ps.using_world_pos);
+		shader_manager->setUniform(shader_name, "particleScreenOrigin", particle_origin);
 
-		if (use_screen_pos) {
-			shader_manager->setUniform(shader_name, "particleScreenOrigin", origin);
+		if (static_cast<NIKE::SysParticle::Data::ParticleRenderType>(ps.render_type) == NIKE::SysParticle::Data::ParticleRenderType::TEXTURED) {
+			// Check if asset exists
+			if (NIKE_ASSETS_SERVICE->getAsset<Assets::Texture>(texture_ref) == nullptr) {
+				return;
+			}
+
+			unsigned int tex_hdl;
+
+			try {
+				// using texture
+				tex_hdl = NIKE_ASSETS_SERVICE->getAsset<Assets::Texture>(texture_ref)->gl_data;
+			}
+			catch (...) {
+				NIKEE_CORE_ERROR("Error: Texture {0} not found in {1}: {2}", texture_ref, __FUNCTION__, "");
+				return;
+			}
+			const int tex_binding_unit = 6;
+			glBindTextureUnit(tex_binding_unit, tex_hdl);
+			shader_manager->setUniform(shader_name, "u_tex2d", tex_binding_unit);
 		}
 
 		err = glGetError();
@@ -883,13 +793,37 @@ namespace NIKE {
 			NIKEE_CORE_ERROR("OpenGL after setting uniform variables in {0}: {1}", __FUNCTION__, err);
 		}
 
-		const unsigned int vao = particle_manager->getVAO(static_cast<NIKE::SysParticle::Data::ParticlePresets>(preset));
+		//Particles to render (transform positions)
+		// USE THIS PARTICLE BUFFER TO RENDER, NOT ps.particles
+		auto particles = ps.particles;
+
+		// transform each particle
+		std::for_each(particles.begin(), particles.end(), [&](SysParticle::Particle& p) {
+			p.pos = worldToScreen(p.pos, ps.using_world_pos);
+			});
+
+
+		//Bind buffer
+		const unsigned int vbo = particle_manager->getVBO(ps.preset);
+		err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error before updating particle system vbo {0}: {1}", __FUNCTION__, err);
+		}
+		glNamedBufferSubData(vbo, 0, particles.size() * sizeof(SysParticle::Particle), particles.data());
+		err = glGetError();
+		if (err != GL_NO_ERROR) {
+			NIKEE_CORE_ERROR("OpenGL error after updating particle system vbo {0}: {1}", __FUNCTION__, err);
+		}
+
+		const unsigned int vao = particle_manager->getVAO(static_cast<NIKE::SysParticle::Data::ParticlePresets>(ps.preset));
 		glBindVertexArray(vao);
 
 		err = glGetError();
 		if (err != GL_NO_ERROR) {
 			NIKEE_CORE_ERROR("OpenGL after binding vao in {0}: {1}", __FUNCTION__, err);
 		}
+
+		const int draw_count = max(1, static_cast<int>(particles.size()));	// number of objects to draw, min 1
 
 		glDrawArraysInstanced(PRIMITIVE, 0, NUM_VERTICES, draw_count);
 
@@ -899,6 +833,329 @@ namespace NIKE {
 
 		while ((err = glGetError()) != GL_NO_ERROR) {
 			NIKEE_CORE_ERROR("OpenGL error at end of {0}: {1}", __FUNCTION__, err);
+		}
+	}
+
+	void Render::Service::renderComponents(std::unordered_map<std::string, std::shared_ptr<void>> comps, bool debug) {
+
+		//Get transform
+		auto trans_it = comps.find(Utility::convertTypeString(typeid(Transform::Transform).name()));
+		if (trans_it == comps.end()) {
+			return;
+		}
+		auto& e_transform = *std::static_pointer_cast<Transform::Transform>(trans_it->second);
+
+		//Camera matrix
+		Matrix_33 cam_ndcx = e_transform.use_screen_pos ? NIKE_CAMERA_SERVICE->getFixedWorldToNDCXform() : NIKE_CAMERA_SERVICE->getWorldToNDCXform();
+		//Get Texture
+		{
+			auto tex_it = comps.find(Utility::convertTypeString(typeid(Render::Texture).name()));
+			if (tex_it != comps.end()) {
+
+				//Texture component
+				auto& e_texture = *std::static_pointer_cast<Render::Texture>(tex_it->second);
+
+				//Check if texture is loaded
+				if (NIKE_ASSETS_SERVICE->isAssetRegistered(e_texture.texture_id)) {
+
+					//Allow stretching of texture
+					if (!e_texture.b_stretch) {
+						//Copy transform for texture mapping ( Locks the transformation of a texture )
+						Vector2f tex_size{
+							static_cast<float>(NIKE_ASSETS_SERVICE->getAsset<Assets::Texture>(e_texture.texture_id)->size.x) / e_texture.frame_size.x,
+							static_cast<float>(NIKE_ASSETS_SERVICE->getAsset<Assets::Texture>(e_texture.texture_id)->size.y) / e_texture.frame_size.y
+						};
+
+						e_transform.scale = tex_size.normalized() * e_transform.scale.length();
+					}
+
+					//Texture render function
+					auto texture_render = [cam_ndcx, e_texture, e_transform]() {
+						//Matrix used for rendering
+						Matrix_33 matrix;
+
+						// Transform matrix here
+						NIKE_RENDER_SERVICE->transformMatrix(e_transform, matrix, cam_ndcx, Vector2b{ e_texture.b_flip.x, e_texture.b_flip.y });
+
+						// Render Texture
+						NIKE_RENDER_SERVICE->renderObject(matrix, e_texture);
+						};
+
+					//Check for screen position
+					if (e_transform.use_screen_pos) {
+						screen_render_queue.push(texture_render);
+					}
+					else {
+						world_render_queue.push(texture_render);
+					}
+				}
+			}
+		}
+
+		//Get Shape
+		{
+			auto shape_it = comps.find(Utility::convertTypeString(typeid(Render::Shape).name()));
+			if (shape_it != comps.end()) {
+
+				//Shape component
+				auto& e_shape = *std::static_pointer_cast<Render::Shape>(shape_it->second);
+
+				//Check if model exists
+				if (NIKE_ASSETS_SERVICE->isAssetRegistered(e_shape.model_id)) {
+
+					//Shape render function
+					auto shape_render = [e_shape, e_transform, cam_ndcx]() {
+						//Matrix used for rendering
+						Matrix_33 matrix;
+
+						// Transform matrix here
+						NIKE_RENDER_SERVICE->transformMatrix(e_transform, matrix, cam_ndcx);
+
+						//Render Shape
+						NIKE_RENDER_SERVICE->renderObject(matrix, e_shape);
+						};
+
+					//Check for screen position
+					if (e_transform.use_screen_pos) {
+						screen_render_queue.push(shape_render);
+					}
+					else {
+						world_render_queue.push(shape_render);
+					}
+				}
+			}
+		}
+
+		//Debug mode rendering
+		{
+			if (debug) {
+				// Render debugging bounding box
+				Vector4f bounding_box_color{ 1.0f, 0.0f, 0.0f, 1.0f };
+
+				//Get Collider
+				auto collider_it = comps.find(Utility::convertTypeString(typeid(Physics::Collider).name()));
+				if (collider_it != comps.end()) {
+
+					//Collider comp
+					auto& e_collider = *std::static_pointer_cast<Physics::Collider>(collider_it->second);
+
+					//Change color of bounding box on collision
+					if (e_collider.b_collided) {
+						bounding_box_color = { 0.0f, 1.0f, 0.0f, 1.0f };
+					}
+
+					//Shape render function
+					auto collider_render = [e_collider, bounding_box_color, cam_ndcx]() {
+						//Matrix used for rendering
+						Matrix_33 matrix;
+
+						//Calculate bounding box matrix
+						NIKE_RENDER_SERVICE->transformMatrix(e_collider.transform, matrix, cam_ndcx);
+						NIKE_RENDER_SERVICE->renderBoundingBox(matrix, bounding_box_color);
+						};
+
+					//Check for screen position
+					if (e_transform.use_screen_pos) {
+						screen_render_queue.push(collider_render);
+					}
+					else {
+						world_render_queue.push(collider_render);
+					}
+				}
+				else {
+
+					//Shape render function
+					auto collider_render = [bounding_box_color, e_transform, cam_ndcx]() {
+						//Matrix used for rendering
+						Matrix_33 matrix;
+
+						//Calculate bounding box matrix
+						NIKE_RENDER_SERVICE->transformMatrix(e_transform, matrix, cam_ndcx);
+						NIKE_RENDER_SERVICE->renderBoundingBox(matrix, bounding_box_color);
+						};
+
+					//Check for screen position
+					if (e_transform.use_screen_pos) {
+						screen_render_queue.push(collider_render);
+					}
+					else {
+						world_render_queue.push(collider_render);
+					}
+				}
+
+				//Get Dynamics
+				auto dynamics_it = comps.find(Utility::convertTypeString(typeid(Physics::Dynamics).name()));
+				if (dynamics_it != comps.end()) {
+
+					//Collider comp
+					auto& e_dynamics = *std::static_pointer_cast<Physics::Dynamics>(dynamics_it->second);
+
+					if (e_dynamics.velocity.x != 0.0f || e_dynamics.velocity.y != 0.0f) {
+
+						//Shape render function
+						auto dir_render = [e_transform, e_dynamics, cam_ndcx, bounding_box_color]() {
+							//Matrix used for rendering
+							Matrix_33 matrix;
+
+							Transform::Transform dir_transform = e_transform;
+							dir_transform.scale.x = 1.0f;
+							dir_transform.rotation = -atan2(e_dynamics.velocity.x, e_dynamics.velocity.y) * static_cast<float>(180.0f / M_PI);
+							dir_transform.position += {0.0f, e_transform.scale.y / 2.0f};
+							NIKE_RENDER_SERVICE->transformDirectionMatrix(dir_transform, matrix, cam_ndcx);
+							NIKE_RENDER_SERVICE->renderBoundingBox(matrix, bounding_box_color);
+							};
+
+						//Check for screen position
+						if (e_transform.use_screen_pos) {
+							screen_render_queue.push(dir_render);
+						}
+						else {
+							world_render_queue.push(dir_render);
+						}
+					}
+				}
+			}
+		}
+
+		//Get Text
+		{
+			auto text_it = comps.find(Utility::convertTypeString(typeid(Render::Text).name()));
+			if (text_it != comps.end()) {
+
+				//Text component
+				auto& e_text = *std::static_pointer_cast<Render::Text>(text_it->second);
+
+				//Check if font exists
+				if (NIKE_ASSETS_SERVICE->isAssetRegistered(e_text.font_id)) {
+
+					//Text render function
+					auto text_render = [e_transform, cam_ndcx, &e_text]() {
+
+						//Transform matrix
+						Matrix_33 matrix;
+
+						//Make copy of transform, scale to 1.0f for calculating matrix
+						Transform::Transform copy = e_transform;
+						copy.scale = { 1.0f, 1.0f };
+
+						//Transform text matrix
+						NIKE_RENDER_SERVICE->transformMatrix(copy, matrix, cam_ndcx);
+
+						//Render text
+						NIKE_RENDER_SERVICE->renderText(matrix, e_text);
+						};
+
+					//Check for screen position
+					if (e_transform.use_screen_pos) {
+						screen_text_render_queue.push(text_render);
+					}
+					else {
+						world_text_render_queue.push(text_render);
+					}
+				}
+			}
+		}
+
+		//Get particle emitter
+		{
+			auto particle_it = comps.find(Utility::convertTypeString(typeid(Render::ParticleEmitter).name()));
+			if (particle_it != comps.end()) {
+
+				//Particle component
+				auto& e_particle = *std::static_pointer_cast<Render::ParticleEmitter>(particle_it->second);
+
+				//Get particle system
+				auto& particle_sys = *e_particle.p_system;
+
+				//Update particle system with updated particle emitter data
+				particle_sys.preset = static_cast<SysParticle::Data::ParticlePresets>(e_particle.preset);
+				particle_sys.origin = e_transform.position + e_particle.offset;
+				particle_sys.duration = e_particle.duration;
+				particle_sys.render_type = static_cast<SysParticle::Data::ParticleRenderType>(e_particle.render_type);
+
+				particle_sys.using_world_pos = !e_transform.use_screen_pos;
+
+				particle_sys.num_new_particles_per_second = e_particle.num_new_particles_per_second;
+				particle_sys.particle_lifespan = e_particle.particle_lifespan;
+				particle_sys.particle_acceleration = e_particle.particle_acceleration;
+				particle_sys.particle_velocity_range = e_particle.particle_velocity_range;
+				particle_sys.particle_vector_x_range = e_particle.particle_vector_x_range;
+				particle_sys.particle_vector_y_range = e_particle.particle_vector_y_range;
+				particle_sys.particle_color_is_random = e_particle.particle_color_is_random;
+				particle_sys.particle_color = e_particle.particle_color;
+				particle_sys.particle_rand_x_offset_range = e_particle.particle_rand_x_offset_range;
+				particle_sys.particle_rand_y_offset_range = e_particle.particle_rand_y_offset_range;
+				particle_sys.particle_rotation = e_particle.particle_rotation;
+				particle_sys.particle_rand_width_range = e_particle.particle_rand_width_range;
+				particle_sys.particle_size_changes_over_time = e_particle.particle_size_changes_over_time;
+				particle_sys.particle_final_size = e_particle.particle_final_size;
+				particle_sys.particle_color_changes_over_time = e_particle.particle_color_changes_over_time;
+				particle_sys.particle_final_color = e_particle.particle_final_color;
+				particle_sys.particle_rotation_speed = e_particle.particle_rotation_speed;
+				particle_sys.texture_ref = e_particle.texture_ref;
+
+				//Update particle system
+				particle_manager->updateParticleSystem(particle_sys);
+
+				//Particle render function
+				auto particle_render = [&particle_sys, ref = e_particle.ref]() {
+
+					NIKE_RENDER_SERVICE->renderParticleSystem(particle_sys, ref == "mouseps1", particle_sys.texture_ref);
+					};
+
+				//Check for screen position !!!More work to be done here to ensure screen particles are rendered correctly
+				if (e_transform.use_screen_pos) {
+					screen_particle_render_queue.push(particle_render);
+				}
+				else {
+					world_particle_render_queue.push(particle_render);
+				}
+			}
+		}
+
+		//Get video
+		{
+			auto video_it = comps.find(Utility::convertTypeString(typeid(Render::Video).name()));
+			if (video_it != comps.end()) {
+
+				//Video component
+				auto& e_video = *std::static_pointer_cast<Render::Video>(video_it->second);
+
+				//Check if video exists
+				if (NIKE_ASSETS_SERVICE->isAssetRegistered(e_video.video_id)) {
+
+					//Update video player
+					video_manager->update(e_video);
+
+					//Check for valid mpeg
+					if (e_video.mpeg) {
+
+						//Clamp aspect ratio of texture
+						e_transform.scale = e_video.texture_size.normalized() * e_transform.scale.length();
+
+						//Video render function
+						auto video_render = [e_transform, cam_ndcx, &e_video]() {
+
+							//Transform matrix
+							Matrix_33 matrix;
+
+							//Transform video matrix
+							NIKE_RENDER_SERVICE->transformMatrix(e_transform, matrix, cam_ndcx);
+
+							//Render video
+							NIKE_RENDER_SERVICE->renderObject(matrix, e_video);
+							};
+
+						//Check for screen position
+						if (e_transform.use_screen_pos) {
+							screen_render_queue.push(video_render);
+						}
+						else {
+							world_render_queue.push(video_render);
+						}
+					}
+				}
+			}
 		}
 	}
 
@@ -1170,7 +1427,7 @@ namespace NIKE {
 	void Render::Service::completeRender() {
 
 		//Update particle manager
-		particle_manager->update();
+		//particle_manager->update();
 
 		//Render world elements
 		while (!world_render_queue.empty()) {
@@ -1221,5 +1478,117 @@ namespace NIKE {
 			screen_particle_render_queue.front()();
 			screen_particle_render_queue.pop();
 		}
+
+		// render from fbo
+
+		{
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+			const Vector2f framesize{ 1.0f , 1.0f };
+			Vector2f uv_offset{ 0, 0 };
+
+			shader_manager->useShader("texture");
+
+			//Texture unit
+			static constexpr int texture_unit = 6;
+
+			// set texture
+			glBindTextureUnit(
+				texture_unit, // texture unit (binding index)
+				fbo_texture
+			);
+
+			glTextureParameteri(fbo_texture, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTextureParameteri(fbo_texture, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+			//Set uniforms for texture rendering
+			shader_manager->setUniform("texture", "u_tex2d", texture_unit);
+			shader_manager->setUniform("texture", "u_opacity", fbo_opacity);
+			shader_manager->setUniform("texture", "u_transform", 2 * Matrix_33::Identity());
+			shader_manager->setUniform("texture", "uvOffset", uv_offset);
+			shader_manager->setUniform("texture", "frameSize", framesize);
+
+			//Blending options for texture
+			shader_manager->setUniform("texture", "u_color", Vector3f(1.f, 1.f, 1.f));
+			shader_manager->setUniform("texture", "u_blend", true);
+			shader_manager->setUniform("texture", "u_intensity", 0.f);
+
+			//Flip texture options
+			//shader_manager->setUniform("texture", "u_fliphorizontal", e_texture.b_flip.x);
+			//shader_manager->setUniform("texture", "u_flipvertical", e_texture.b_flip.y);
+
+			//Get model
+			auto& model = *NIKE_ASSETS_SERVICE->getAsset<Assets::Model>("square-texture.model");
+
+			//Draw
+			glClear(GL_COLOR_BUFFER_BIT);
+			glBindVertexArray(model.vaoid);
+			glDrawElements(model.primitive_type, model.draw_count, GL_UNSIGNED_INT, nullptr);
+
+			//Unuse texture
+			glBindVertexArray(0);
+			shader_manager->unuseShader();
+		}
+
+		 // fbo update
+		{
+			switch (fade_state) {
+			case FADE_STATE::FADE_IN:
+				fadeInHelper();
+				break;
+			case FADE_STATE::FADE_OUT:
+				fadeOutHelper();
+				break;
+			}
+		}
+	}
+
+	void Render::Service::fadeIn(float duration) {
+		fade_duration = duration;
+		fade_elapsed_time = 0.f;
+		fbo_opacity = 0.f;
+		fade_state = FADE_STATE::FADE_IN;
+	}
+
+	void Render::Service::fadeOut(float duration) {
+		fade_duration = duration;
+		fade_elapsed_time = 0.f;
+		fbo_opacity = 1.f;
+		fade_state = FADE_STATE::FADE_OUT;
+	}
+
+	void Render::Service::fadeInHelper() {
+		if (fade_elapsed_time >= fade_duration) {
+			fbo_opacity = 1.f;
+			fade_state = FADE_STATE::NONE;
+			return;
+		}
+
+		fade_elapsed_time += NIKE_WINDOWS_SERVICE->getDeltaTime();
+
+		static constexpr float start_opacity = 0.f;
+		static constexpr float end_opacity = 1.f;
+
+		fbo_opacity = lerp(start_opacity, end_opacity, fade_elapsed_time / fade_duration);
+	}
+
+	void Render::Service::fadeOutHelper() {
+		if (fade_elapsed_time >= fade_duration) {
+			fbo_opacity = 0.f;
+			fade_state = FADE_STATE::NONE;
+			return;
+		}
+		fade_elapsed_time += NIKE_WINDOWS_SERVICE->getDeltaTime();
+		static constexpr float start_opacity = 1.f;
+		static constexpr float end_opacity = 0.f;
+		fbo_opacity = lerp(start_opacity, end_opacity, fade_elapsed_time / fade_duration);
+	}
+
+	float Render::Service::getFboOpacity() const {
+		return fbo_opacity;
+	}
+
+	Render::FADE_STATE Render::Service::getFadeState() const {
+		return fade_state;
 	}
 }

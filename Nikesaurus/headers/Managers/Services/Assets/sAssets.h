@@ -49,7 +49,8 @@ namespace NIKE {
 			Scene,
 			Prefab,
 			Grid,
-			Script
+			Script,
+			Video
 		};
 
 		//Asset service

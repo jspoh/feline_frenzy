@@ -3,6 +3,7 @@
  * \brief  Physics system for engine
  *
  * \author Soh Zhi Jie Bryan, 2301238, z.soh@digipen.edu (100%)
+ *         Min Khant Ko, 2301320, ko.m@digipen.edu (60%)
  * \date   September 2024
  * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
@@ -181,8 +182,8 @@ namespace NIKE {
             float width = transform.scale.x;
             float height = transform.scale.y;
 
-            // If bigger than 1500 in either dimension, treat as a "wall"
-            return (width >= 1500.0f || height >= 1500.0f);
+            // If bigger than 1000 in either dimension, treat as a "wall"
+            return (width >= 1000.0f || height >= 1000.0f);  // (Temporarily forced more)
             };
 
         // Collect "large" entities and all other colliders
@@ -356,65 +357,4 @@ namespace NIKE {
         collision_system->setRestitution(event->restitution);
         event->setEventProcessed(true);
     }
-
-
-    // OLD SINGLE-CELL BROAD-PHASE CODE (commented out) which only hashed one cell per entity
-    //------------------------------------------------------------------------
-    /*
-    // void Physics::Manager::update() {
-    //     // Clear processed collisions
-    //     collision_system->clearProcessedCollisions();
-
-    //     float dt = NIKE_WINDOWS_SERVICE->getFixedDeltaTime();
-    //     auto const& layers = NIKE_SCENES_SERVICE->getLayers();
-
-    //     // Hash function
-    //     auto hash = [](int x, int y) -> int {
-    //         return static_cast<int>(std::hash<int>()(x) ^ (std::hash<int>()(y) << 1));
-    //     };
-
-    //     constexpr int MAX_PHYSICS_STEPS = 5;
-    //     for (int step = 0; step < min(NIKE_WINDOWS_SERVICE->getCurrentNumOfSteps(), MAX_PHYSICS_STEPS); ++step) {
-
-    //         // Single-cell approach
-    //         std::unordered_map<int, std::vector<Entity::Type>> spatial_grid;
-    //         const Vector2f grid_scale = NIKE_MAP_SERVICE->getGridScale() / 2;
-
-    //         Physics::Dynamics def_dynamics;
-
-    //         for (auto& layer : layers) {
-    //             if (!layer->getLayerState()) continue;
-
-    //             for (auto& entity : layer->getEntitites()) {
-    //                 if (entities.find(entity) == entities.end()) continue;
-    //                 auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
-    //                 if (!e_transform_comp) continue;
-    //                 auto& e_transform = e_transform_comp.value().get();
-
-    //                 // old physics update, etc...
-
-    //                 // Then hash single cell
-    //                 auto e_collider_comp = NIKE_ECS_MANAGER->getEntityComponent<Physics::Collider>(entity);
-    //                 if (e_collider_comp.has_value()) {
-    //                     auto& e_collider = e_collider_comp.value().get();
-    //                     if (e_collider.b_bind_to_entity) {
-    //                         e_collider.transform = e_transform;
-    //                     } else {
-    //                         e_collider.transform.position = e_transform.position + e_collider.pos_offset;
-    //                     }
-
-    //                     int cell_x = static_cast<int>(e_collider.transform.position.x / grid_scale.x);
-    //                     int cell_y = static_cast<int>(e_collider.transform.position.y / grid_scale.y);
-    //                     int cell_id = hash(cell_x, cell_y);
-    //                     spatial_grid[cell_id].push_back(entity);
-    //                 }
-    //             }
-    //         }
-
-    //         // Then do narrow-phase among each cell's contents
-    //         // ...
-    //     }
-    // }
-    */
-
 } // namespace NIKE

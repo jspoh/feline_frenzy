@@ -34,6 +34,8 @@ namespace NIKE {
 
 		private:
 			void spawnHealthDrop(Entity::Type entity);
+			void spawnBrokenBarrel(Entity::Type entity);
+			void spawnBrokenChest(Entity::Type entity);
 		};
 	}
 }

@@ -1,12 +1,12 @@
 {
     "Components": {
-        "Audio::SFX": {
-            "Audio_ID": "Waterball1.wav",
-            "B_Play_SFX": false,
-            "Channel_Group_ID": "BulletSFX",
-            "Pitch": 1.0,
-            "Volume": 0.5
-        },
+      "Audio::SFX": {
+        "Audio_ID": "Shoot_Water_01.wav",
+        "B_Play_SFX": false,
+        "Channel_Group_ID": "BulletSFX",
+        "Pitch": 1.0,
+        "Volume": 0.5
+      },
         "Combat::Damage": {
             "Damage": 10.0
         },
@@ -46,6 +46,64 @@
                 "y": 0.0
             }
         },
+        "Render::ParticleEmitter": {
+            "duration": -1.0,
+            "num_new_particles_per_second": 10,
+            "offset": {
+                "x": 0.0,
+                "y": 0.0
+            },
+            "particle_acceleration": 0.0,
+            "particle_color": {
+                "w": 1.0,
+                "x": 0.0,
+                "y": 0.9760003089904785,
+                "z": 1.0
+            },
+            "particle_color_changes_over_time": true,
+            "particle_color_is_random": false,
+            "particle_final_color": {
+                "w": 0.0,
+                "x": 0.0,
+                "y": 0.37600016593933105,
+                "z": 1.0
+            },
+            "particle_final_size": {
+                "x": 0.0,
+                "y": 0.0
+            },
+            "particle_lifespan": 0.20000000298023224,
+            "particle_rand_width_range": {
+                "x": 5.0,
+                "y": 10.0
+            },
+            "particle_rand_x_offset_range": {
+                "x": 0.0,
+                "y": 0.0
+            },
+            "particle_rand_y_offset_range": {
+                "x": 0.0,
+                "y": 0.0
+            },
+            "particle_rotation": 0.0,
+            "particle_rotation_speed": 0.0,
+            "particle_size_changes_over_time": false,
+            "particle_vector_x_range": {
+                "x": -1.0,
+                "y": 1.0
+            },
+            "particle_vector_y_range": {
+                "x": -1.0,
+                "y": 1.0
+            },
+            "particle_velocity_range": {
+                "x": 5.0,
+                "y": 100.0
+            },
+            "preset": 0,
+            "render_type": 1,
+            "texture_ref": ""
+        },
         "Render::Texture": {
             "B_Blend": false,
             "B_Flip": {
@@ -84,7 +142,7 @@
         }
     },
     "MetaData": {
-        "Layer ID": 0,
+        "Layer ID": 1,
         "Tags": []
     }
 }

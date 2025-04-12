@@ -1,10 +1,10 @@
 /*****************************************************************//**
  * \file   sInput.h
  * \brief  input manager for engine
- * 
+ *
  * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (100%)
  * \date   September 2024
- * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ * All content ï¿½ 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 #pragma once
 
@@ -17,9 +17,9 @@ namespace NIKE {
 	namespace Input {
 
 		//Temporary Disable DLL Export Warning
-		#pragma warning(disable: 4251)
+#pragma warning(disable: 4251)
 
-		//Key States
+//Key States
 		enum class NIKE_API States {
 			PRESS = NIKE_PRESS,
 			RELEASE = NIKE_RELEASE,
@@ -61,12 +61,21 @@ namespace NIKE {
 				: offset{ offset } {}
 		};
 
+		//Cursor Enter Event
+		struct NIKE_API CursorEnterEvent : public Events::IEvent {
+			int entered;
+
+			CursorEnterEvent(int entered)
+				: entered{ entered } {}
+		};
+
 		//Input manager for input polling
-		class NIKE_API Service 
-			:	public Events::IEventListener<KeyEvent>,
-				public Events::IEventListener<MouseBtnEvent>,
-				public Events::IEventListener<MouseMovedEvent>,
-				public Events::IEventListener<MouseScrollEvent>
+		class NIKE_API Service
+			: public Events::IEventListener<KeyEvent>,
+			public Events::IEventListener<MouseBtnEvent>,
+			public Events::IEventListener<MouseMovedEvent>,
+			public Events::IEventListener<MouseScrollEvent>,
+			public Events::IEventListener<CursorEnterEvent>
 		{
 		private:
 
@@ -79,16 +88,19 @@ namespace NIKE {
 			void onEvent(std::shared_ptr<MouseBtnEvent> event) override;
 			void onEvent(std::shared_ptr<MouseMovedEvent> event) override;
 			void onEvent(std::shared_ptr<MouseScrollEvent> event) override;
+			void onEvent(std::shared_ptr<CursorEnterEvent> event) override;
 
 			//Data structure of state
 			struct EventStates {
+				bool polling;
 				bool pressed;
 				bool triggered;
 				bool released;
 			};
 
-			//Input events map
-			std::unordered_map<int, EventStates> input_events;
+			//Set of keys
+			std::set<int> curr_keys;
+			std::set<int> prev_keys;
 
 			//Mouse data structure
 			struct Mouse {
@@ -99,10 +111,21 @@ namespace NIKE {
 
 			//Mouse event
 			Mouse mouse;
+
+			struct Cursor {
+				bool is_crosshair = false;
+				bool cursor_entered;
+			};
+
+			Cursor cursor;
+
 		public:
 
 			//Default Constructor
 			Service() = default;
+
+			//Update func
+			void update();
 
 			//Key Pressed
 			bool isKeyPressed(int key);
@@ -130,10 +153,19 @@ namespace NIKE {
 
 			//Get Mouse Scroll Offset
 			Vector2f getMouseScroll() const;
+
+			//Get Cursor Entered
+			bool getCursorEntererd() const;
+
+			//Get Is Crosshair
+			bool getCrosshair() const;
+
+			//Set Crosshair
+			void setCrosshair(bool is_crosshair);
 		};
 
 		//Re-enable DLL Export warning
-		#pragma warning(default: 4251)
+#pragma warning(default: 4251)
 	}
 }
 

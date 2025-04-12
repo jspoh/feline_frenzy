@@ -9,8 +9,9 @@
  *  All content � 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 #include "Core/stdafx.h"
-#include "Managers/Services/LevelEditor/sEditorPanels.h"
 #include "Core/Engine.h"
+#include "Managers/Services/LevelEditor/sEditorPanels.h"
+
 #include "Systems/Render/sysRender.h"
 #include <ShlObj.h>
 
@@ -260,6 +261,12 @@ namespace NIKE {
 		return b_debug_mode;
 	}
 
+
+	bool LevelEditor::MainPanel::getGameState() const {
+		return b_game_state;
+	}
+
+
 	void LevelEditor::MainPanel::setGameState(bool state) {
 		b_game_state = state;
 
@@ -286,12 +293,12 @@ namespace NIKE {
 		}
 	}
 
-	bool LevelEditor::MainPanel::getGameState() const {
-		return b_game_state;
-	}
-
 	bool LevelEditor::MainPanel::getGridState() const {
 		return b_grid_state;
+	}
+
+	void LevelEditor::MainPanel::setGridState(bool state) {
+		b_grid_state = state;
 	}
 
 	bool LevelEditor::MainPanel::getGizmoState() const {
@@ -841,6 +848,7 @@ namespace NIKE {
 					if (NIKE_ECS_MANAGER->checkEntity(clone_entity)) {
 						//Clone entity 
 						Entity::Type new_id = NIKE_ECS_MANAGER->cloneEntity(clone_entity);
+						NIKE_METADATA_SERVICE->setEntityLayerID(new_id, NIKE_METADATA_SERVICE->getEntityLayerID(clone_entity));
 
 						//If entity name is valid
 						if (!shared_id->empty() && NIKE_METADATA_SERVICE->isNameValid(*shared_id))
@@ -1162,7 +1170,7 @@ namespace NIKE {
 					ImGui::SameLine();
 
 					// Button to remove an entity, which triggers the popup
-					if (NIKE_ECS_MANAGER->checkEntity(selected_entity) && layer->checkEntity(selected_entity) && (ImGui::Button("Remove##Entity") || ImGui::GetIO().KeysDown[ImGuiKey_Delete])) {
+					if (NIKE_ECS_MANAGER->checkEntity(selected_entity) && layer->checkEntity(selected_entity) && (ImGui::Button("Remove##Entity") || ImGui::GetIO().KeysDown[NIKE_KEY_DELETE])) {
 						openPopUp("Remove Entity");
 					}
 
@@ -1476,6 +1484,98 @@ namespace NIKE {
 				ImGui::Text("No Tags Exists.");
 			}
 
+			//Add Spacing
+			ImGui::Spacing();
+
+			ImGui::SeparatorText("Relation");
+
+			//Add Spacing
+			ImGui::Spacing();
+
+			//Get entity relation
+			auto const& relation = NIKE_METADATA_SERVICE->getEntityRelation(selected_entity);
+			auto* parent = std::get_if<MetaData::Parent>(&relation);
+			auto* child = std::get_if<MetaData::Child>(&relation);
+
+			//Toggle between parent & child
+			ImGui::Text("Relation: ");
+			ImGui::SameLine();
+			if (ImGui::SmallButton(parent ? "Parent" : "Child")) {
+				if (parent) {
+					NIKE_METADATA_SERVICE->setEntityChildRelation(selected_entity);
+				}
+				else {
+					NIKE_METADATA_SERVICE->setEntityParentRelation(selected_entity);
+				}
+			}
+
+			//Add Children
+			if (parent) {
+
+				//List childrens
+				ImGui::Text("Children: ");
+
+				//Iterate through children
+				for (auto const& child_name : parent->childrens) {
+
+					//List entity name
+					if (ImGui::Button(child_name.c_str())) {
+						auto c_entity = NIKE_METADATA_SERVICE->getEntityByName(child_name);
+						if (c_entity.has_value()) {
+							selected_entity = c_entity.value();
+						}
+					}
+				}
+			}
+
+			//Change Parent
+			if (child) {
+				ImGui::Text("Parent: ");
+
+				//Entities name
+				auto parents_name = NIKE_METADATA_SERVICE->getAllParents();
+
+				//Static prev parent
+				static std::string prev_parent = "";
+
+				//Find the index of the currently selected parent entity in the list
+				int current_index = -1;
+				for (size_t i = 0; i < parents_name.size(); ++i) {
+					if (child->parent == parents_name[i]) {
+						current_index = static_cast<int>(i);
+						break;
+					}
+				}
+
+				// Display combo box for video selection
+				if (ImGui::Combo("##SelectParent", &current_index, parents_name.data(), static_cast<int>(parents_name.size()))) {
+
+					//Validate the selected index and get the new video
+					if (current_index >= 0 && current_index < static_cast<int>(parents_name.size())) {
+						std::string new_parent = parents_name[current_index];
+
+						if (new_parent != child->parent) {
+							// Save action
+							LevelEditor::Action change_parent_action;
+							change_parent_action.do_action = [&, parent = new_parent]() {
+								NIKE_METADATA_SERVICE->setEntityChildRelationParent(selected_entity, parent);
+								};
+
+							// Undo action
+							change_parent_action.undo_action = [&, parent = prev_parent]() {
+								NIKE_METADATA_SERVICE->setEntityChildRelationParent(selected_entity, parent);
+								};
+
+							// Execute the action
+							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(change_parent_action));
+
+							//Update the previous parent
+							prev_parent = new_parent;
+						}
+					}
+				}
+			}
+
 			//Render popups
 			renderPopUps();
 
@@ -1581,6 +1681,11 @@ namespace NIKE {
 					//Get mouse pos
 					Vector2f world_mouse = game_panel.lock()->getWorldMousePos();
 				}
+
+				// Delete Entity popup
+				if (NIKE_ECS_MANAGER->checkEntity(selected_entity) && ImGui::GetIO().KeysDown[NIKE_KEY_DELETE]) {
+					openPopUp("Remove Entity");
+				}
 			}
 		}
 
@@ -1607,7 +1712,30 @@ namespace NIKE {
 		if (e_transform_comp.has_value()) {
 
 			//Get transform
-			const auto& e_transform = e_transform_comp.value().get();
+			Transform::Transform e_transform = e_transform_comp.value().get();
+
+			if (e_transform.use_screen_pos) {
+				return false;
+			}
+
+			//Check if child
+			auto relation = NIKE_METADATA_SERVICE->getEntityRelation(entity);
+			auto* child = std::get_if<MetaData::Child>(&relation);
+			if (child) {
+
+				//Get parent entity
+				auto parent_entity = NIKE_METADATA_SERVICE->getEntityByName(child->parent);
+				if (parent_entity.has_value()) {
+
+					//Get parent transform
+					auto p_trans = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(parent_entity.value());
+					if (p_trans.has_value()) {
+
+						//Get parent transform reference
+						e_transform.position += p_trans.value().get().position;
+					}
+				}
+			}
 
 			// Retrieve the cursor position in world space
 			Vector2f cursorWorldPos = game_panel.lock()->getWorldMousePos();
@@ -1624,13 +1752,16 @@ namespace NIKE {
 	* Components Panel
 	*********************************************************************/
 	void LevelEditor::ComponentsPanel::interactGizmo() {
+		//Selected entity
+		auto entity = entities_panel.lock()->getSelectedEntity();
+
 		//Check if entity is locked or game is playing
-		if (main_panel.lock()->getGameState() || NIKE_METADATA_SERVICE->checkEntityLocked(entities_panel.lock()->getSelectedEntity())) {
+		if (main_panel.lock()->getGameState() || NIKE_METADATA_SERVICE->checkEntityLocked(entity)) {
 			return;
 		}
 
 		//Get transform component
-		auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entities_panel.lock()->getSelectedEntity());
+		auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
 
 		if (!e_transform_comp.has_value())
 			return;
@@ -1651,11 +1782,34 @@ namespace NIKE {
 		Vector2f world_mouse = e_transform.use_screen_pos ? Vector2f(mouse_pos.x - window_size.x * 0.5f, -(mouse_pos.y - window_size.y * 0.5f)) :
 			game_panel.lock()->getWorldMousePos();
 
+		//Get parent position
+		Vector2f parent_pos = { 0.0f, 0.0f };
+
+		//Check if child
+		auto relation = NIKE_METADATA_SERVICE->getEntityRelation(entity);
+		auto* child = std::get_if<MetaData::Child>(&relation);
+		if (child) {
+
+			//Get parent entity
+			auto parent_entity = NIKE_METADATA_SERVICE->getEntityByName(child->parent);
+			if (parent_entity.has_value()) {
+
+				//Get parent transform
+				auto p_trans = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(parent_entity.value());
+				if (p_trans.has_value()) {
+
+					//Get parent transform reference
+					parent_pos = p_trans.value().get().position;
+				}
+			}
+		}
+
 		//Render for each gizmo mode
 		switch (gizmo.mode) {
 		case GizmoMode::Translate: {
+
 			//Extra object for translate ( Move box )
-			gizmo.objects["Move Box"].first.position = { e_transform.position.x + gizmo_scale * 2.5f + gizmo.x_axis_offset * cam_zoom, e_transform.position.y + gizmo_scale * 2.5f + gizmo.y_axis_offset * cam_zoom };
+			gizmo.objects["Move Box"].first.position = { e_transform.position.x + parent_pos.x + gizmo_scale * 2.5f + gizmo.x_axis_offset * cam_zoom, e_transform.position.y + parent_pos.y + gizmo_scale * 2.5f + gizmo.y_axis_offset * cam_zoom };
 			gizmo.objects["Move Box"].first.scale = { gizmo_scale, gizmo_scale };
 			gizmo.objects["Move Box"].second = { 100, 100, 100, 255 };
 
@@ -1673,15 +1827,16 @@ namespace NIKE {
 
 				//Apply transformation
 				e_transform.position = { world_mouse.x - (gizmo_scale * 2.5f + gizmo.x_axis_offset * cam_zoom),  world_mouse.y - (gizmo_scale * 2.5f + gizmo.y_axis_offset * cam_zoom) };
+				e_transform.position = e_transform.position - parent_pos;
 			}
 
 			//Add gizmo up
-			gizmo.objects["Up"].first.position = { e_transform.position.x, e_transform.position.y + gizmo.y_axis_offset * cam_zoom };
+			gizmo.objects["Up"].first.position = { e_transform.position.x + parent_pos.x, e_transform.position.y + parent_pos.y + gizmo.y_axis_offset * cam_zoom };
 			gizmo.objects["Up"].first.scale = { gizmo_scale * 0.3f , gizmo_scale * 4 };
 			gizmo.objects["Up"].second = { 0, 255, 0, 255 };
 
 			//Add gizmo up point
-			gizmo.objects["Up Point"].first.position = { e_transform.position.x, e_transform.position.y + gizmo_scale * 2.5f + gizmo.y_axis_offset * cam_zoom };
+			gizmo.objects["Up Point"].first.position = { e_transform.position.x + parent_pos.x, e_transform.position.y + parent_pos.y + gizmo_scale * 2.5f + gizmo.y_axis_offset * cam_zoom };
 			gizmo.objects["Up Point"].first.scale = { gizmo_scale * 0.7f, gizmo_scale };
 			gizmo.objects["Up Point"].second = { 0, 255, 0, 255 };
 
@@ -1712,12 +1867,12 @@ namespace NIKE {
 			}
 
 			//Add gizmo right
-			gizmo.objects["Right"].first.position = { e_transform.position.x + gizmo.x_axis_offset * cam_zoom , e_transform.position.y };
+			gizmo.objects["Right"].first.position = { e_transform.position.x + parent_pos.x + gizmo.x_axis_offset * cam_zoom , e_transform.position.y + parent_pos.y };
 			gizmo.objects["Right"].first.scale = { gizmo_scale * 4, gizmo_scale * 0.3f };
 			gizmo.objects["Right"].second = { 255, 0, 0, 255 };
 
 			//Add gizmo right point
-			gizmo.objects["Right Point"].first.position = { e_transform.position.x + gizmo_scale * 2.5f + gizmo.x_axis_offset * cam_zoom, e_transform.position.y };
+			gizmo.objects["Right Point"].first.position = { e_transform.position.x + parent_pos.x + gizmo_scale * 2.5f + gizmo.x_axis_offset * cam_zoom, e_transform.position.y + parent_pos.y };
 			gizmo.objects["Right Point"].first.scale = { gizmo_scale, gizmo_scale * 0.7f };
 			gizmo.objects["Right Point"].second = { 255, 0, 0, 255 };
 
@@ -1768,7 +1923,7 @@ namespace NIKE {
 					if (cursor_cell.has_value()) {
 
 						//Snap to cell
-						e_transform.position = cursor_cell.value().get().position;
+						e_transform.position = cursor_cell.value().get().position - parent_pos;
 					}
 				}
 
@@ -1917,7 +2072,7 @@ namespace NIKE {
 		case GizmoMode::Rotate: {
 
 			//Add rotation circle
-			gizmo.objects["Rot Circle"].first.position = { e_transform.position.x, e_transform.position.y };
+			gizmo.objects["Rot Circle"].first.position = { e_transform.position.x + parent_pos.x, e_transform.position.y + parent_pos.y };
 			gizmo.objects["Rot Circle"].first.scale = { gizmo_scale * 8, gizmo_scale * 8 };
 			gizmo.objects["Rot Circle"].second = { 255, 255, 255, 255 };
 
@@ -2062,54 +2217,8 @@ namespace NIKE {
 				//Display each component as a button
 				if (ImGui::Button(component.first.c_str())) {
 
-					//Temporary add component action
-					//Action add_comp;
-
-					//Setup undo action for add component
-					//add_comp.undo_action = [=]() {
-					//	if (NIKE_ECS_MANAGER->checkEntityComponent(entities_panel.lock()->getSelectedEntity(), component.second)) {
-					//		NIKE_ECS_MANAGER->removeEntityComponent(entities_panel.lock()->getSelectedEntity(), component.second);
-					//	}
-					//};
-
-					//Setup do action for add component
-					//add_comp.do_action = [=]() {
-
 					//Add default comp to entity
 					NIKE_ECS_MANAGER->addDefEntityComponent(entities_panel.lock()->getSelectedEntity(), component.second);
-
-					//// add active particle system if particle emitter is added
-					//if (component.first == "Render::ParticleEmitter") {
-					//	using namespace NIKE::SysParticle;
-
-					//	// get entity position
-					//	const auto comps = NIKE_ECS_MANAGER->getAllEntityComponents(entities_panel.lock()->getSelectedEntity());
-
-					//	if (comps.find("Transform::Transform") == comps.end()) {
-					//		NIKEE_CORE_WARN("Transform component not found. Particle Emitter component cannot be added without a transform component. Creating component.");
-					//		NIKE_ECS_MANAGER->addDefEntityComponent(entities_panel.lock()->getSelectedEntity(), NIKE_ECS_MANAGER->getComponentType("Transform::Transform"));
-					//	}
-					//	NIKE_ECS_MANAGER->getComponentType("Transform::Transform");
-
-					//	const auto comp = reinterpret_cast<Transform::Transform*>(comps.at("Transform::Transform").get());
-
-					//	const std::string particle_emitter_ref = NIKE::SysParticle::Manager::ENTITY_PARTICLE_EMITTER_PREFIX + std::to_string(NIKE::SysParticle::Manager::getInstance().getNewPSID());
-
-					//	// update default particle system config
-					//	auto pe_comp = reinterpret_cast<Render::ParticleEmitter*>(comps.at("Render::ParticleEmitter").get());
-					//	pe_comp->duration = -1.f;
-					//	pe_comp->preset = static_cast<int>(Data::ParticlePresets::CLUSTER);
-					//	pe_comp->ref = particle_emitter_ref;
-					//	pe_comp->offset = { 0.f, 0.f };
-					//	pe_comp->render_type = static_cast<int>(Data::ParticleRenderType::CIRCLE);
-
-					//	NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem(particle_emitter_ref, static_cast<Data::ParticlePresets>(pe_comp->preset), comp->position + pe_comp->offset, static_cast<Data::ParticleRenderType>(pe_comp->render_type));
-					//}
-
-					//	};
-
-					//Execute add component action
-					//NIKE_LVLEDITOR_SERVICE->executeAction(std::move(add_comp));
 
 					//Close popup
 					closePopUp(popup_id);
@@ -2142,16 +2251,6 @@ namespace NIKE {
 			if (ImGui::Button("Ok")) {
 				// Retrieve component type from reference
 				Component::Type comp_type_copy = comps.at(comp_string_ref);
-
-				//if (comp_string_ref == "Render::ParticleEmitter") {
-				//	// get entity position
-				//	const auto comps = NIKE_ECS_MANAGER->getAllEntityComponents(entities_panel.lock()->getSelectedEntity());
-				//	const auto pe_comp = reinterpret_cast<Render::ParticleEmitter*>(comps.at("Render::ParticleEmitter").get());
-				//	bool success = NIKE::SysParticle::Manager::getInstance().removeActiveParticleSystem(pe_comp->ref);
-				//	if (!success) {
-				//		throw std::runtime_error("Failed to remove particle system: " + pe_comp->ref);
-				//	}
-				//}
 
 				// Remove the component from the entity
 				NIKE_ECS_MANAGER->removeEntityComponent(entities_panel.lock()->getSelectedEntity(), comp_type_copy);
@@ -2491,13 +2590,16 @@ namespace NIKE {
 	}
 
 	void LevelEditor::ComponentsPanel::renderEntityBoundingBox(void* draw_list, Vector2f const& render_size) {
+		//Selected entity
+		auto entity = entities_panel.lock()->getSelectedEntity();
+
 		//Check if entity is locked or game is playing
-		if (main_panel.lock()->getGameState() || NIKE_METADATA_SERVICE->checkEntityLocked(entities_panel.lock()->getSelectedEntity())) {
+		if (main_panel.lock()->getGameState() || NIKE_METADATA_SERVICE->checkEntityLocked(entity)) {
 			return;
 		}
 
 		//Get transform component
-		auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entities_panel.lock()->getSelectedEntity());
+		auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
 		if (!e_transform_comp.has_value())
 			return;
 
@@ -2515,19 +2617,45 @@ namespace NIKE {
 			worldCircle(draw, rotation_circle.first, rendersize, IM_COL32(rotation_circle.second.r, rotation_circle.second.g, rotation_circle.second.b, rotation_circle.second.a), gizmo.gizmo_scaling * 0.15f);
 		}
 		else {
+			//Get parent position
+			Transform::Transform transform = e_transform;
+
+			//Check if child
+			auto relation = NIKE_METADATA_SERVICE->getEntityRelation(entity);
+			auto* child = std::get_if<MetaData::Child>(&relation);
+			if (child) {
+
+				//Get parent entity
+				auto parent_entity = NIKE_METADATA_SERVICE->getEntityByName(child->parent);
+				if (parent_entity.has_value()) {
+
+					//Get parent transform
+					auto p_trans = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(parent_entity.value());
+					if (p_trans.has_value()) {
+
+						//Get parent transform reference
+						transform.position = p_trans.value().get().position + e_transform.position;
+					}
+				}
+			}
+
 			//Render rotated rectangle
-			worldQuad(draw, e_transform, rendersize, IM_COL32(255, 255, 255, 255), (gizmo.gizmo_scaling * 0.05f));
+			worldQuad(draw, transform, rendersize, IM_COL32(255, 255, 255, 255), (gizmo.gizmo_scaling * 0.05f));
 		}
 	}
 
 	void LevelEditor::ComponentsPanel::renderEntityGizmo(void* draw_list, Vector2f const& render_size) {
+
+		//Selected entity
+		auto entity = entities_panel.lock()->getSelectedEntity();
+
 		//Check if entity is locked or game is playing
-		if (main_panel.lock()->getGameState() || NIKE_METADATA_SERVICE->checkEntityLocked(entities_panel.lock()->getSelectedEntity())) {
+		if (main_panel.lock()->getGameState() || NIKE_METADATA_SERVICE->checkEntityLocked(entity)) {
 			return;
 		}
 
 		//Get transform component
-		auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entities_panel.lock()->getSelectedEntity());
+		auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity);
 		if (!e_transform_comp.has_value())
 			return;
 
@@ -2550,6 +2678,28 @@ namespace NIKE {
 
 		//Convert rendersize
 		ImVec2 rendersize = { render_size.x, render_size.y };
+
+		//Get parent position
+		Vector2f parent_pos = { 0.0f, 0.0f };
+
+		//Check if child
+		auto relation = NIKE_METADATA_SERVICE->getEntityRelation(entity);
+		auto* child = std::get_if<MetaData::Child>(&relation);
+		if (child) {
+
+			//Get parent entity
+			auto parent_entity = NIKE_METADATA_SERVICE->getEntityByName(child->parent);
+			if (parent_entity.has_value()) {
+
+				//Get parent transform
+				auto p_trans = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(parent_entity.value());
+				if (p_trans.has_value()) {
+
+					//Get parent transform reference
+					parent_pos = p_trans.value().get().position;
+				}
+			}
+		}
 
 		//Render for each gizmo mode
 		switch (gizmo.mode) {
@@ -2635,7 +2785,7 @@ namespace NIKE {
 			draw->AddText(worldToScreen(ImVec2(rotation_circle.position.x - (rotation_circle.scale.x / 2.0f), rotation_circle.position.y - (rotation_circle.scale.y * 0.6f)), rendersize, e_transform.use_screen_pos), IM_COL32(255, 255, 255, 255), gizmo_text.c_str());
 		}
 		else {
-			draw->AddText(worldToScreen(ImVec2(e_transform.position.x - (e_transform.scale.x / 2.0f), e_transform.position.y - (e_transform.scale.y * 0.6f)), rendersize, e_transform.use_screen_pos), IM_COL32(255, 255, 255, 255), gizmo_text.c_str());
+			draw->AddText(worldToScreen(ImVec2(e_transform.position.x + parent_pos.x - (e_transform.scale.x / 2.0f), e_transform.position.y + parent_pos.y - (e_transform.scale.y * 0.6f)), rendersize, e_transform.use_screen_pos), IM_COL32(255, 255, 255, 255), gizmo_text.c_str());
 		}
 	}
 
@@ -2751,6 +2901,9 @@ namespace NIKE {
 				//Reset prefab comps
 				prefab_comps.clear();
 
+				//Clear prefab meta data
+				meta_data = MetaData::EntityData();
+
 				//Set prefab ID
 				prefab_id = new_prefab_id + ".prefab";
 
@@ -2813,6 +2966,9 @@ namespace NIKE {
 
 						//Clear prefab comps
 						prefab_comps.clear();
+
+						//Clear prefab meta data
+						meta_data = MetaData::EntityData();
 
 						//Reset current index
 						current_index = 0;
@@ -4466,7 +4622,7 @@ namespace NIKE {
 					NIKE_ASSETS_SERVICE->getAssetType(selected_asset_id) == Assets::Types::Music)) {
 
 					//Show audio length
-					auto length = NIKE_ASSETS_SERVICE->getAsset<Audio::IAudio>(selected_asset_id)->getLength();
+					auto length = NIKE_ASSETS_SERVICE->getAsset<Audio::IAudio>(selected_asset_id)->getLength(NIKE_AUDIO_TIMEUNIT_MS);
 					ImGui::Text("Length:");
 					ImGui::Text("%d ms", length);
 					ImGui::Text("%.2f s", length / 1000.0f);
@@ -4898,6 +5054,13 @@ namespace NIKE {
 	/*****************************************************************//**
 	* User Interface Management Panel
 	*********************************************************************/
+	std::unordered_map<std::string, int> LevelEditor::UIPanel::val_type_map;
+	std::unordered_map<std::string, std::string> LevelEditor::UIPanel::named_key_map;
+	std::unordered_map<std::string, std::string> LevelEditor::UIPanel::str_val_map;
+	std::unordered_map<std::string, int> LevelEditor::UIPanel::int_val_map;
+	std::unordered_map<std::string, float> LevelEditor::UIPanel::float_val_map;
+	std::unordered_map<std::string, bool> LevelEditor::UIPanel::bool_val_map;
+
 	std::function<void()> LevelEditor::UIPanel::createButtonPopup(std::string const& popup_id) {
 		return [this, popup_id]() {
 
@@ -4963,12 +5126,6 @@ namespace NIKE {
 					ImGui::DragFloat2("##BtnScale", &btn_transform.scale.x, 0.1f, 0.f, (float)UINT16_MAX, "%.3f", ImGuiSliderFlags_AlwaysClamp);
 				}
 
-				////Edit Rotation ( Temporarily Disabled )
-				//{
-				//	//Change rotation
-				//	ImGui::Text("Rotation");
-				//	ImGui::DragFloat("##BtnRotation", &btn_transform.rotation, 0.1f, -360.f, 360.f);
-				//}
 			}
 
 			ImGui::Separator();
@@ -5099,133 +5256,103 @@ namespace NIKE {
 			};
 	}
 
-	void LevelEditor::UIPanel::init() {
-		registerPopUp("Create Button", createButtonPopup("Create Button"));
+	void LevelEditor::UIPanel::renderButtonEvent(const std::string& event_name, const std::string& button_name, NIKE::UI::UIBtn & button) {
+		if (ImGui::TreeNode(std::string(event_name + " Event##" + button_name).c_str())) {
+			auto& button_event = button.scripts[event_name];
 
-		entities_panel = std::dynamic_pointer_cast<EntitiesPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(EntitiesPanel::getStaticName()));
-	}
+			//Select script
+			{
+				// Get all loaded scripts
+				const auto& get_load_scripts = NIKE_ASSETS_SERVICE->getAssetRefs(Assets::Types::Script);
 
-	void LevelEditor::UIPanel::render() {
-		ImGui::Begin(getName().c_str());
-
-		//Set window dock id
-		dock_id = ImGui::GetWindowDockID();
-
-		//Create button
-		{
-			if (ImGui::Button("Create Button")) {
-				openPopUp("Create Button");
-			}
-		}
-
-		ImGui::Separator();
-
-		//List of buttons
-		auto& buttons = NIKE_UI_SERVICE->getAllButtons();
-		if (buttons.empty()) {
-			ImGui::Text("No active buttons.");
-		}
-		else {
-			ImGui::Text("Active Buttons: ");
-		}
-
-		// Temporary map to store UI state per button
-		static std::unordered_map<std::string, int> val_type_map;
-		static std::unordered_map<std::string, std::string> named_key_map;
-		static std::unordered_map<std::string, std::string> str_val_map;
-		static std::unordered_map<std::string, int> int_val_map;
-		static std::unordered_map<std::string, float> float_val_map;
-		static std::unordered_map<std::string, bool> bool_val_map;
-
-		//Show all active buttons
-		for (auto& button : buttons) {
-			ImGui::Spacing();
-
-			//Collapsing button
-			if (ImGui::CollapsingHeader(std::string("Button: " + button.first).c_str(), ImGuiTreeNodeFlags_None)) {
-
-				//Set trigger state
-				{
-					//Select Input State
-					static int trigger_index = 0;
-					trigger_index = static_cast<int>(button.second.input_state);
-					ImGui::Text("Button Input State: ");
-					if (ImGui::Combo(std::string("##ButtonInput" + button.first).c_str(), &trigger_index, "Pressed\0Triggered\0Released\0")) {
-						button.second.input_state = static_cast<UI::InputStates>(trigger_index);
+				// Find the index of the currently selected script id in the list
+				int script_index = -1;
+				for (size_t i = 0; i < get_load_scripts.size(); ++i) {
+					if (button_event.script_id == get_load_scripts[i]) {
+						script_index = static_cast<int>(i);
+						break;
 					}
 				}
 
-				//Select script
-				{
-					// Get all loaded scripts
-					const auto& get_load_scripts = NIKE_ASSETS_SERVICE->getAssetRefs(Assets::Types::Script);
+				//Display combo box for script selection
+				ImGui::Text("Button Script: ");
+				if (ImGui::Combo(std::string("##ButtonScript" + button_name).c_str(), &script_index, get_load_scripts.data(), static_cast<int>(get_load_scripts.size()))) {
+					// Validate the selected index and get the new font ID
+					if (script_index >= 0 && script_index < static_cast<int>(get_load_scripts.size())) {
+						button_event.script_id = get_load_scripts[script_index];
+					}
+				}
+			}
+
+			//Select script function
+			{
+				if (!button_event.script_id.empty() && NIKE_ASSETS_SERVICE->isAssetRegistered(button_event.script_id)) {
+					// Get all loaded script functions
+					const auto& get_script_functions = NIKE_LUA_SERVICE->getScriptFunctions(NIKE_ASSETS_SERVICE->getAssetPath(button_event.script_id));
+					std::vector<const char*> funcs;
+					funcs.push_back(""); // Add an empty option first
+					//Convert to const char*
+					std::for_each(get_script_functions.begin(), get_script_functions.end(), [&funcs](std::string const& ref) {
+						funcs.push_back(ref.c_str());
+						});
 
 					// Find the index of the currently selected script id in the list
-					int script_index = -1;
-					for (size_t i = 0; i < get_load_scripts.size(); ++i) {
-						if (button.second.script.script_id == get_load_scripts[i]) {
-							script_index = static_cast<int>(i);
+					int start_func_index = -1;
+					for (size_t i = 0; i < funcs.size(); ++i) {
+						if (button_event.start_function == funcs[i]) {
+							start_func_index = static_cast<int>(i);
+							break;
+						}
+					}
+					// Display combo box for script start function selection
+					ImGui::Text("Button OnLoad Function: ");
+					if (ImGui::Combo("##ButtonScriptStartFunc", &start_func_index, funcs.data(), static_cast<int>(funcs.size()))) {
+						// Validate the selected index and set the new start function
+						if (start_func_index >= 0 && start_func_index < static_cast<int>(funcs.size())) {
+							button_event.start_function = funcs[start_func_index];
+						}
+					}
+
+					// Find the index of the currently selected script id in the list
+					int script_func_index = -1;
+					for (size_t i = 0; i < funcs.size(); ++i) {
+						if (button_event.update_function == funcs[i]) {
+							script_func_index = static_cast<int>(i);
 							break;
 						}
 					}
 
-					//Display combo box for script selection
-					ImGui::Text("Button Script: ");
-					if (ImGui::Combo(std::string("##ButtonScript" + button.first).c_str(), &script_index, get_load_scripts.data(), static_cast<int>(get_load_scripts.size()))) {
+					//Display combo box for script function selection
+					ImGui::Text("Button OnUpdate Function: ");
+					if (ImGui::Combo(std::string("##ButtonScriptUpdateFunc" + button_name).c_str(), &script_func_index, funcs.data(), static_cast<int>(funcs.size()))) {
 						// Validate the selected index and get the new font ID
-						if (script_index >= 0 && script_index < static_cast<int>(get_load_scripts.size())) {
-							button.second.script.script_id = get_load_scripts[script_index];
+						if (script_func_index >= 0 && script_func_index < static_cast<int>(funcs.size())) {
+							button_event.update_function = funcs[script_func_index];
 						}
 					}
+
 				}
+			}
 
-				//Select script function
-				{
-					if (!button.second.script.script_id.empty() && NIKE_ASSETS_SERVICE->isAssetRegistered(button.second.script.script_id)) {
-						// Get all loaded script functions
-						const auto& get_script_functions = NIKE_LUA_SERVICE->getScriptFunctions(NIKE_ASSETS_SERVICE->getAssetPath(button.second.script.script_id));
-						std::vector<const char*> funcs;
-						//Convert to const char*
-						std::for_each(get_script_functions.begin(), get_script_functions.end(), [&funcs](std::string const& ref) {
-							funcs.push_back(ref.c_str());
-							});
+			//Set variadic arguements
+			{
+				//Get arguments
+				auto& args = button_event.named_args;
 
-						// Find the index of the currently selected script id in the list
-						int script_func_index = -1;
-						for (size_t i = 0; i < funcs.size(); ++i) {
-							if (button.second.script.function == funcs[i]) {
-								script_func_index = static_cast<int>(i);
-								break;
-							}
-						}
-
-						//Display combo box for script function selection
-						ImGui::Text("Button Script Function: ");
-						if (ImGui::Combo(std::string("##ButtonScriptFunc" + button.first).c_str(), &script_func_index, funcs.data(), static_cast<int>(funcs.size()))) {
-							// Validate the selected index and get the new font ID
-							if (script_func_index >= 0 && script_func_index < static_cast<int>(funcs.size())) {
-								button.second.script.function = funcs[script_func_index];
-							}
-						}
-					}
+				//Display all arguments
+				ImGui::Text("Arguments:");
+				if (args.empty()) {
+					ImGui::Text("No arguments.");
 				}
-
-				//Set variadic arguements
-				{
-					//Get arguments
-					auto& args = button.second.script.named_args;
-
-					//Display all arguments
-					ImGui::Text("Arguments:");
-					if (args.empty()) {
-						ImGui::Text("No arguments.");
-					}
+				else {
 					for (auto it = args.begin(); it != args.end(); ++it) {
 						const auto& key = it->first;
 						const auto& value = it->second;
 
 						//Display arguments
-						if (ImGui::TreeNode(std::string("Key: " + key + "##" + button.first).c_str())) {
+						if (ImGui::TreeNode(std::string("Key: " + key + "##" + button_name).c_str())) {
+
+							//ImGui::Text("Function: %s", button_event.update_function.c_str());
 
 							//Display value based on its type
 							std::visit(
@@ -5256,91 +5383,167 @@ namespace NIKE {
 							ImGui::TreePop();
 						}
 					}
+				}
+				//Input Variables
+				int& val_type_index = val_type_map[button_name];
+				std::string& named_key = named_key_map[button_name];
+				const size_t MAX_INPUT_SIZE = 256;
+				if (named_key.capacity() < MAX_INPUT_SIZE) {
+					named_key.reserve(MAX_INPUT_SIZE);
+					named_key.resize(MAX_INPUT_SIZE - 1); // Resize to match reserved capacity
+				}
 
-					//Seperator
-					ImGui::Spacing();
+				std::string& str_val = str_val_map[button_name];
+				if (str_val.capacity() < MAX_INPUT_SIZE) {
+					str_val.reserve(MAX_INPUT_SIZE);
+					str_val.resize(MAX_INPUT_SIZE - 1); // Resize to match reserved capacity
+				}
+				int& int_val = int_val_map[button_name];
+				float& float_val = float_val_map[button_name];
+				bool& bool_val = bool_val_map[button_name];
 
-					//Input Variables
-					int& val_type_index = val_type_map[button.first];
-					std::string& named_key = named_key_map[button.first];
-					std::string& str_val = str_val_map[button.first];
-					int& int_val = int_val_map[button.first];
-					float& float_val = float_val_map[button.first];
-					bool& bool_val = bool_val_map[button.first];
+				//Set arguments
+				if (ImGui::InputText(std::string("Input Key##" + button_name).c_str(), named_key.data(), MAX_INPUT_SIZE)) {
+					named_key.resize(strlen(named_key.c_str())); // Trim to actual input length
+				}
 
-					//Set arguments
-					if (ImGui::InputText(std::string("Input Key##" + button.first).c_str(), named_key.data(), named_key.capacity() + 1)) {
-						named_key.resize(strlen(named_key.c_str()));
+				//Select value type
+				ImGui::Combo(std::string("Value Type##" + button_name).c_str(), &val_type_index, "Int\0Float\0String\0Bool\0");
+
+				//Take in input based on selected combo
+				switch (val_type_index) {
+				case 0: {
+					ImGui::InputInt(std::string("Value (int)##" + button_name).c_str(), &int_val);
+					break;
+				}
+				case 1: {
+					ImGui::InputFloat(std::string("Value (float)##" + button_name).c_str(), &float_val);
+					break;
+				}
+				case 2: {
+					if (ImGui::InputText(std::string("Value (string)##" + button_name).c_str(), str_val.data(), str_val.capacity() + 1)) {
+						str_val.resize(strlen(str_val.c_str()));
 					}
+					break;
+				}
+				case 3: {
+					ImGui::Checkbox(std::string("Value (bool)##" + button_name).c_str(), &bool_val);
+					break;
+				}
+				default: {
+					break;
+				}
+				}
 
-					//Select value type
-					ImGui::Combo(std::string("Value Type##" + button.first).c_str(), &val_type_index, "Int\0Float\0String\0Bool\0");
+				//Add argument button
+				if (ImGui::Button(std::string("Add Argument##" + button_name).c_str())) {
 
-					//Take in input based on selected combo
-					switch (val_type_index) {
-					case 0: {
-						ImGui::InputInt(std::string("Value (int)##" + button.first).c_str(), &int_val);
-						break;
-					}
-					case 1: {
-						ImGui::InputFloat(std::string("Value (float)##" + button.first).c_str(), &float_val);
-						break;
-					}
-					case 2: {
-						if (ImGui::InputText(std::string("Value (string)##" + button.first).c_str(), str_val.data(), str_val.capacity() + 1)) {
-							str_val.resize(strlen(str_val.c_str()));
+					//Check if named key is correct
+					if (!named_key.empty() && args.find(named_key) == args.end()) {
+						switch (val_type_index) {
+						case 0: {
+							args[named_key] = int_val;
+							named_key.clear();
+							break;
 						}
-						break;
-					}
-					case 3: {
-						ImGui::Checkbox(std::string("Value (bool)##" + button.first).c_str(), &bool_val);
-						break;
-					}
-					default: {
-						break;
-					}
-					}
-
-					//Add argument button
-					if (ImGui::Button(std::string("Add Argument##" + button.first).c_str())) {
-
-						//Check if named key is correct
-						if (!named_key.empty() && args.find(named_key) == args.end()) {
-							switch (val_type_index) {
-							case 0: {
-								args[named_key] = int_val;
-								named_key.clear();
-								break;
-							}
-							case 1: {
-								args[named_key] = float_val;
-								named_key.clear();
-								break;
-							}
-							case 2: {
-								args[named_key] = str_val;
-								named_key.clear();
-								break;
-							}
-							case 3: {
-								args[named_key] = bool_val;
-								named_key.clear();
-								break;
-							}
-							default: {
-								break;
-							}
-							}
+						case 1: {
+							args[named_key] = float_val;
+							named_key.clear();
+							break;
+						}
+						case 2: {
+							args[named_key] = str_val;
+							named_key.clear();
+							break;
+						}
+						case 3: {
+							args[named_key] = bool_val;
+							named_key.clear();
+							break;
+						}
+						default: {
+							break;
+						}
 						}
 					}
 				}
 
+				//Seperator
+				ImGui::Spacing();
+
+				
+			}
+			ImGui::TreePop();
+		}
+	}
+
+	void LevelEditor::UIPanel::init() {
+		registerPopUp("Create Button", createButtonPopup("Create Button"));
+
+		entities_panel = std::dynamic_pointer_cast<EntitiesPanel>(NIKE_LVLEDITOR_SERVICE->getPanel(EntitiesPanel::getStaticName()));
+	}
+
+	void LevelEditor::UIPanel::render() {
+		ImGui::Begin(getName().c_str());
+
+		//Set window dock id
+		dock_id = ImGui::GetWindowDockID();
+
+		//Create button
+		{
+			if (ImGui::Button("Create Button")) {
+				openPopUp("Create Button");
+			}
+		}
+
+		ImGui::Separator();
+
+		//List of buttons
+		auto& buttons = NIKE_UI_SERVICE->getAllButtons();
+		if (buttons.empty()) {
+			ImGui::Text("No active buttons.");
+		}
+		else {
+			ImGui::Text("Active Buttons: ");
+		}
+
+		//Show all active buttons
+		for (auto& [button_name, button] : buttons) {
+			ImGui::Spacing();
+
+			//Collapsing button
+			if (ImGui::CollapsingHeader(std::string("Button: " + button_name).c_str(), ImGuiTreeNodeFlags_None)) {
+
+				// Enable / Disable button
+				bool disable_button = button.b_disabled;
+				if (ImGui::Checkbox(std::string("Disable Button##" + button_name).c_str(), &disable_button)) {
+					button.b_disabled = disable_button; // Flip the state correctly
+				}
+
+
+				//Set trigger state
+				{
+					//Select Input State
+					static int trigger_index = 0;
+					trigger_index = static_cast<int>(button.input_state);
+					ImGui::Text("Button Input State: ");
+					if (ImGui::Combo(std::string("##ButtonInput" + button_name).c_str(), &trigger_index, "Pressed\0Triggered\0Released\0")) {
+						button.input_state = static_cast<UI::InputStates>(trigger_index);
+					}
+				}
+
+				ImGui::Separator();
+				
+				renderButtonEvent("OnClick", button_name, button);
+				renderButtonEvent("OnHover", button_name, button);
+
+			
 				//Add spacing
 				ImGui::Spacing();
 
 				//Delete Button
-				if (ImGui::Button(std::string("Delete Button##" + button.first).c_str())) {
-					NIKE_UI_SERVICE->destroyButton(button.first);
+				if (ImGui::Button(std::string("Delete Button##" + button_name).c_str())) {
+					NIKE_UI_SERVICE->destroyButton(button_name);
 					break;
 				}
 			}
@@ -5398,6 +5601,8 @@ namespace NIKE {
 				//Do grid mode
 				set_grid_mode.do_action = [&, mode = !b_grid_edit]() {
 					b_grid_edit = mode;
+					// set to grid view
+					main_panel.lock()->setGridState(true);
 					entities_panel.lock()->unselectEntity();
 					};
 
@@ -6570,7 +6775,7 @@ namespace NIKE {
 
 		//Configure viewport size
 		ImVec2 window_size = ImGui::GetContentRegionAvail();
-		float aspect_ratio = NIKE_WINDOWS_SERVICE->getWindow()->getAspectRatio();
+		float aspect_ratio = win_size.x / win_size.y;
 		float viewport_width = window_size.x;
 		float viewport_height = window_size.x / aspect_ratio;
 		if (viewport_height > window_size.y) {
@@ -6586,8 +6791,12 @@ namespace NIKE {
 
 		window_is_selected = ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByPopup);
 
+		//Account for gaps between game viewport and game window
+		auto gaps = NIKE_WINDOWS_SERVICE->getWindow()->getViewportWindowGap();
+		gaps /= 2.0f;
+
 		//Calculate world mouse position
-		world_mouse_pos = { (io.MousePos.x - window_pos.x) * scale.x, (io.MousePos.y - window_pos.y) * scale.y };
+		world_mouse_pos = { (io.MousePos.x - window_pos.x - gaps.x) * scale.x, (io.MousePos.y - window_pos.y - gaps.y) * scale.y };
 		world_mouse_pos.x = world_mouse_pos.x - ((viewport_width * scale.x) / 2.0f) + NIKE_CAMERA_SERVICE->getActiveCamera().position.x;
 		world_mouse_pos.y = -(world_mouse_pos.y - ((viewport_height * scale.y) / 2.0f) - NIKE_CAMERA_SERVICE->getActiveCamera().position.y);
 
@@ -6598,10 +6807,9 @@ namespace NIKE {
 		window_mouse_pos = { (io.MousePos.x - window_pos.x) * scale.x , (io.MousePos.y - window_pos.y) * scale.y };
 
 		//Calculate UV coordinates for cropping when there are gaps
-		Vector2f gaps = NIKE_WINDOWS_SERVICE->getWindow()->getViewportWindowGap();
-		float u_min = gaps.x / 2.0f / win_size.x;
+		float u_min = 0.0f;
 		float u_max = 1.0f - u_min;
-		float v_min = gaps.y / 2.0f / win_size.y;
+		float v_min = 0.0f;
 		float v_max = 1.0f - v_min;
 
 		//Configure UV Offsets

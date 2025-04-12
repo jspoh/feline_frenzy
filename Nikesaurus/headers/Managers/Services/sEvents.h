@@ -92,6 +92,7 @@ namespace NIKE {
 			static void mousescroll_cb(GLFWwindow* pwin, double xoffset, double yoffset);
 			static void windowfocus_cb(GLFWwindow* window, int focused);
 			static void dropfile_cb(GLFWwindow* window, int count, const char** paths);
+			static void cursorenter_cb(GLFWwindow* window, int entered);
 
 			#endif //Expose implementation only to NIKE Engine
 

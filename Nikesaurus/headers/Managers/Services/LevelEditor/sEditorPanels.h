@@ -14,11 +14,10 @@
 #ifndef EDITOR_PANELS_HPP
 #define EDITOR_PANELS_HPP
 
-#include "Components/cRender.h"
-#include "Components/cTransform.h"
-#include "Managers/Services/Assets/sAssets.h"
 #include "Managers/ECS/mCoordinator.h"
+#include "Managers/Services/Assets/sAssets.h"
 #include "Managers/Services/sMetaData.h"
+#include "Managers/Services/sUserInterface.h"
 
 namespace NIKE {
 	namespace LevelEditor {
@@ -155,14 +154,17 @@ namespace NIKE {
 			//Public get debug state
 			bool getDebugState() const;
 
-			//Set Game State
-			void setGameState(bool state);
-
 			//Public get game state
 			bool getGameState() const;
 
+			//Set Game State
+			void setGameState(bool state);
+
 			//Public get grid state
 			bool getGridState() const;
+
+			//Public set Game State
+			void setGridState(bool state);
 
 			//Public get gizmo state
 			bool getGizmoState() const;
@@ -741,6 +743,15 @@ namespace NIKE {
 
 			//Weak reference to entity panel
 			std::weak_ptr<EntitiesPanel> entities_panel;
+
+			// Temporary map to store UI state per button
+			static std::unordered_map<std::string, int> val_type_map;
+			static std::unordered_map<std::string, std::string> named_key_map;
+			static std::unordered_map<std::string, std::string> str_val_map;
+			static std::unordered_map<std::string, int> int_val_map;
+			static std::unordered_map<std::string, float> float_val_map;
+			static std::unordered_map<std::string, bool> bool_val_map;
+
 		public:
 			UIPanel() = default;
 			~UIPanel() = default;
@@ -754,6 +765,8 @@ namespace NIKE {
 			static std::string getStaticName() {
 				return "User Interface Management";
 			}
+
+			void renderButtonEvent(const std::string& event_name, const std::string& button_name, NIKE::UI::UIBtn & button);
 
 			//Init
 			void init() override;

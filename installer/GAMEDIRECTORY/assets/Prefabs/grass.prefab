@@ -1,0 +1,64 @@
+{
+    "Components": {
+        "Animation::Base": {
+            "Animation_Count": 0,
+            "B_PingPong": false,
+            "B_Reverse": false,
+            "Frame_Duration": 0.17000000178813934
+        },
+        "Animation::Sprite": {
+            "End_Index": {
+                "x": 8,
+                "y": 1
+            },
+            "Sheet_Size": {
+                "x": 4,
+                "y": 2
+            },
+            "Start_Index": {
+                "x": 0,
+                "y": 0
+            }
+        },
+        "Render::Texture": {
+            "B_Blend": false,
+            "B_Flip": {
+                "x": false,
+                "y": false
+            },
+            "B_Stretch": false,
+            "Color": {
+                "w": 1.0,
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "Frame_Index": {
+                "x": 0,
+                "y": 0
+            },
+            "Frame_Size": {
+                "x": 8,
+                "y": 1
+            },
+            "Intensity": 0.5,
+            "Texture_ID": "Grass_animation_sprite.png"
+        },
+        "Transform::Transform": {
+            "Position": {
+                "x": -280.05963134765625,
+                "y": -576.0347290039063
+            },
+            "Rotation": 0.0,
+            "Scale": {
+                "x": 87.71672821044922,
+                "y": 59.80685806274414
+            },
+            "Screen Position": false
+        }
+    },
+    "MetaData": {
+        "Layer ID": 1,
+        "Tags": []
+    }
+}

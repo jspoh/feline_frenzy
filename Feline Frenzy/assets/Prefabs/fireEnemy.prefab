@@ -39,6 +39,9 @@
         "Element::Entity": {
             "Element": 1
         },
+        "Element::Combo": {
+            "LastHits": []
+        },
         "Enemy::Attack": {
             "Cooldown": 1.0,
             "Function": "enemyBullet",
@@ -82,7 +85,7 @@
             }
         },
         "Render::Texture": {
-            "B_Blend": false,
+            "B_Blend": true,
             "B_Flip": {
                 "x": false,
                 "y": false
@@ -90,9 +93,9 @@
             "B_Stretch": false,
             "Color": {
                 "w": 1.0,
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
             },
             "Frame_Index": {
                 "x": 0,
@@ -122,7 +125,9 @@
         }
     },
     "MetaData": {
-        "Layer ID": 0,
-        "Tags": []
+        "Layer ID": 1,
+        "Tags": [
+            "enemy"
+        ]
     }
 }

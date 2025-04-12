@@ -16,7 +16,7 @@
 #include "sSerialization.h"
 #include "Lua/sLua.h"
 
-//Forward declaration of friend class
+ //Forward declaration of friend class
 namespace NIKE {
 	namespace Serialization {
 		class Service;
@@ -36,14 +36,24 @@ namespace NIKE {
 			RELEASED
 		};
 
+		inline const char* inputStateToString(InputStates state) {
+			switch (state) {
+			case InputStates::PRESSED:   return "Pressed";
+			case InputStates::TRIGGERED: return "Triggered";
+			case InputStates::RELEASED:  return "Released";
+			default: return "Unknown";
+			}
+		}
+
 		//UI Data Structure
 		struct UIBtn {
 			Entity::Type entity_id;
 			bool b_hovered;
 			InputStates input_state;
-			Lua::Script script;
+			std::unordered_map<std::string, Lua::Script> scripts;
+			bool b_disabled;
 
-			UIBtn() : entity_id{ 0 }, b_hovered{ false }, input_state{ InputStates::TRIGGERED }, script() {};
+			UIBtn() : entity_id{ 0 }, b_hovered{ false }, input_state{ InputStates::TRIGGERED }, b_disabled{ false } {};
 
 			nlohmann::json serialize() const;
 
@@ -54,19 +64,19 @@ namespace NIKE {
 		struct ChangeBtnTxtRatio : Events::IEvent {
 			Vector2f ratio;
 
-			ChangeBtnTxtRatio() : ratio(){}
+			ChangeBtnTxtRatio() : ratio() {}
 			ChangeBtnTxtRatio(Vector2f const& ratio) : ratio{ ratio } {}
 		};
 
 		//User Interface Service
-		class NIKE_API Service 
-			:	public Events::IEventListener<Input::KeyEvent>,
-				public Events::IEventListener<Input::MouseMovedEvent>,
-				public Events::IEventListener<Input::MouseBtnEvent>,
-				public Events::IEventListener<ChangeBtnTxtRatio> {
+		class NIKE_API Service
+			: public Events::IEventListener<Input::KeyEvent>,
+			public Events::IEventListener<Input::MouseMovedEvent>,
+			public Events::IEventListener<Input::MouseBtnEvent>,
+			public Events::IEventListener<ChangeBtnTxtRatio> {
 
-		//Friend class
-		friend class NIKE::Serialization::Service;
+			//Friend class
+			friend class NIKE::Serialization::Service;
 
 		private:
 			//On key btn event
@@ -120,6 +130,11 @@ namespace NIKE {
 			//Default destructor
 			~Service() = default;
 
+			// Game overlay
+			bool is_pause_initialized;
+			bool is_how_to_play_overlay;
+			std::unordered_map<Entity::Type, bool> inRangeEntities;
+
 			//Create Shaped button
 			Entity::Type createButton(std::string const& btn_id, Transform::Transform&& trans, Render::Text&& text, Render::Shape&& shape, Animation::Sprite&& sprite = Animation::Sprite());
 
@@ -128,6 +143,9 @@ namespace NIKE {
 
 			//Destroy button
 			void destroyButton(std::string const& btn_id);
+
+			//Set button disabled
+			void setButtonDisabled(std::string const& btn_id, bool disable);
 
 			//Check button hovered
 			bool isButtonHovered(std::string const& btn_id) const;
@@ -138,6 +156,9 @@ namespace NIKE {
 			//Get all buttons
 			std::unordered_map<std::string, UI::UIBtn>& getAllButtons();
 
+			//Find a button
+			UI::UIBtn* getButton(const std::string& buttonName);
+
 			//Destroy all buttons
 			void destroyAllButtons();
 
@@ -147,11 +168,13 @@ namespace NIKE {
 			//Check if UI ID has been registered
 			bool checkUIEntity(std::string const& btn_id);
 
-			//Set button script
-			void setButtonScript(std::string const& btn_id, Lua::Script const& script);
+			// Set button script 
+			// button_event is OnClick / OnHover
+			void setButtonScript(std::string const& btn_id, Lua::Script const& script, std::string const& button_event);
 
-			//Get button script
-			Lua::Script getButtonScript(std::string const& btn_id) const;
+			// Get button script
+			// button_event is OnClick / OnHover
+			Lua::Script getButtonScript(std::string const& btn_id, std::string const& button_event) const;
 
 			//Set button input state
 			void setButtonInputState(std::string const& btn_id, InputStates state);
@@ -164,9 +187,12 @@ namespace NIKE {
 
 			//UI Update function
 			void update();
+
+			// Update volume slider function
+			void updateVolumeSliderPositions();
 		};
 
 		//Re-enable DLL Export warning
-		#pragma warning(default: 4251)
+#pragma warning(default: 4251)
 	}
 }

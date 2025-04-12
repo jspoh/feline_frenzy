@@ -4,7 +4,7 @@
  *
  * \author Bryan Lim, 2301214, bryanlicheng.l@digipen.edu (35%)
  * \co-author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (35%)
- * \co-author Sean Gwee, 2301326, g.boonxuensean@digipen.edu (30%)
+ * \co-author Sean Gwee, g.boonxuensean@digipen.edu (30%)
  * \date   September 2024
  *  All content � 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
@@ -19,13 +19,13 @@
 namespace NIKE {
 	namespace Audio {
 		//Temporary Disable DLL Export Warning
-		#pragma warning(disable: 4251)
+#pragma warning(disable: 4251)
 
-		/*****************************************************************//**
-		* Abstract Audio Classes
-		*********************************************************************/
+/*****************************************************************//**
+* Abstract Audio Classes
+*********************************************************************/
 
-		//Abstract audio class
+//Abstract audio class
 		class IAudio {
 		private:
 		public:
@@ -33,14 +33,20 @@ namespace NIKE {
 			IAudio() = default;
 			virtual ~IAudio() = default;
 
+			//Lock audio
+			virtual void lock(unsigned int offset, unsigned int length, void** ptr1, void** ptr2, unsigned int* len1, unsigned int* len2) = 0;
+
+			//Unlock audio
+			virtual void unlock(void* ptr1, void* ptr2, unsigned int len1, unsigned int len2) = 0;
+
 			//Release Audio
 			virtual void release() = 0;
 
 			//Get audio file path
 			virtual std::string getFilePath() const = 0;
 
-			//Get length of audio ( Milliseconds )
-			virtual unsigned int getLength() const = 0;
+			//Get length of audio
+			virtual unsigned int getLength(NIKE_AUDIO_TIMEUNIT time_unit) const = 0;
 
 			//Set audio mode
 			virtual void setMode(NIKE_AUDIO_MODE mode) = 0;
@@ -131,8 +137,8 @@ namespace NIKE {
 			virtual ~IChannel() = default;
 
 			//Stop audio playing in channel
-			virtual void stop() = 0; 
-			
+			virtual void stop() = 0;
+
 			//Set state of channel
 			virtual void setPaused(bool state) = 0;
 
@@ -155,16 +161,16 @@ namespace NIKE {
 			virtual float getPitch() const = 0;
 
 			//Set channel loop count ( -1 loop indefinitely )
-			virtual void setLoopCount(int count) = 0; 
+			virtual void setLoopCount(int count) = 0;
 
 			//Get channel loop count
 			virtual int getLoopCount() const = 0;
 
 			//Set channel loop point ( Milliseconds )
-			virtual void setLoopPoints(unsigned int start, unsigned int end) = 0;
+			virtual void setLoopPoints(unsigned int start, unsigned int end, NIKE_AUDIO_TIMEUNIT time_unit) = 0;
 
 			//Get audio loop point ( Milliseconds )
-			virtual Vector2<unsigned int> getLoopPoints() const = 0;
+			virtual Vector2<unsigned int> getLoopPoints(NIKE_AUDIO_TIMEUNIT time_unit) const = 0;
 
 			//Set channel mute
 			virtual void setMute(bool state) = 0;
@@ -177,6 +183,12 @@ namespace NIKE {
 
 			//Get channel mode
 			virtual NIKE_AUDIO_MODE getMode() const = 0;
+
+			//Set channel position
+			virtual void setPosition(unsigned int position, NIKE_AUDIO_TIMEUNIT time_unit) = 0;
+
+			//Get channel position
+			virtual unsigned int getPosition(NIKE_AUDIO_TIMEUNIT time_unit) const = 0;
 
 			//Get sound in channel
 			virtual std::shared_ptr<IAudio> getSound() const = 0;
@@ -199,8 +211,14 @@ namespace NIKE {
 			//Create Sound Audio
 			virtual std::shared_ptr<Audio::IAudio> createSound(std::string const& file_path) = 0;
 
+			//Create Sound audio ( Manual )
+			virtual std::shared_ptr<Audio::IAudio> createSound(const char* name_or_data, unsigned int mode, void* exinfo) = 0;
+
 			//Create Stream Audio ( For music )
 			virtual std::shared_ptr<Audio::IAudio> createStream(std::string const& file_path) = 0;
+
+			//Create stream audio ( Manual )
+			virtual std::shared_ptr<Audio::IAudio> createStream(const char* name_or_data, unsigned int mode, void* exinfo) = 0;
 
 			//Create channel group
 			virtual std::shared_ptr<Audio::IChannelGroup> createChannelGroup(std::string const& identifier) = 0;
@@ -218,7 +236,7 @@ namespace NIKE {
 		/*****************************************************************//**
 		* DLL Build Implementation
 		*********************************************************************/
-		#ifdef NIKE_BUILD_DLL //Expose implementation only to NIKE Engine
+#ifdef NIKE_BUILD_DLL //Expose implementation only to NIKE Engine
 
 		//NIKE Audio
 		class NIKEAudio : public IAudio {
@@ -232,11 +250,15 @@ namespace NIKE {
 
 			FMOD::Sound* getAudio();
 
+			void lock(unsigned int offset, unsigned int length, void** ptr1, void** ptr2, unsigned int* len1, unsigned int* len2) override;
+
+			void unlock(void* ptr1, void* ptr2, unsigned int len1, unsigned int len2) override;
+
 			void release() override;
 
 			std::string getFilePath() const override;
 
-			unsigned int getLength() const override;
+			unsigned int getLength(NIKE_AUDIO_TIMEUNIT time_unit) const override;
 
 			void setMode(NIKE_AUDIO_MODE) override;
 
@@ -329,9 +351,9 @@ namespace NIKE {
 
 			int getLoopCount() const override;
 
-			void setLoopPoints(unsigned int start, unsigned int end) override;
+			void setLoopPoints(unsigned int start, unsigned int end, NIKE_AUDIO_TIMEUNIT time_unit) override;
 
-			Vector2<unsigned int> getLoopPoints() const override;
+			Vector2<unsigned int> getLoopPoints(NIKE_AUDIO_TIMEUNIT time_unit) const override;
 
 			void setMute(bool state) override;
 
@@ -340,6 +362,10 @@ namespace NIKE {
 			void setMode(NIKE_AUDIO_MODE mode) override;
 
 			NIKE_AUDIO_MODE getMode() const override;
+
+			void setPosition(unsigned int position, NIKE_AUDIO_TIMEUNIT time_unit) override;
+
+			unsigned int getPosition(NIKE_AUDIO_TIMEUNIT time_unit) const override;
 
 			std::shared_ptr<IAudio> getSound() const override;
 
@@ -362,7 +388,11 @@ namespace NIKE {
 
 			std::shared_ptr<Audio::IAudio> createSound(std::string const& file_path) override;
 
+			std::shared_ptr<Audio::IAudio> createSound(const char* name_or_data, unsigned int mode, void* exinfo) override;
+
 			std::shared_ptr<Audio::IAudio> createStream(std::string const& file_path) override;
+
+			std::shared_ptr<Audio::IAudio> createStream(const char* name_or_data, unsigned int mode, void* exinfo) override;
 
 			std::shared_ptr<Audio::IChannelGroup> createChannelGroup(std::string const& identifier) override;
 
@@ -373,7 +403,7 @@ namespace NIKE {
 			void shutdown() override;
 		};
 
-		#endif //Expose implementation only to NIKE Engine
+#endif //Expose implementation only to NIKE Engine
 
 		/*****************************************************************//**
 		* Audio Service
@@ -399,6 +429,24 @@ namespace NIKE {
 			//Map of groups
 			static std::unordered_map<std::string, std::shared_ptr<Audio::IChannelGroup>> channel_groups;
 
+			//Static channel group ID
+			std::string bgm_channel_group_id;
+			std::string sfx_channel_group_id;
+			// Turns out "channel group" is just a singular channel so need to add another "channel" group to have 2 tracks playing together
+			std::string bgmc_channel_group_id;
+
+			// Define the global volume variables.
+			float gGlobalBGMVolume = 0.5f;  // Default volume for BGM (range 0.0 - 1.0)
+			float gGlobalSFXVolume = 0.5f;  // Default volume for SFX (range 0.0 - 1.0)
+			// BGM fading variables
+			// In Audio::Service private section:
+			float bgmFadeDuration = 0.0f;       // Total fade duration in seconds.
+			float bgmFadeTimeRemaining = 0.0f;    // Time remaining in the fade.
+			bool  bgmFadeInProgress = false;      // True if a fade is active.
+			bool  bgmFadingIn = false;            // True for fade in, false for fade out.
+			float bgmFadeStartVolume = 0.0f;      // Volume when fade started.
+			float bgmFadeTargetVolume = 0.0f;     // Volume we want to reach at the end.
+
 			// Playlist Management
 			struct Playlist {
 				std::deque<std::string> tracks;
@@ -406,7 +454,7 @@ namespace NIKE {
 			};
 
 			//Queue for each channel's playlist
-			std::unordered_map<std::string , Playlist> channel_playlists;
+			std::unordered_map<std::string, Playlist> channel_playlists;
 
 		public:
 
@@ -417,7 +465,7 @@ namespace NIKE {
 			~Service() = default;
 
 			//Init Audio Service
-			void init(std::shared_ptr<Audio::IAudioSystem> audio_sys);
+			void init(nlohmann::json const& config);
 
 			//Get Audio System
 			std::shared_ptr<Audio::IAudioSystem> getAudioSystem() const;
@@ -447,20 +495,42 @@ namespace NIKE {
 			bool checkChannelGroupExist(std::string const& channel_id);
 			bool checkChannelExist(std::string const& channel_id);
 
+			//Get BGM Channel Group
+			std::string getBGMChannelGroupID() const;
+
+			//Get SFX Channel Group
+			std::string getSFXChannelGroupID() const;
+
+			//Getter for BGMC channel group ID.
+			std::string getBGMCChannelGroupID() const;
+
 			//Play Audio
 			//Channel retrieval: channel_id has to be specified & bool loop has to be true ( channel_id = "" or loop = false, if retrieval is not needed )
 			//Channel ID will override each other if the same id is specified more than once
 			void playAudio(std::string const& audio_id, std::string const& channel_id, std::string const& channel_group_id, float vol, float pitch, bool loop, bool is_music, bool start_paused = false);
+			
+			float getGlobalBGMVolume() const;
+			void setGlobalBGMVolume(float vol);
+
+			float getGlobalSFXVolume() const;
+			void setGlobalSFXVolume(float vol);
+
+			// Fading BGM between scenes functions
+			void BGMFadeIn(float fadeTime);
+			void BGMFadeOut(float fadeTime);
+
+			// Save volume settings...
+			void saveAudioConfig(nlohmann::json& config_data);
 
 			/**
 			 * pauses all audio.
-			 * 
+			 *
 			 */
 			void pauseAllChannels();
 
 			/**
 			 * resumes all audio.
-			 * 
+			 *
 			 */
 			void resumeAllChannels();
 
@@ -499,10 +569,16 @@ namespace NIKE {
 			// Deserialize
 			void deserializeAudioChannels(nlohmann::json const& data);
 
+			// Get the current BGM track for the scene.
+			std::string getBGMTrackForScene();
+
+			// Get current BGMC track for scene
+			std::string getBGMCTrackForScene();
+
 		};
 
 		//Re-enable DLL Export warning
-		#pragma warning(default: 4251)
+#pragma warning(default: 4251)
 	}
 }
 

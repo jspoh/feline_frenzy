@@ -1,0 +1,38 @@
+{
+    "Components": {
+        "Render::Text": {
+            "Color": {
+                "w": 0.0,
+                "x": 0.2666666805744171,
+                "y": 0.7921568751335144,
+                "z": 1.0
+            },
+            "Font_ID": "Skranji-Bold.ttf",
+            "Origin": 0,
+            "Scale": 1.0,
+            "Size": {
+                "x": 571.0,
+                "y": 45.0
+            },
+            "Text": "A Portal Has Appeared!"
+        },
+        "Transform::Transform": {
+            "Position": {
+                "x": 0.0,
+                "y": 300.0
+            },
+            "Rotation": 0.0,
+            "Scale": {
+                "x": 1.0,
+                "y": 1.0
+            },
+            "Screen Position": true
+        }
+    },
+    "MetaData": {
+        "Layer ID": 4,
+        "Tags": [
+            "screen_text"
+        ]
+    }
+}

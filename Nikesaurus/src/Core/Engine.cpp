@@ -18,6 +18,7 @@
 #include "Systems/Render/sysRender.h"
 #include "Systems/GameLogic/sysInteraction.h"
 #include "Managers/Services/State Machine/enemyUtils.h"
+#include <ShlObj.h>
 
 namespace NIKE {
 
@@ -111,7 +112,6 @@ namespace NIKE {
 		NIKE_ECS_MANAGER->addSystemComponentType<Physics::Manager>(NIKE_ECS_MANAGER->getComponentType<Physics::Dynamics>());
 		NIKE_ECS_MANAGER->addSystemComponentType<Physics::Manager>(NIKE_ECS_MANAGER->getComponentType<Physics::Collider>());
 		NIKE_ECS_MANAGER->addSystemComponentType<Physics::Manager>(NIKE_ECS_MANAGER->getComponentType<Transform::Transform>());
-		//game_logic_sys->registerLuaSystem(physics_sys);
 
 		//Register animation manager
 		NIKE_ECS_MANAGER->registerSystem<Animation::Manager>(false);
@@ -187,9 +187,6 @@ namespace NIKE {
 		//Set up event callbacks
 		NIKE_WINDOWS_SERVICE->getWindow()->setupEventCallbacks();
 
-		//Setup input modes
-		NIKE_WINDOWS_SERVICE->getWindow()->setInputMode(NIKE_CURSOR, NIKE_CURSOR_NORMAL);
-
 		//Add event listeners for window resized
 		NIKE_EVENTS_SERVICE->addEventListeners<Windows::WindowResized>(NIKE_WINDOWS_SERVICE->getWindow());
 		NIKE_EVENTS_SERVICE->addEventListeners<Windows::WindowFocusEvent>(NIKE_WINDOWS_SERVICE->getWindow());
@@ -221,6 +218,7 @@ namespace NIKE {
 		//Add event listeners for mouse event
 		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseBtnEvent>(NIKE_INPUT_SERVICE);
 		NIKE_EVENTS_SERVICE->addEventListeners<Input::MouseBtnEvent>(NIKE_UI_SERVICE);
+		NIKE_EVENTS_SERVICE->addEventListeners<Input::CursorEnterEvent>(NIKE_INPUT_SERVICE);
 
 
 		//Add event listeners for mouse move event
@@ -235,7 +233,7 @@ namespace NIKE {
 		NIKE_PATH_SERVICE->init(json_config);
 
 		//Init Audio
-		NIKE_AUDIO_SERVICE->init(std::make_shared<Audio::NIKEAudioSystem>());
+		NIKE_AUDIO_SERVICE->init(json_config);
 
 		//Initialize assets service
 		NIKE_ASSETS_SERVICE->init(NIKE_AUDIO_SERVICE->getAudioSystem());
@@ -320,6 +318,9 @@ namespace NIKE {
 		//update UI First
 		NIKE_UI_SERVICE->update();
 
+		//Update input service
+		NIKE_INPUT_SERVICE->update();
+
 		//Swap Buffers
 		NIKE_WINDOWS_SERVICE->getWindow()->swapBuffers();
 
@@ -330,11 +331,6 @@ namespace NIKE {
 	}
 
 	void Core::Engine::run() {
-
-		using namespace NIKE::SysParticle;
-		//NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem("mouseps1", Data::ParticlePresets::BASE, {window_size.x / 2.f, window_size.y / 2.f}, Data::ParticleRenderType::CIRCLE, -1.f, false);
-		//NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem("mouseps2", Data::ParticlePresets::CLUSTER, { window_size.x / 2.f, window_size.y / 2.f }, Data::ParticleRenderType::CIRCLE, -1.f, false);
-		//NIKE::SysParticle::Manager::getInstance().addActiveParticleSystem("mouseps3", Data::ParticlePresets::FIRE, { window_size.x / 2.f, window_size.y / 2.f }, Data::ParticleRenderType::CIRCLE, -1.f, false);
 
 		//Update loop
 		while (NIKE_WINDOWS_SERVICE->getWindow()->windowState()) {
@@ -349,14 +345,14 @@ namespace NIKE {
 			}
 
 			//Escape Key
-			if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_ESCAPE)) {
-				if (NIKE_WINDOWS_SERVICE->getWindow()->getFullScreen()) {
-					NIKE_WINDOWS_SERVICE->getWindow()->setFullScreen(false);
-				}
-				else {
-					NIKE_WINDOWS_SERVICE->getWindow()->terminate();
-				}
-			}
+			//if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_ESCAPE)) {
+			//	if (NIKE_WINDOWS_SERVICE->getWindow()->getFullScreen()) {
+			//		NIKE_WINDOWS_SERVICE->getWindow()->setFullScreen(false);
+			//	}
+			//	else {
+			//		NIKE_WINDOWS_SERVICE->getWindow()->terminate();
+			//	}
+			//}
 
 			//Toggle full screen
 			if (NIKE_INPUT_SERVICE->isKeyPressed(NIKE_KEY_LEFT_CONTROL) && NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_KEY_ENTER)) {
@@ -379,6 +375,53 @@ namespace NIKE {
 				//Implement update logic
 				updateLogic();
 			}
+		}
+		// Updating Config.json (currently only for volume settings)
+		try {
+
+			static char documents_path[MAX_PATH] = "";
+
+			// Get the path to the Desktop folder
+			if (SHGetFolderPathA(NULL, CSIDL_PERSONAL, NULL, 0, documents_path) != S_OK) {
+				cerr << "Failed to get desktop path!" << endl;
+			}
+
+			// Open crash log file
+			std::string configFilePath(std::string{ documents_path } + R"(\feline-frenzy-logs\AudioSettings.json)");
+
+			NIKEE_CORE_INFO("Attempting to save configuration to {}", configFilePath);
+			// 1. Load the current config data
+			nlohmann::json current_config_data = NIKE_SERIALIZE_SERVICE->loadJsonFile(configFilePath);
+
+			// Check if loading failed (e.g., file didn't exist or was invalid)
+			if (current_config_data.is_null()) {
+				NIKEE_CORE_WARN("Config file '{}' not found or invalid on shutdown. Creating new object for saving.", configFilePath);
+				current_config_data = nlohmann::json::object(); // Start with an empty object
+			}
+
+			// 2. Update the JSON object with current audio settings
+			NIKE_AUDIO_SERVICE->saveAudioConfig(current_config_data);
+
+			// --- Add calls here to save other services' settings if needed ---
+			// Example: NIKE_SOME_OTHER_SERVICE->saveSettings(current_config_data);
+
+			// Ensure the directory exists
+			std::filesystem::create_directories(std::filesystem::path(configFilePath).parent_path());
+
+			// 3. Save the modified JSON back to the file
+			std::fstream file(configFilePath, std::ios::out | std::ios::trunc);
+			if (file.is_open()) {
+				file << current_config_data.dump(4); // Use dump(4) for pretty printing
+				file.close();
+				NIKEE_CORE_INFO("Successfully saved configuration to {}", configFilePath);
+			}
+			else {
+				NIKEE_CORE_ERROR("Failed to open {} for saving configuration.", configFilePath);
+			}
+		}
+		catch (const std::exception& e) {
+			// Catch potential errors during load/save
+			NIKEE_CORE_ERROR("Exception caught during config save: {}", e.what());
 		}
 
 		//Stop watching all directories

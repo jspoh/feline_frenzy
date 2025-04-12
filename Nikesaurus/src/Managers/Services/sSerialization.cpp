@@ -134,7 +134,10 @@ namespace NIKE {
 				}
 
 				//Deserialize data into component
-				comp_registry->deserializeComponent(comp_name, NIKE_ECS_MANAGER->getEntityComponent(entity, comp_type).get(), comp_data);
+				if (auto comp = NIKE_ECS_MANAGER->getEntityComponent(entity, comp_type))
+				{
+					comp_registry->deserializeComponent(comp_name, comp.get(), comp_data);
+				}
 			}
 			else {
 				success = false;
@@ -175,8 +178,12 @@ namespace NIKE {
 		//Json Data
 		nlohmann::json data;
 
+#ifndef NDEBUG
 		//Open file stream
 		std::fstream file(file_path, std::ios::in | std::ios::out);
+#else
+		std::ifstream file(file_path, std::ios::in);
+#endif
 
 		//Return if there is no data
 		if (!std::filesystem::exists(file_path))
@@ -210,8 +217,8 @@ namespace NIKE {
 		}
 
 		//Load prefab metadata
-		if (!data.contains("MetaData")) {
-			success = NIKE_METADATA_SERVICE->deserializePrefabData(meta_data, data);
+		if (data.contains("MetaData")) {
+			success = NIKE_METADATA_SERVICE->deserializePrefabData(meta_data, data.at("MetaData"));
 		}
 		else {
 			success = false;
@@ -317,8 +324,12 @@ namespace NIKE {
 		//Json Data
 		nlohmann::json data;
 
+#ifndef NDEBUG
 		//Open file stream
 		std::fstream file(file_path, std::ios::in | std::ios::out);
+#else
+		std::ifstream file(file_path, std::ios::in);
+#endif
 
 		//Return if there is no data
 		if (!std::filesystem::exists(file_path))
@@ -356,8 +367,12 @@ namespace NIKE {
 		//Get file path
 		auto file_path = NIKE_ASSETS_SERVICE->getAssetPath(prefab_id);
 
+#ifndef NDEBUG
 		//Open file stream
 		std::fstream file(file_path, std::ios::in | std::ios::out);
+#else
+		std::ifstream file(file_path, std::ios::in);
+#endif
 
 		//Return if there is no data
 		if (!std::filesystem::exists(file_path))
@@ -385,6 +400,42 @@ namespace NIKE {
 		//Close file
 		file.close();
 	}
+
+	nlohmann::json Serialization::Service::serializePlayerData(Entity::Type player) {
+		// Create a new JSON object
+		nlohmann::json playerData;
+
+		// Get player health
+		if (auto healthComp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(player)) {
+			playerData["Health"] = healthComp.value().get().health;
+		}
+
+		// Get equipped element
+		if (auto elementComp = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(player)) {
+			playerData["Element"] = static_cast<int>(elementComp.value().get().element);
+		}
+
+		return playerData;
+	}
+
+
+	bool Serialization::Service::deserializePlayerData(Entity::Type player, nlohmann::json const& data) {
+		// Check if the JSON contains player data
+		if (data.contains("Health")) {
+			if (auto healthComp = NIKE_ECS_MANAGER->getEntityComponent<Combat::Health>(player)) {
+				healthComp.value().get().health = data["Health"];
+			}
+		}
+
+		if (data.contains("Element")) {
+			if (auto elementComp = NIKE_ECS_MANAGER->getEntityComponent<Element::Entity>(player)) {
+				elementComp.value().get().element = static_cast<Element::Elements>(data["Element"]);
+			}
+		}
+
+		return true; // Return success
+	}
+
 
 	/*****************************************************************//**
 	* Scenes
@@ -516,8 +567,12 @@ namespace NIKE {
 		//Json Data
 		nlohmann::json data;
 
+#ifndef NDEBUG
 		//Open file stream
 		std::fstream file(file_path, std::ios::in | std::ios::out);
+#else
+		std::ifstream file(file_path, std::ios::in);
+#endif
 
 		//Read data from file
 		file >> data;
@@ -643,8 +698,12 @@ namespace NIKE {
 		//Json Data
 		nlohmann::json data;
 
+#ifndef NDEBUG
 		//Open file stream
-		std::fstream file(file_path, std::ios::in);
+		std::fstream file(file_path, std::ios::in | std::ios::out);
+#else
+		std::ifstream file(file_path, std::ios::in);
+#endif
 
 		//Return empty data if there is no data
 		if (!std::filesystem::exists(file_path))

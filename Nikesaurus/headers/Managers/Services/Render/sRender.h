@@ -6,7 +6,7 @@
  * \co-author Sean Gwee, 2301326, g.boonxuensean@digipen.edu (50%)
  * \date   September 2024
  *
- * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ * All content 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 
 #include "Managers/Services/Render/sShader.h"
@@ -14,6 +14,7 @@
 #include "Components/cPhysics.h"
 #include "Components/cRender.h"
 #include "Managers/Services/Render/sParticle.h"
+#include "Managers/Services/Render/sVideoPlayer.h"
 
 #ifndef RENDER_SERVICE_HPP
 #define RENDER_SERVICE_HPP
@@ -56,8 +57,28 @@ namespace NIKE {
 			TextBuffer() : vao{ 0 }, vbo{ 0 } {};
 		};
 
+		enum class FADE_STATE {
+			NONE = 0,
+			FADE_IN,
+			FADE_OUT
+		};
+
 		class Service : public Events::IEventListener<Windows::WindowResized> {
 			private:
+				/* this fbo effects affect entire screen */
+				unsigned int fbo{};
+				unsigned int fbo_texture{};
+				float fbo_opacity{1.f};
+
+				FADE_STATE fade_state{ FADE_STATE::NONE };
+
+				float fade_duration{};
+				float fade_elapsed_time{};
+
+				void fadeInHelper();
+				void fadeOutHelper();
+
+				/* end fbo effects */
 
 				//Delete Copy Constructor & Copy Assignment
 				Service(Service const& copy) = delete;
@@ -71,6 +92,9 @@ namespace NIKE {
 
 				//Particle system
 				std::unique_ptr<SysParticle::Manager> particle_manager;
+
+				//Video manager
+				std::unique_ptr<VideoPlayer::Manager> video_manager;
 
 				//Text buffer for rendering text
 				TextBuffer text_buffer;
@@ -101,6 +125,8 @@ namespace NIKE {
 
 			public:
 
+				unsigned int getFbo() const { return fbo; }
+
 				//Rendering constants
 				const bool BATCHED_RENDERING = true;
 				static constexpr unsigned int MAX_INSTANCES = 500;
@@ -116,6 +142,16 @@ namespace NIKE {
 				*********************************************************************/
 
 				void init();
+
+				/*****************************************************************//**
+				* SHADERS
+				*********************************************************************/
+
+				//Bind shader
+				void bindShader(std::string const& shader_ref);
+
+				//Unbind shader
+				void unbindShader();
 
 				/*****************************************************************//**
 				* FRAME BUFFERS
@@ -156,26 +192,23 @@ namespace NIKE {
 				//Render Texture
 				void renderObject(Matrix_33 const& x_form, Render::Texture const& e_texture);
 
+				//Render Video
+				void renderObject(Matrix_33 const& x_form, Render::Video const& e_video);
+
 				//Render Bounding Box
 				void renderBoundingBox(Matrix_33 const& x_form, Vector4f const& e_color);
 
 				//Render text
 				void renderText(Matrix_33 const& x_form, Render::Text& e_text);
 
+				//Render Cursor
+				void renderCursor(bool is_crosshair, bool cursor_entered);
+
+				//Render particle system
+				void renderParticleSystem(const NIKE::SysParticle::ParticleSystem& ps, bool use_screen_pos = false, const std::string& texture_ref = std::string{});
+
 				//Render entity
 				void renderComponents(std::unordered_map<std::string, std::shared_ptr<void>> comps, bool debug = false);
-
-				// render particle system
-
-				/**
-				 * use shader prefix (without '_') as ref.
-				 * 
-				 * preset follows NIKE::SysParticle::Data::particle_preset_map
-				 * render_type follows NIKE::SysParticle::Data::particle_render_type_map
-				 * 
-				 * \param ref
-				 */
-				void renderParticleSystem(int preset, const Vector2f& origin, int render_type, int draw_count=1, bool use_screen_pos = false);
 
 				/*****************************************************************//**
 				* BATCH RENDERING
@@ -206,6 +239,18 @@ namespace NIKE {
 				* RENDER COMPLETION CALL
 				*********************************************************************/
 				void completeRender();
+
+				/*****************************************************************//**
+				* SPECIAL EFFECTS
+				*********************************************************************/
+
+				void fadeIn(float duration);
+
+				void fadeOut(float duration);
+
+				float getFboOpacity() const;
+
+				FADE_STATE getFadeState() const;
 		};
 	}
 }

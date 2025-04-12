@@ -1,0 +1,56 @@
+{
+    "Components": {
+        "Audio::SFX": {
+            "Audio_ID": "ChangeElement.wav",
+            "B_Play_SFX": false,
+            "Channel_Group_ID": "EnvironmentSFX",
+            "Pitch": 1.0,
+            "Volume": 1.0
+        },
+        "Element::Source": {
+            "Element": 1
+        },
+        "Render::Texture": {
+            "B_Blend": true,
+            "B_Flip": {
+                "x": false,
+                "y": false
+            },
+            "B_Stretch": false,
+            "Color": {
+                "w": 0.0,
+                "x": 0.9489796161651611,
+                "y": 0.2614535689353943,
+                "z": 0.0
+            },
+            "Frame_Index": {
+                "x": 0,
+                "y": 0
+            },
+            "Frame_Size": {
+                "x": 1,
+                "y": 1
+            },
+            "Intensity": 0.09000001847743988,
+            "Texture_ID": "Fire icon.png"
+        },
+        "Transform::Transform": {
+            "Position": {
+                "x": -24.32012939453125,
+                "y": 367.5151062011719
+            },
+            "Rotation": 0.0,
+            "Scale": {
+                "x": 215.8861541748047,
+                "y": 215.8861541748047
+            },
+            "Screen Position": false
+        }
+    },
+    "MetaData": {
+        "Layer ID": 3,
+        "Tags": [
+            "element_src"
+        ]
+    }
+}

@@ -4,7 +4,7 @@
  *
  * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (100%)
  * \date   September 2024
- * All content © 2024 DigiPen Institute of Technology Singapore, all rights reserved.
+ * All content ï¿½ 2024 DigiPen Institute of Technology Singapore, all rights reserved.
  *********************************************************************/
 #pragma once
 
@@ -15,6 +15,20 @@
 
 namespace NIKE {
 	namespace MetaData {
+
+		//Parent entity
+		struct Parent {
+			std::set<std::string> childrens;
+
+			Parent() {};
+		};
+
+		//Children entity
+		struct Child {
+			std::string parent;
+
+			Child() : parent{ "" } {}
+		};
 
 		//Data Type
 		struct EntityData {
@@ -40,10 +54,13 @@ namespace NIKE {
 			//Dynamic tagging
 			std::set<std::string> tags;
 
+			//Parent or child
+			std::variant<Parent, Child> relation;
+
 			//Constructors
-			EntityData() : name{ "entity_" }, prefab_id{ "" }, b_locked{ false }, layer_id{ 0 }, layer_order{ 0 } {}
+			EntityData() : name{ "entity_" }, prefab_id{ "" }, b_locked{ false }, layer_id{ 0 }, layer_order{ 0 }, relation{ Parent() } {}
 			EntityData(std::string const& name)
-				: name{ name }, prefab_id{ "" }, b_locked{ false }, layer_id{ 0 }, layer_order{ 0 } {}
+				: name{ name }, prefab_id{ "" }, b_locked{ false }, layer_id{ 0 }, layer_order{ 0 }, relation{ Parent() } {}
 
 			//Serialize data
 			nlohmann::json serialize() const;
@@ -162,6 +179,9 @@ namespace NIKE {
 			//Check if entity is locked
 			bool checkEntityLocked(Entity::Type entity) const;
 
+			//Check if entity tag check
+			bool checkEntityTagExist(Entity::Type entity) const;
+
 			//Set Entity layer ID
 			void setEntityLayerID(Entity::Type entity, unsigned int layer_id);
 
@@ -173,6 +193,30 @@ namespace NIKE {
 
 			//Get Entity layer order
 			size_t getEntityLayerOrder(Entity::Type entity) const;
+
+			//Update relation
+			void updateRelation();
+
+			//Set Entity Relation Parent Type
+			void setEntityParentRelation(Entity::Type entity);
+
+			//Set Entity Relation Child Type
+			void setEntityChildRelation(Entity::Type entity);
+
+			//Set Entity Child's Parent
+			void setEntityChildRelationParent(Entity::Type entity, std::string const& parent_name);
+
+			//Get Entity Relation
+			std::variant<Parent, Child> getEntityRelation(Entity::Type entity) const;
+
+			//Get all parents
+			std::vector<const char*> getAllParents() const;
+
+			//Check if parent is valid
+			bool checkParent(Entity::Type entity) const;
+
+			//Check if parent is valid
+			bool checkParent(std::string const& parent_name) const;
 
 			//Clone MetaData except for name
 			void cloneEntityData(Entity::Type entity, Entity::Type clone);
@@ -215,6 +259,8 @@ namespace NIKE {
 
 			//Deserialize data
 			void deserialize(nlohmann::json const& data);
+
+			void setEntityPrefab(Entity::Type entity, std::string const& prefab_id);
 		};
 	}
 }

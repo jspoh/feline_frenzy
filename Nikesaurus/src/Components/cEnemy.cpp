@@ -136,6 +136,7 @@ namespace NIKE {
 			// Serialize
 			[](Spawner const& comp) -> nlohmann::json {
 				return {
+					{ "EnemyElement", comp.enemy_element},
 					{ "EnemyLimit", comp.enemy_limit},
 					{ "EnemiesSpawned", comp.enemies_spawned},
 					{ "Cooldown", comp.cooldown },
@@ -145,6 +146,7 @@ namespace NIKE {
 
 			// Deserialize
 			[](Spawner& comp, nlohmann::json const& data) {
+				comp.enemy_element = data.at("EnemyElement").get<Element::Elements>();
 				comp.enemy_limit = data.at("EnemyLimit").get<int>();
 				comp.enemies_spawned = data.at("EnemiesSpawned").get<int>();
 				comp.cooldown = data.at("Cooldown").get<float>();
@@ -155,6 +157,9 @@ namespace NIKE {
 			[](Spawner const& comp, Spawner const& other_comp) -> nlohmann::json {
 				nlohmann::json delta;
 
+				if (comp.enemy_element != other_comp.enemy_element) {
+					delta["EnemyElement"] = comp.enemy_element;
+				}
 				if (comp.enemy_limit != other_comp.enemy_limit) {
 					delta["EnemyLimit"] = comp.enemy_limit;
 				}
@@ -173,6 +178,9 @@ namespace NIKE {
 
 			// Override Deserialize for Spawner
 			[](Spawner& comp, nlohmann::json const& delta) {
+				if (delta.contains("EnemyElement")) {
+					comp.enemy_element = delta["EnemyElement"];
+				}
 				if (delta.contains("EnemyLimit")) {
 					comp.enemy_limit = delta["EnemyLimit"];
 				}
@@ -336,6 +344,38 @@ namespace NIKE {
 
 				ImGui::Text("Edit Spawner Variables:");
 
+				// For Enemy Element
+				{
+					ImGui::Text("Enemy Element:");
+					static const char* elements_names[] = { "RANDOM", "FIRE", "WATER", "GRASS" };
+
+					static Element::Elements before_change_element;
+					static int previous_element = static_cast<int>(comp.enemy_element);
+					int current_element = static_cast<int>(comp.enemy_element);
+
+					if (ImGui::Combo("##Element", &current_element, elements_names, IM_ARRAYSIZE(elements_names))) {
+						Element::Elements new_element = static_cast<Element::Elements>(current_element);
+						if (new_element != comp.enemy_element) {
+							// Save action
+							LevelEditor::Action save_element;
+							save_element.do_action = [&, enemy_element = new_element]() {
+								comp.enemy_element = enemy_element;
+								};
+
+							// Undo action
+							save_element.undo_action = [&, enemy_element = before_change_element]() {
+								comp.enemy_element = enemy_element;
+								};
+
+							NIKE_LVLEDITOR_SERVICE->executeAction(std::move(save_element));
+
+							// Update the previous value
+							before_change_element = comp.enemy_element;
+							// Apply the new element
+							comp.enemy_element = new_element;
+						}
+					}
+				}
 				// For Enemy Limit
 				{
 					static int before_change_limit;

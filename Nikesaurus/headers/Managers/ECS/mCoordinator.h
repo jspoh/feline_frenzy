@@ -32,6 +32,7 @@ namespace NIKE {
 			std::unique_ptr<Entity::Manager> entity_manager;
 			std::unique_ptr<Component::Manager> component_manager;
 			std::unique_ptr<System::Manager> system_manager;
+			static int nextEntityId;
 
 		public:
 

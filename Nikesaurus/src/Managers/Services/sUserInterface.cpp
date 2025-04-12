@@ -1,5 +1,5 @@
 ﻿/*****************************************************************//**
- * \file   sUserInterface.h
+ * \file   sUserInterface.cpp
  * \brief
  *
  * \author Ho Shu Hng, 2301339, shuhng.ho@digipen.edu (100%)
@@ -8,25 +8,38 @@
  *********************************************************************/
 
 #include "Core/stdafx.h"
-#include "Managers/Services/sUserInterface.h"
 #include "Core/Engine.h"
 
+#include "Managers/Services/sUserInterface.h"
 #include "Systems/GameLogic/sysInteraction.h"
 
 namespace NIKE {
 
 	nlohmann::json UI::UIBtn::serialize() const {
-		return	{
-		{"Input_State", static_cast<int>(input_state)},
-		{"Script", script.serialize()}
+		nlohmann::json script_data;
+
+		for (const auto& [event_type, script] : scripts) {
+			script_data[event_type] = script.serialize(); // Serialize each script
+		}
+
+		return {
+			{"Disabled", b_disabled},
+			{"Input_State", static_cast<int>(input_state)},
+			{"Scripts", script_data} // Store all scripts
 		};
 	}
 
 	void UI::UIBtn::deserialize(nlohmann::json const& data) {
+		b_disabled = data.value("Disabled", false);
 		input_state = data.value("Input_State", UI::InputStates::TRIGGERED);
 
-		if (data.contains("Script")) {
-			script.deserialize(data["Script"]);
+		if (data.contains("Scripts")) {
+			const auto& script_data = data["Scripts"];
+			for (auto it = script_data.begin(); it != script_data.end(); ++it) {
+				Lua::Script script;
+				script.deserialize(it.value());
+				scripts[it.key()] = script; // Assign deserialized script to the correct event type
+			}
 		}
 	}
 
@@ -111,8 +124,8 @@ namespace NIKE {
 		mouse_pos = event->window_pos - (gaps / 2);
 
 		//Check if mouse is over any entity currently
-		std::for_each(ui_entities.begin(), ui_entities.end(), 
-			[&event](std::pair<std::string, UIBtn> entity){
+		std::for_each(ui_entities.begin(), ui_entities.end(),
+			[&event](std::pair<std::string, UIBtn> entity) {
 				if (entity.second.b_hovered) {
 					event->setEventProcessed(true);
 					return;
@@ -161,19 +174,19 @@ namespace NIKE {
 					vert.push_back(v.pos);
 				}
 				return vert;
-			};
+				};
 
 			vert = getVertices();
-				for (auto& point : vert) {
-					point.x *= (e_transform.scale.x * scale_factor.x);
-					point.y *= (e_transform.scale.y * scale_factor.y);
-					point.x += (e_transform.position.x * scale_factor.x);
-					point.y -= (e_transform.position.y * scale_factor.y);
+			for (auto& point : vert) {
+				point.x *= (e_transform.scale.x * scale_factor.x);
+				point.y *= (e_transform.scale.y * scale_factor.y);
+				point.x += (e_transform.position.x * scale_factor.x);
+				point.y -= (e_transform.position.y * scale_factor.y);
 
-					//Translate model to world coordinates
-					point.x += (window_size.x / 2.0f);
-					point.y += (window_size.y / 2.0f);
-				}
+				//Translate model to world coordinates
+				point.x += (window_size.x / 2.0f);
+				point.y += (window_size.y / 2.0f);
+			}
 		}
 		else {
 			if (!NIKE_ASSETS_SERVICE->isAssetRegistered("square-texture.model")) {
@@ -231,11 +244,19 @@ namespace NIKE {
 			NIKE_SCENES_SERVICE->createLayer();
 		}
 
+		if (!NIKE_METADATA_SERVICE->isNameValid(btn_id)) {
+			NIKEE_CORE_ERROR("Button has already been created");
+			return uint16_t(-1);
+		}
+
+
 		//Place always place UI entity at the top layer
 		UIBtn btn;
 		btn.entity_id = NIKE_ECS_MANAGER->createEntity();
+		NIKE_METADATA_SERVICE->setEntityName(btn.entity_id, btn_id);
 		NIKE_METADATA_SERVICE->setEntityLayerID(btn.entity_id, NIKE_SCENES_SERVICE->getLayerCount() - 1);
 		btn.b_hovered = false;
+		btn.b_disabled = false;
 		ui_entities[btn_id] = btn;
 
 		//Add components for UI
@@ -265,11 +286,18 @@ namespace NIKE {
 			NIKE_SCENES_SERVICE->createLayer();
 		}
 
+		if (!NIKE_METADATA_SERVICE->isNameValid(btn_id)) {
+			NIKEE_CORE_ERROR("Button has already been created");
+			return uint16_t(-1);
+		}
+
 		//Place always place UI entity at the top layer
 		UIBtn btn;
 		btn.entity_id = NIKE_ECS_MANAGER->createEntity();
+		NIKE_METADATA_SERVICE->setEntityName(btn.entity_id, btn_id);
 		NIKE_METADATA_SERVICE->setEntityLayerID(btn.entity_id, NIKE_SCENES_SERVICE->getLayerCount() - 1);
 		btn.b_hovered = false;
+		btn.b_disabled = false;
 		ui_entities[btn_id] = btn;
 
 		//Add components for UI
@@ -311,6 +339,15 @@ namespace NIKE {
 		//Erase button
 		it = ui_entities.erase(it);
 	}
+	void UI::Service::setButtonDisabled(std::string const& btn_id, bool disable) {
+		//Check if button exists
+		auto it = ui_entities.find(btn_id);
+		if (it == ui_entities.end()) {
+			throw std::runtime_error("Button doesnt exist.");
+		}
+
+		it->second.b_disabled = disable;
+	}
 
 	bool UI::Service::isButtonHovered(std::string const& btn_id) const {
 
@@ -326,40 +363,58 @@ namespace NIKE {
 
 	bool UI::Service::isButtonClicked(std::string const& btn_id, int keyorbtn_code) {
 
-		if (ui_entities.at(btn_id).b_hovered) {
-			input_checks[keyorbtn_code].first = true;
+		// Get the entity once instead of multiple calls
+		auto it = ui_entities.find(btn_id);
+
+		if (it == ui_entities.end()) {
+			return false; // Button not found
 		}
-		else {
+
+		auto& entity = it->second;
+		// If not hovered, return false and update input check
+		if (!entity.b_hovered) {
 			input_checks[keyorbtn_code].first = false;
 			return false;
 		}
 
+		input_checks[keyorbtn_code].first = true;
+
 		bool return_state = false;
 
 		//Return state & if button hovered
-		switch (ui_entities.at(btn_id).input_state) {
+		switch (entity.input_state) {
 		case InputStates::PRESSED:
-			return input_checks[keyorbtn_code].second.pressed;
+			return_state = input_checks[keyorbtn_code].second.pressed;
 			break;
 		case InputStates::TRIGGERED:
 			return_state = input_checks[keyorbtn_code].second.triggered;
-			input_checks[keyorbtn_code].second.triggered = false;
-			return return_state;
+
 			break;
 		case InputStates::RELEASED:
 			return_state = input_checks[keyorbtn_code].second.released;
-			input_checks[keyorbtn_code].second.released = false;
-			return return_state;
 			break;
 		default:
 			break;
 		}
 
-		return false;
+		// Reset input
+		input_checks[keyorbtn_code].second.pressed = false;
+		input_checks[keyorbtn_code].second.triggered = false;
+		input_checks[keyorbtn_code].second.released = false;
+
+		return return_state;
 	}
 
 	std::unordered_map<std::string, UI::UIBtn>& UI::Service::getAllButtons() {
 		return ui_entities;
+	}
+
+	UI::UIBtn* UI::Service::getButton(const std::string& buttonName) {
+		auto it = ui_entities.find(buttonName);
+		if (it != ui_entities.end()) {
+			return &(it->second); // Return a pointer to the button if found
+		}
+		return nullptr; // Return nullptr if button not found
 	}
 
 	void UI::Service::destroyAllButtons() {
@@ -379,22 +434,27 @@ namespace NIKE {
 		return ui_entities.find(btn_id) != ui_entities.end();
 	}
 
-	void UI::Service::setButtonScript(std::string const& btn_id, Lua::Script const& script) {
+	void UI::Service::setButtonScript(std::string const& btn_id, Lua::Script const& script, std::string const& button_event) {
 		auto it = ui_entities.find(btn_id);
 		if (it == ui_entities.end()) {
 			throw std::runtime_error("Button does not exist");
 		}
 
-		it->second.script = script;
+		it->second.scripts[button_event] = script;
 	}
 
-	Lua::Script UI::Service::getButtonScript(std::string const& btn_id) const {
+	Lua::Script UI::Service::getButtonScript(std::string const& btn_id, std::string const& button_event) const {
 		auto it = ui_entities.find(btn_id);
 		if (it == ui_entities.end()) {
 			throw std::runtime_error("Button does not exist");
 		}
 
-		return it->second.script;
+		auto script_it = it->second.scripts.find(button_event);
+		if (script_it == it->second.scripts.end()) {
+			throw std::runtime_error("Script for '" + button_event + "' does not exist");
+		}
+
+		return script_it->second;
 	}
 
 	void UI::Service::setButtonInputState(std::string const& btn_id, InputStates state) {
@@ -432,32 +492,43 @@ namespace NIKE {
 		}
 
 		//Iterate through active entities
-		for (auto& entity : ui_entities) {
+		for (auto& [entity_name, entity] : ui_entities) {
 
-			//Always set UI layer entity to the last layer
-			if (NIKE_METADATA_SERVICE->getEntityLayerID(entity.second.entity_id) != NIKE_SCENES_SERVICE->getLayerCount() - 1) {
-				NIKE_METADATA_SERVICE->setEntityLayerID(entity.second.entity_id, NIKE_SCENES_SERVICE->getLayerCount() - 1);
+			////Always set UI layer entity to the last layer
+			//if (NIKE_METADATA_SERVICE->getEntityLayerID(entity.second.entity_id) != NIKE_SCENES_SERVICE->getLayerCount() - 1) {
+			//	NIKE_METADATA_SERVICE->setEntityLayerID(entity.second.entity_id, NIKE_SCENES_SERVICE->getLayerCount() - 1);
+			//}
+
+#ifndef NDEBUG
+			if (!NIKE_LVLEDITOR_SERVICE->getGameState()) {
+				return;
+			}
+#endif
+			if (entity.b_disabled) {
+				continue;
 			}
 
-			//Reset all input checks to false
+			// Reset all input checks once per frame
 			for (auto& input : input_checks) {
 				input.second.first = false;
 			}
 
 			//Get transform comp
-			auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity.second.entity_id);
+			auto e_transform_comp = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(entity.entity_id);
 			if (!e_transform_comp.has_value()) continue;
 			auto& e_transform = e_transform_comp.value().get();
 
 			//Get text comp
-			auto e_text_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Text>(entity.second.entity_id);
+			auto e_text_comp = NIKE_ECS_MANAGER->getEntityComponent<Render::Text>(entity.entity_id);
 			if (!e_text_comp.has_value()) continue;
 			auto& e_text = e_text_comp.value().get();
 
 			//Get animation comp
-			auto e_animate_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(entity.second.entity_id);
+			auto e_animate_comp = NIKE_ECS_MANAGER->getEntityComponent<Animation::Sprite>(entity.entity_id);
 			if (!e_animate_comp.has_value()) continue;
 			auto& e_animate = e_animate_comp.value().get();
+
+
 
 			//Clamp rotation ( Disable rotating buttons for now )
 			e_transform.rotation = 0.0f;
@@ -478,59 +549,263 @@ namespace NIKE {
 			//Clamp scale
 			e_text.scale = std::clamp(e_text.scale, EPSILON, 10.0f);
 
-			//Check if button is hovered
-			if (buttonHovered(entity.second.entity_id)) {
+			// Lambda to execute scripts if they exist
+			auto executeScriptIfExists = [&](auto& ent, const std::string& scriptName) {
+				auto it = ent.scripts.find(scriptName);
+				if (it != ent.scripts.end() && !it->second.script_id.empty()) {
+					it->second.named_args["entity"] = ent.entity_id; // Set entity default
+					NIKE_LUA_SERVICE->executeScript(it->second);
+				}
+				};
 
-				// Temporary hardcoded SFX (for main menu buttons)
-				if (!entity.second.b_hovered) {
-					Interaction::playOneShotSFX(entity.second.entity_id, "MenuHoverOverSFX.wav", "SFX", 1.0f, 1.0f);
+			// Hovering logic
+			if (buttonHovered(entity.entity_id)) {
+
+				entity.b_hovered = true;
+
+				if (!hover_container[entity_name].b_hovered) {
+					// Store original properties BEFORE modifying them
+					hover_container[entity_name].btn_transform.scale = e_transform.scale;
+					hover_container[entity_name].btn_text.color = e_text.color;
+					hover_container[entity_name].btn_animate = e_animate;
+					hover_container[entity_name].b_hovered = true;
+
+					executeScriptIfExists(entity, "OnHover");
 				}
 
-				entity.second.b_hovered = true;
+				// Apply hover effects
+				e_transform.scale = hover_container[entity_name].btn_transform.scale * 1.05f;
 
-				//Save data before hover
-				if (!hover_container[entity.first].b_hovered) {
-					hover_container[entity.first].btn_transform.scale = e_transform.scale;
-					hover_container[entity.first].btn_text.color = e_text.color;
-					hover_container[entity.first].btn_animate = e_animate;
-					hover_container[entity.first].b_hovered = true;
+				e_text.color.r = std::clamp(hover_container[entity_name].btn_text.color.r + 0.15f, 0.0f, 1.0f);
+				e_text.color.g = std::clamp(hover_container[entity_name].btn_text.color.g + 0.15f, 0.0f, 1.0f);
+				e_text.color.b = std::clamp(hover_container[entity_name].btn_text.color.b + 0.15f, 0.0f, 1.0f);
 
-				}
-
-				//Hover
-				e_transform.scale = hover_container[entity.first].btn_transform.scale * 1.05f;
-
-				//Increase color channel
-				e_text.color.r = hover_container[entity.first].btn_text.color.r + 0.15f;
-				e_text.color.g = hover_container[entity.first].btn_text.color.g + 0.15f;
-				e_text.color.b = hover_container[entity.first].btn_text.color.b + 0.15f;
-
-				//Set start and end index ( ! TO BE MOVED OUT )
-				e_animate.start_index = Vector2i(1, 0);
-				e_animate.end_index = Vector2i(6, 0);
-
-				//Execute script for trigger
-				if (!entity.second.script.script_id.empty() && isButtonClicked(entity.first, NIKE_MOUSE_BUTTON_LEFT)) {
-					// Temporary hardcoded SFX (for main menu buttons)
-					// Get button ID
-					//...
-					Interaction::playOneShotSFX(entity.second.entity_id, "UI_Select.wav", "SFX", 1.0f, 1.0f);
-
-					NIKE_LUA_SERVICE->executeScript(entity.second.script);
+				//Check if button is clicked
+				if (NIKE_INPUT_SERVICE->isKeyTriggered(NIKE_MOUSE_BUTTON_LEFT)) {
+					executeScriptIfExists(entity, "OnClick");
 				}
 			}
 			else {
-				entity.second.b_hovered = false;
-				if (hover_container[entity.first].b_hovered) {
-					e_transform.scale = hover_container[entity.first].btn_transform.scale;
-					e_text.color = hover_container[entity.first].btn_text.color;
-					e_animate = hover_container[entity.first].btn_animate;
-					hover_container[entity.first].b_hovered = false;				
+				entity.b_hovered = false;
+				if (hover_container[entity_name].b_hovered) {
+					e_transform.scale = hover_container[entity_name].btn_transform.scale;
+					e_text.color = hover_container[entity_name].btn_text.color;
+					e_animate = hover_container[entity_name].btn_animate;
+					hover_container[entity_name].b_hovered = false;
 				}
 
 				//Reset polling for Mouse left button
 				input_checks[NIKE_MOUSE_BUTTON_LEFT].first = false;
 			}
+
+		}
+		// ---- Begin of Slider Processing for BGM and SFX ----
+
+		// A static variable to track which slider is currently being dragged.
+		// Allowed values: "BGMSlider", "SFXSlider", or empty if none.
+		static std::string currentlyDraggedSlider = "";
+
+		// Also declare separate static variables for each slider’s original scale.
+		static Vector2f originalBGMSliderScale(0.0f, 0.0f);
+		static Vector2f originalSFXSliderScale(0.0f, 0.0f);
+
+		// If the left mouse button is not pressed at all, then reset the currently dragged slider.
+		if (!NIKE_INPUT_SERVICE->isMousePressed(NIKE_MOUSE_BUTTON_LEFT)) {
+			currentlyDraggedSlider = "";
+		}
+
+		//////////////////////
+		// Process BGM Slider
+		//////////////////////
+		{
+			auto bgmSliderBarOpt = NIKE_METADATA_SERVICE->getEntityByName("BGMSliderBar");
+			auto bgmSliderOpt = NIKE_METADATA_SERVICE->getEntityByName("BGMSlider");
+			if (bgmSliderBarOpt.has_value() && bgmSliderOpt.has_value()) {
+				Entity::Type bgmSliderBar = bgmSliderBarOpt.value();
+				Entity::Type bgmSlider = bgmSliderOpt.value();
+
+				// Retrieve Transform components.
+				auto barTransformOpt = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(bgmSliderBar);
+				auto sliderTransformOpt = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(bgmSlider);
+				if (barTransformOpt.has_value() && sliderTransformOpt.has_value()) {
+					Transform::Transform& barTransform = barTransformOpt.value().get();
+					Transform::Transform& sliderTransform = sliderTransformOpt.value().get();
+
+					// Calculate full horizontal boundaries of the BGMSliderBar.
+					float barLeftFull = barTransform.position.x - (barTransform.scale.x * 0.5f);
+					float barRightFull = barTransform.position.x + (barTransform.scale.x * 0.5f);
+					float barWidth = barRightFull - barLeftFull;
+
+					// Define effective sliding area as the middle 90% (5% margin each side).
+					float margin = barWidth * 0.05f;
+					float barLeft = barLeftFull + margin;
+					float barRight = barRightFull - margin;
+
+					// If this slider is not currently being dragged, update its position based on gGlobalBGMVolume.
+					if (currentlyDraggedSlider == "" || currentlyDraggedSlider == "BGMSlider") {
+						if (currentlyDraggedSlider == "") {
+							// If no slider is active, claim BGMSlider if the mouse is over it.
+							Vector2f mousePos = NIKE_INPUT_SERVICE->getMouseWorldPos();
+							bool mouseOver = (mousePos.x >= sliderTransform.position.x - (sliderTransform.scale.x * 0.5f)) &&
+								(mousePos.x <= sliderTransform.position.x + (sliderTransform.scale.x * 0.5f)) &&
+								(mousePos.y >= sliderTransform.position.y - (sliderTransform.scale.y * 0.5f)) &&
+								(mousePos.y <= sliderTransform.position.y + (sliderTransform.scale.y * 0.5f));
+							if (mouseOver && NIKE_INPUT_SERVICE->isMousePressed(NIKE_MOUSE_BUTTON_LEFT))
+								currentlyDraggedSlider = "BGMSlider";
+						}
+						if (currentlyDraggedSlider == "BGMSlider") {
+							// Store original scale if not already stored.
+							if (originalBGMSliderScale.x == 0.0f && originalBGMSliderScale.y == 0.0f)
+								originalBGMSliderScale = sliderTransform.scale;
+
+							// Get mouse position.
+							Vector2f mousePos = NIKE_INPUT_SERVICE->getMouseWorldPos();
+							// Update slider position if left mouse is pressed.
+							if (NIKE_INPUT_SERVICE->isMousePressed(NIKE_MOUSE_BUTTON_LEFT)) {
+								sliderTransform.scale = originalBGMSliderScale * 1.15f;
+								sliderTransform.position.x = std::clamp(mousePos.x, barLeft, barRight);
+							}
+							if (NIKE_INPUT_SERVICE->isMouseReleased(NIKE_MOUSE_BUTTON_LEFT)) {
+								currentlyDraggedSlider = "";
+								sliderTransform.scale = originalBGMSliderScale;
+							}
+							// Compute new BGM volume.
+							float newBGMVol = (sliderTransform.position.x - barLeft) / (barRight - barLeft);
+							newBGMVol = std::clamp(newBGMVol, 0.0f, 1.0f);
+							NIKE_AUDIO_SERVICE->setGlobalBGMVolume(newBGMVol);
+						}
+					}
+				}
+			}
+		}
+
+		//////////////////////
+		// Process SFX Slider
+		//////////////////////
+		{
+			auto sfxSliderBarOpt = NIKE_METADATA_SERVICE->getEntityByName("SFXSliderBar");
+			auto sfxSliderOpt = NIKE_METADATA_SERVICE->getEntityByName("SFXSlider");
+			if (sfxSliderBarOpt.has_value() && sfxSliderOpt.has_value()) {
+				Entity::Type sfxSliderBar = sfxSliderBarOpt.value();
+				Entity::Type sfxSlider = sfxSliderOpt.value();
+
+				// Retrieve Transform components.
+				auto barTransformOpt = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(sfxSliderBar);
+				auto sliderTransformOpt = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(sfxSlider);
+				if (barTransformOpt.has_value() && sliderTransformOpt.has_value()) {
+					Transform::Transform& barTransform = barTransformOpt.value().get();
+					Transform::Transform& sliderTransform = sliderTransformOpt.value().get();
+
+					// Calculate full horizontal boundaries of the SFXSliderBar.
+					float barLeftFull = barTransform.position.x - (barTransform.scale.x * 0.5f);
+					float barRightFull = barTransform.position.x + (barTransform.scale.x * 0.5f);
+					float barWidth = barRightFull - barLeftFull;
+
+					// Define effective sliding area (middle 90% with 5% margin on each side).
+					float margin = barWidth * 0.05f;
+					float barLeft = barLeftFull + margin;
+					float barRight = barRightFull - margin;
+
+					// If this slider is not currently being dragged, update its position based on gGlobalSFXVolume.
+					if (currentlyDraggedSlider == "" || currentlyDraggedSlider == "SFXSlider") {
+						if (currentlyDraggedSlider == "") {
+							// If no slider is active, claim SFXSlider if the mouse is over it.
+							Vector2f mousePos = NIKE_INPUT_SERVICE->getMouseWorldPos();
+							bool mouseOver = (mousePos.x >= sliderTransform.position.x - (sliderTransform.scale.x * 0.5f)) &&
+								(mousePos.x <= sliderTransform.position.x + (sliderTransform.scale.x * 0.5f)) &&
+								(mousePos.y >= sliderTransform.position.y - (sliderTransform.scale.y * 0.5f)) &&
+								(mousePos.y <= sliderTransform.position.y + (sliderTransform.scale.y * 0.5f));
+							if (mouseOver && NIKE_INPUT_SERVICE->isMousePressed(NIKE_MOUSE_BUTTON_LEFT))
+								currentlyDraggedSlider = "SFXSlider";
+						}
+						if (currentlyDraggedSlider == "SFXSlider") {
+							// Store original scale if not already stored.
+							if (originalSFXSliderScale.x == 0.0f && originalSFXSliderScale.y == 0.0f)
+								originalSFXSliderScale = sliderTransform.scale;
+
+							// Get mouse position.
+							Vector2f mousePos = NIKE_INPUT_SERVICE->getMouseWorldPos();
+							// Update slider position if left mouse is pressed.
+							if (NIKE_INPUT_SERVICE->isMousePressed(NIKE_MOUSE_BUTTON_LEFT)) {
+								sliderTransform.scale = originalSFXSliderScale * 1.15f;
+								sliderTransform.position.x = std::clamp(mousePos.x, barLeft, barRight);
+							}
+							if (NIKE_INPUT_SERVICE->isMouseReleased(NIKE_MOUSE_BUTTON_LEFT)) {
+								currentlyDraggedSlider = "";
+								sliderTransform.scale = originalSFXSliderScale;
+							}
+							// Compute new SFX volume.
+							float newSFXVol = (sliderTransform.position.x - barLeft) / (barRight - barLeft);
+							newSFXVol = std::clamp(newSFXVol, 0.0f, 1.0f);
+							NIKE_AUDIO_SERVICE->setGlobalSFXVolume(newSFXVol);
+						}
+					}
+				}
+			}
+		}
+		// ---- End of Slider Processing for BGM and SFX ----
+
+	}
+
+	// --- New function to update slider positions from global volume values ---
+	void UI::Service::updateVolumeSliderPositions() {
+		// --- Update BGM Slider Position ---
+		auto bgmSliderBarOpt = NIKE_METADATA_SERVICE->getEntityByName("BGMSliderBar");
+		auto bgmSliderOpt = NIKE_METADATA_SERVICE->getEntityByName("BGMSlider");
+		if (bgmSliderBarOpt.has_value() && bgmSliderOpt.has_value()) {
+			Entity::Type bgmSliderBar = bgmSliderBarOpt.value();
+			Entity::Type bgmSlider = bgmSliderOpt.value();
+
+			// Retrieve Transform components.
+			auto barTransformOpt = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(bgmSliderBar);
+			auto sliderTransformOpt = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(bgmSlider);
+			if (barTransformOpt.has_value() && sliderTransformOpt.has_value()) {
+				Transform::Transform& barTransform = barTransformOpt.value().get();
+				Transform::Transform& sliderTransform = sliderTransformOpt.value().get();
+
+				// Calculate full horizontal boundaries of the BGMSliderBar.
+				float barLeftFull = barTransform.position.x - (barTransform.scale.x * 0.5f);
+				float barRightFull = barTransform.position.x + (barTransform.scale.x * 0.5f);
+				float barWidth = barRightFull - barLeftFull;
+
+				// Define effective sliding area as the middle 90% (5% margin each side).
+				float margin = barWidth * 0.05f;
+				float barLeft = barLeftFull + margin;
+				float barRight = barRightFull - margin;
+
+				// Update slider position based on the current global BGM volume.
+				sliderTransform.position.x = barLeft + (NIKE_AUDIO_SERVICE->getGlobalBGMVolume() * (barRight - barLeft));
+			}
+		}
+
+		// --- Update SFX Slider Position ---
+		auto sfxSliderBarOpt = NIKE_METADATA_SERVICE->getEntityByName("SFXSliderBar");
+		auto sfxSliderOpt = NIKE_METADATA_SERVICE->getEntityByName("SFXSlider");
+		if (sfxSliderBarOpt.has_value() && sfxSliderOpt.has_value()) {
+			Entity::Type sfxSliderBar = sfxSliderBarOpt.value();
+			Entity::Type sfxSlider = sfxSliderOpt.value();
+
+			// Retrieve Transform components.
+			auto barTransformOpt = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(sfxSliderBar);
+			auto sliderTransformOpt = NIKE_ECS_MANAGER->getEntityComponent<Transform::Transform>(sfxSlider);
+			if (barTransformOpt.has_value() && sliderTransformOpt.has_value()) {
+				Transform::Transform& barTransform = barTransformOpt.value().get();
+				Transform::Transform& sliderTransform = sliderTransformOpt.value().get();
+
+				// Calculate full horizontal boundaries of the SFXSliderBar.
+				float barLeftFull = barTransform.position.x - (barTransform.scale.x * 0.5f);
+				float barRightFull = barTransform.position.x + (barTransform.scale.x * 0.5f);
+				float barWidth = barRightFull - barLeftFull;
+
+				// Define effective sliding area (middle 90% with 5% margin on each side).
+				float margin = barWidth * 0.05f;
+				float barLeft = barLeftFull + margin;
+				float barRight = barRightFull - margin;
+
+				// Update slider position based on the current global SFX volume.
+				sliderTransform.position.x = barLeft + (NIKE_AUDIO_SERVICE->getGlobalSFXVolume() * (barRight - barLeft));
+			}
 		}
 	}
-}
+
+} // namespace NIKE
